@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+out/
+AWSCLIV2.pkg
+.DS_Store
+*.mp4
+*.wav
+.env

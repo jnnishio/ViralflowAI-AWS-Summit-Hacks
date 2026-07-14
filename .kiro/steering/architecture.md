@@ -77,28 +77,56 @@ export time for aspect ratio, duration caps, and bitrate.
 ### 3. Highlight detection + processing animation
 Long-running, so orchestrated by **Step Functions** with fan-out:
 - **MediaConvert** — normalize source, emit low-res proxy for the browser editor,
-  extract audio track.
+  extract audio track. (Transcribe rejects media >2GB — always feed it the extracted
+  audio track, never the raw VOD.)
 - **Transcribe** — word-level timestamps (backbone for cutting on sentence boundaries).
-- **Rekognition Video** — shot boundaries, face emotions, labels/activities, on-screen text.
-- **Audio analysis Lambda** — RMS loudness spikes, laughter/cheer energy (cheap, strong signal).
-- **Chat analysis Lambda** — message-rate and emote-burst spikes when a chat log is
-  provided. For live content this is often the single best virality predictor; prioritize it.
+  zh-TW for langlive content; speaker labels on; request SRT/VTT sidecars for export.
+- **Rekognition Video** — shot boundaries (also the clip cut points), face emotions
+  (SURPRISED/HAPPY spikes), face bounding boxes (reused for 9:16 smart-crop panning).
+- **Audio analysis Lambda** — RMS loudness spikes + onset jumps (quiet→scream),
+  laughter/cheer energy (cheap, strong signal).
+- **Chat analysis Lambda** — per-5s-bin features from the platform event log:
+  message-rate z-score, unique chatters, join surges, laugh/slang bursts (哈哈哈, 笑死,
+  666), **VIP/user-level-weighted message value** (a whale reacting ≠ a lurker spamming),
+  and **template-spam suppression** (novelty weight = 1/√(times this exact text repeats
+  in the session) — kills copy-paste fan-club promos that otherwise dominate the peaks).
+  For live content this is often the single best virality predictor; prioritize it.
 
 UI progress is driven by real Step Functions state transitions pushed over an
 API Gateway WebSocket (fallback: poll `GET /jobs/{id}`).
 
 ### The highlight-detection / virality algorithm (Fusion Lambda)
-Slide a window over the timeline; for each candidate compute a weighted composite of
-z-normalized signals (normalized per-VOD so scores are comparable within a stream):
+All signals are resampled onto a common 5-second bin grid and z-normalized per-VOD
+(so scores are comparable within a stream), then combined as a weighted composite:
 
 ```
 score = w_chat·chatSpikeZ + w_audio·audioEnergyZ + w_emotion·faceEmotionPeak
       + w_text·transcriptSalience + w_scene·sceneChangeDensity
 ```
 
-Bedrock then adds the semantic pass: category ("funny moment", "clutch play",
-"hot take"), a one-line title, and the factor breakdown shown in "view score details."
-Keep weights in config for tuning without redeploy.
+- **Per-vertical weight presets** (config, not code — `config/weights.json`):
+  talk/entertainment boosts chat + audio + speech; gaming boosts scene-change + OCR.
+- Peak-pick the smoothed curve, then expand each peak outward while the curve stays
+  elevated (captures build-up, max ~75s), and merge overlapping windows.
+- **Cross-modal validation**: a candidate survives only if ≥2 modalities spike
+  together near the peak. This is the false-positive killer (chat spam without an
+  on-stream moment, loud music without a reaction, scene-change bursts alone).
+- Missing signals degrade gracefully: weights renormalize over whatever modalities
+  are present (e.g. no chat file → audio/visual/speech only).
+
+### The AI Director (Bedrock semantic pass)
+Statistical peaks become publishable clips here. For each surviving candidate,
+Bedrock (Claude) receives the transcript excerpt, the novelty-weighted chat excerpt,
+and up to 3 keyframes (multimodal), and returns:
+- **keep/drop** — is this genuinely clip-worthy, or idle filler that spiked?
+- **Narrative boundaries** — adjusted start/end capturing *setup → payoff*, not just
+  the peak (snap near sentence/shot boundaries).
+- **virality_score** (0–100), **mood** (funny/hype/emotional/impressive/wholesome/
+  controversial), **category** (grouping label for compilation mode).
+- **Platform metadata** — title, ≤12-char on-screen hook, caption, hashtags, in
+  Traditional Chinese + English.
+The per-modality `factors{}` breakdown from fusion is carried through to the clip
+record and drives "view score details."
 
 ### 4. Grid + sort + score details + multi-select / Compilation mode
 All DynamoDB reads. Each clip row holds `{start, end, score, factors{}, category,
@@ -129,7 +157,8 @@ burned-in SRT. "Export raw file" serves the rendered MP4 via presigned GET.
 ## Data model (DynamoDB, single-table friendly)
 
 - `Job`: `jobId, userId, status, targets[], sourceKey, proxyKey, createdAt`
-- `Clip`: `jobId, clipId, start, end, score, factors{}, category, title, thumbKey`
+- `Clip`: `jobId, clipId, start, end, score, factors{}, category, mood, title,
+  titleEn, hook, caption, captionEn, hashtags[], thumbKey`
 - `Edit`: `jobId, editId, clipIds[], edl(json), status`
 - `Export`: `jobId, exportId, platform, outputKey, captions`
 
@@ -152,6 +181,21 @@ upload → analyze pipeline → scored grid → auto-edit EDL → basic editor �
 compilation-mode grouping, freeform LLM edits (chips only at first), simultaneous
 multi-platform export, chat-log ingestion (highest-value signal — add right after
 the core loop works).
+
+## Reference implementation (repo `pipeline/`)
+
+The detection pipeline exists as runnable Python modules, validated on a real 96-min
+langlive VOD (`6910008`) + its event log; the Lambda/Step Functions deployment wraps
+these same stages:
+
+- `pipeline/signals/chat.py` — event-log parsing + engagement features + spam suppression
+- `pipeline/signals/audio.py` — audio-track extraction + RMS/onset energy
+- `pipeline/signals/transcript.py` — Transcribe job mgmt + word-timeline parsing
+- `pipeline/signals/visual.py` — Rekognition shot/face jobs + per-bin visual features
+- `pipeline/fusion.py` — bin/normalize/weight → excitement curve → validated candidates
+- `pipeline/director.py` — Bedrock AI Director (multimodal judging + metadata)
+- `pipeline/render.py` — 9:16 face-guided crop, ASS caption burn-in, hook overlay, thumbnails
+- `pipeline/run.py` — end-to-end local orchestrator (mirrors the Step Functions graph)
 
 ## Non-negotiables to remember
 
