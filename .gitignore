@@ -6,3 +6,4 @@ AWSCLIV2.pkg
 *.mp4
 *.wav
 .env
+data/

@@ -1,0 +1,4 @@
+{
+  "talk": {"chat": 0.40, "audio": 0.25, "speech": 0.15, "visual": 0.20},
+  "gaming": {"chat": 0.35, "audio": 0.20, "speech": 0.10, "visual": 0.35}
+}
