@@ -1,0 +1,31 @@
+[Script Info]
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
+Style: zh,PingFang TC,64,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+
+[Events]
+Format: Layer, Start, End, Style, Text
+Dialogue: 0,0:00:00.00,0:00:04.12,zh,是什麼東西？感覺他們要說很荒唐，
+Dialogue: 0,0:00:04.12,0:00:08.24,zh,誰比較可能會把浣熊當成貓帶回家，
+Dialogue: 0,0:00:10.37,0:00:17.04,zh,321，這什麼東西啦，我想跟你說
+Dialogue: 0,0:00:17.04,0:00:18.29,zh,，當成
+Dialogue: 0,0:00:18.29,0:00:21.18,zh,貓是怎樣，但因為我，我不會，我就
+Dialogue: 0,0:00:21.18,0:00:24.08,zh,算把它當成貓，我也不會帶它回家，
+Dialogue: 0,0:00:24.08,0:00:26.97,zh,因為我超嚴重的貓過敏，所以我肯定
+Dialogue: 0,0:00:26.97,0:00:29.87,zh,是投你啊。對啊，對啊，你家貓也蠻
+Dialogue: 0,0:00:29.87,0:00:30.77,zh,像浣熊的。
+Dialogue: 0,0:00:32.84,0:00:34.74,zh,好。
+Dialogue: 0,0:00:35.61,0:00:38.50,zh,哦，我們那個也稱倒數1分鐘，時間
+Dialogue: 0,0:00:38.50,0:00:39.22,zh,比較清。
+Dialogue: 0,0:00:39.91,0:00:42.32,zh,好，等一下，我們現在目前的那個榜
+Dialogue: 0,0:00:42.32,0:00:44.27,zh,前3的話，倒數最後1分鐘，
+Dialogue: 0,0:00:44.71,0:00:46.15,zh,最後咯，加油
+Dialogue: 0,0:00:46.15,0:00:50.35,zh,加油，好，題目是，誰會自信滿滿地
+Dialogue: 0,0:00:50.35,0:00:53.24,zh,唱錯歌詞，3、2、1。
+Dialogue: 0,0:00:55.80,0:00:57.45,zh,承認，
+Dialogue: 0,0:00:58.72,0:01:02.60,zh,沒有沒有這回事，但其實我們兩個都
+Dialogue: 0,0:01:02.60,0:01:05.76,zh,蠻不常唱錯的，對，意外的，

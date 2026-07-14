@@ -1,0 +1,23 @@
+{
+  "jobId": "job_3654414",
+  "userId": "user_9f2a",
+  "status": "RUNNING",
+  "stage": "DIRECTOR",
+  "targets": ["tiktok", "reels"],
+  "vertical": "talk",
+  "sourceKey": "raw/3654414_video.mp4",
+  "proxyKey": "proxy/3654414_video_proxy.mp4",
+  "progress": {
+    "stage": "DIRECTOR",
+    "pct": 82,
+    "message": "AI Director scoring candidate 9/11 (Bedrock)",
+    "updatedAt": "2026-07-14T09:11:40Z"
+  },
+  "counts": {
+    "candidates": 11,
+    "kept": 8
+  },
+  "error": null,
+  "createdAt": "2026-07-14T08:47:12Z",
+  "updatedAt": "2026-07-14T09:11:40Z"
+}

@@ -150,17 +150,27 @@ def main(argv=None):
 
     brt = boto3.client("bedrock-runtime", region_name=REGION)
     highlights = []
-    for i, cand in enumerate(cands):
+
+    def judge(i_cand):
+        i, cand = i_cand
         try:
-            verdict = judge_candidate(brt, cand, transcript, chats, args.video, args.model)
+            return i, judge_candidate(brt, cand, transcript, chats, args.video, args.model)
         except Exception as e:  # keep going; one bad candidate shouldn't kill the run
             print(f"  candidate {i} ({cand['peak_s']}s) ERROR: {e}")
-            continue
-        status = "KEEP" if verdict.get("keep") else "drop"
-        print(f"  [{status}] {cand['peak_s']:6.0f}s v={verdict.get('virality_score')} "
-              f"{verdict.get('mood','')} | {verdict.get('title_zh','')}")
-        if verdict.get("keep"):
-            highlights.append({**cand, **verdict})
+            return i, None
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for i, verdict in pool.map(judge, enumerate(cands)):
+            if verdict is None:
+                continue
+            cand = cands[i]
+            status = "KEEP" if verdict.get("keep") else "drop"
+            print(f"  [{status}] {cand['peak_s']:6.0f}s v={verdict.get('virality_score')} "
+                  f"{verdict.get('mood','')} | {verdict.get('title_zh','')}")
+            if verdict.get("keep"):
+                highlights.append({**cand, **verdict})
 
     highlights.sort(key=lambda h: -h.get("virality_score", 0))
     out = Path(args.out)

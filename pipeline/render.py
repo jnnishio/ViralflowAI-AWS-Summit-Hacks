@@ -132,8 +132,9 @@ def main(argv=None):
 
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    manifest = []
-    for i, hl in enumerate(hls, 1):
+
+    def render_one(i_hl):
+        i, hl = i_hl
         name = f"clip_{i:02d}_{hl.get('mood','clip')}.mp4"
         out_path = outdir / name
         print(f"rendering {name}  {hl['start_s']:.0f}-{hl['end_s']:.0f}s  v={hl.get('virality_score')}")
@@ -146,11 +147,16 @@ def main(argv=None):
             check=True,
         )
         # field names follow the UI's Clip data model (see .kiro/steering/architecture.md)
-        manifest.append({**{k: hl.get(k) for k in
-                            ("start_s", "end_s", "virality_score", "mood", "category",
-                             "factors", "title_zh", "title_en", "hook_zh", "caption_zh",
-                             "caption_en", "hashtags")},
-                         "file": str(out_path), "thumb": str(thumb)})
+        return {**{k: hl.get(k) for k in
+                   ("start_s", "end_s", "virality_score", "mood", "category",
+                    "factors", "title_zh", "title_en", "hook_zh", "caption_zh",
+                    "caption_en", "hashtags")},
+                "file": str(out_path), "thumb": str(thumb)}
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=3) as pool:  # ffmpeg is multi-threaded; 3 keeps cores busy
+        manifest = list(pool.map(render_one, enumerate(hls, 1)))
     (outdir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
     print(f"{len(manifest)} clips -> {outdir}/")
 
