@@ -1,0 +1,131 @@
+{
+ "edlId": "edl_clip_01_v1",
+ "jobId": "job_3654414",
+ "clipIds": [
+  "clip_01"
+ ],
+ "status": "draft",
+ "canvas": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30
+ },
+ "segments": [
+  {
+   "segmentId": "seg_01",
+   "clipId": "clip_01",
+   "sourceStart": 0,
+   "sourceEnd": 60.0,
+   "timelineStart": 0,
+   "timelineEnd": 60.0,
+   "transitionIn": null,
+   "crop": {
+    "mode": "face_track",
+    "cx": 0.4925
+   }
+  }
+ ],
+ "effects": [],
+ "captions": {
+  "source": "transcribe_word_timeline",
+  "burnIn": true,
+  "style": {
+   "fontName": "PingFang TC",
+   "fontSize": 64,
+   "alignment": 2,
+   "marginV": 220
+  },
+  "overlays": [
+   {
+    "start": 0.0,
+    "end": 0.919,
+    "text": "這個呢是",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 2.08,
+    "end": 8.159,
+    "text": "這個是香菜花生冰心粽，哇，你一定覺得很",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 8.159,
+    "end": 8.909,
+    "text": "好吃。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 10.639,
+    "end": 11.08,
+    "text": "我。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 12.379,
+    "end": 15.439,
+    "text": "等一下等一下，好正經三觀哦，你看，Ohmy",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 15.629,
+    "end": 17.439,
+    "text": "God，哎他怎麼裂開了，他",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 17.59,
+    "end": 22.31,
+    "text": "不是重點是他裡麵真的有香菜，我以為他只是外面這個，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 22.54,
+    "end": 25.82,
+    "text": "鏡頭看一下，拍得到嗎？真的拍得到，",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 26.86,
+    "end": 37.379,
+    "text": "真的是，裡麵有香菜，然後他的表情，跟那個綠綠的香，對，好來，我們就直接講吧，他其實就是那個吧，花蓮的麻",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 37.379,
+    "end": 41.699,
+    "text": "糬吧大概，的，蠻像麻吉的，因為他又冰心啊。",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 42.229,
+    "end": 54.34,
+    "text": "在看到今天有香菜的時候，我就沒有啊，我就問了大家說，哎你們吃香菜嗎？哎，結果全部人都吃哎，然後想說太好了，交給你們",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 54.34,
+    "end": 56.85,
+    "text": "了，沒有，然後哥就說太好了，那就是你的",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 58.56,
+    "end": 59.0,
+    "text": "顧客，",
+    "speaker": "spk_2"
+   }
+  ]
+ },
+ "hookOverlay": {
+  "text": "香菜粽驚魂！",
+  "start": 0,
+  "duration": 2.5,
+  "style": {
+   "fontSize": 88,
+   "fontColor": "white",
+   "borderWidth": 6,
+   "borderColor": "black"
+  }
+ },
+ "musicBed": null
+}

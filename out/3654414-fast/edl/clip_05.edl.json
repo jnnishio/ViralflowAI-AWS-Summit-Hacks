@@ -1,0 +1,149 @@
+{
+ "edlId": "edl_clip_05_v1",
+ "jobId": "job_3654414",
+ "clipIds": [
+  "clip_05"
+ ],
+ "status": "draft",
+ "canvas": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30
+ },
+ "segments": [
+  {
+   "segmentId": "seg_01",
+   "clipId": "clip_05",
+   "sourceStart": 0,
+   "sourceEnd": 60.0,
+   "timelineStart": 0,
+   "timelineEnd": 60.0,
+   "transitionIn": null,
+   "crop": {
+    "mode": "face_track",
+    "cx": 0.6478
+   }
+  }
+ ],
+ "effects": [],
+ "captions": {
+  "source": "transcribe_word_timeline",
+  "burnIn": true,
+  "style": {
+   "fontName": "PingFang TC",
+   "fontSize": 64,
+   "alignment": 2,
+   "marginV": 220
+  },
+  "overlays": [
+   {
+    "start": 0.0,
+    "end": 3.389,
+    "text": "那這個，好，下一題，誰會在吵架的時候，假哭來獲得優勢？3、",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 3.59,
+    "end": 5.54,
+    "text": "2、1，好傷人哦。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 6.919,
+    "end": 7.87,
+    "text": "你是假哭了，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 11.09,
+    "end": 12.149,
+    "text": "罵的，",
+    "speaker": "spk_0"
+   },
+   {
+    "start": 13.0,
+    "end": 21.56,
+    "text": "我覺得他比較可能都是真哭。對，但是你哭這件事情來說，就不可能指向我，所以，哦，對吧？嗯，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 24.35,
+    "end": 24.919,
+    "text": "這什麼題目",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 24.919,
+    "end": 26.8,
+    "text": "啊，這是挑不離間好嗎。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 28.149,
+    "end": 38.029,
+    "text": "所以我們這邊精挑細選，細，OKOK，沒問題，好，沒有，都沒有很好笑，已經要到這樣子，我",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 38.029,
+    "end": 41.35,
+    "text": "這邊很好笑的感覺不能播。",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 42.008,
+    "end": 42.918,
+    "text": "不對，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 45.229,
+    "end": 45.878,
+    "text": "感覺不太",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 45.969,
+    "end": 47.04,
+    "text": "對。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 47.758,
+    "end": 50.409,
+    "text": "姐姐已經",
+    "speaker": "spk_0"
+   },
+   {
+    "start": 51.278,
+    "end": 53.229,
+    "text": "默默的。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 53.758,
+    "end": 55.719,
+    "text": "怎麼樣怎麼樣，你說，諸位",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 55.719,
+    "end": 60.519,
+    "text": "好，誰65歲還會被要求點兒童餐，",
+    "speaker": "spk_2"
+   }
+  ]
+ },
+ "hookOverlay": {
+  "text": "誰在假哭？😭",
+  "start": 0,
+  "duration": 2.5,
+  "style": {
+   "fontSize": 88,
+   "fontColor": "white",
+   "borderWidth": 6,
+   "borderColor": "black"
+  }
+ },
+ "musicBed": null
+}
