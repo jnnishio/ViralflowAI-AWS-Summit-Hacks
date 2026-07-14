@@ -71,6 +71,6 @@ Scalability: every stage is a stateless job on managed services — N VODs fan o
 
 ## 6. Performance Evaluation (成效衡量)
 - **Detection precision**: top-5 clips judged highlight-worthy by a human vs the streamer's own picks (target ≥ 4/5). Cross-modal validation eliminated 100% of chat-template spam false positives on the demo VOD.
-- **Speed**: ~90-min VOD → clips in ≈15 min wall-clock (stages parallelized).
-- **Cost per VOD** (96 min): Transcribe ≈ $2.3, Rekognition shots+faces ≈ $14, Bedrock Director ≈ $0.3, MediaConvert ≈ $1 → **< $20 per VOD**, vs. hours of editor time.
+- **Speed** (measured, 74-min VOD): full-VOD visual analysis ≈ 29 min; **fast mode ≈ 7.5 min** (12 min with cold Transcribe) — candidates detected from chat+audio+speech first, Rekognition face jobs run only on candidate windows, in parallel, overlapped with the Bedrock Director.
+- **Cost per VOD** (measured, 74 min, fast mode): Transcribe ≈ $1.8, Rekognition faces-on-candidates ≈ $1, Bedrock Director ≈ $0.3, render ≈ $1 → **≈ $5 per VOD** (full-VOD visual mode ≈ $17), vs. hours of editor time.
 - **Commercial applicability**: per-VOD SaaS pricing for creators/agencies; platform-side integration (langlive already stores VOD + event logs — zero-friction data source); highlight metadata doubles as content-moderation and engagement analytics.
