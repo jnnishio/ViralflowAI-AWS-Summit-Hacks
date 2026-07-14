@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "edl.schema.json",
+  "title": "EDL",
+  "description": "DRAFT — Edit Decision List. This is the shape of the `edl` field inside the DynamoDB `Edit` item from .kiro/steering/architecture.md (`jobId, editId, clipIds[], edl(json), status`). Produced by the AI auto-edit engine (Bedrock + effects-library manifest) from one or more approved Clips; loaded by the built-in editor (fork of openvideodev/react-video-editor) as initial timeline state. Edits are data, not renders (architecture.md non-negotiable) — only final export hits ffmpeg-on-Fargate.",
+  "type": "object",
+  "required": ["edlId", "jobId", "clipIds", "status", "canvas", "segments", "captions"],
+  "properties": {
+    "edlId": { "type": "string" },
+    "jobId": { "type": "string" },
+    "clipIds": {
+      "type": "array", "items": { "type": "string" },
+      "description": "Source Clip(s) this EDL was generated from. A single-clip EDL has one entry; a compilation-mode EDL concatenates several."
+    },
+    "status": { "type": "string", "enum": ["draft", "approved", "rendered"] },
+    "canvas": {
+      "type": "object", "required": ["width", "height", "fps"],
+      "properties": {
+        "width": { "type": "integer", "description": "1080 for the 9:16 export target used throughout the pipeline (pipeline/render.py scale=1080:1920)." },
+        "height": { "type": "integer" },
+        "fps": { "type": "number" }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "description": "Ordered timeline segments. Each pulls a window from one source Clip's proxy media.",
+      "items": {
+        "type": "object",
+        "required": ["segmentId", "clipId", "sourceStart", "sourceEnd", "timelineStart", "timelineEnd", "crop"],
+        "properties": {
+          "segmentId": { "type": "string" },
+          "clipId": { "type": "string", "description": "Which source Clip (see top-level clipIds) this segment cuts from." },
+          "sourceStart": { "type": "number", "description": "In-point, seconds into the source clip's own [0, end-start] window (NOT the original VOD timeline)." },
+          "sourceEnd": { "type": "number" },
+          "timelineStart": { "type": "number", "description": "Position on the assembled output timeline." },
+          "timelineEnd": { "type": "number" },
+          "transitionIn": {
+            "type": ["object", "null"],
+            "properties": {
+              "type": { "type": "string", "enum": ["cut", "crossfade", "whip_pan"] },
+              "duration": { "type": "number" }
+            },
+            "description": "null/omitted = hard cut."
+          },
+          "crop": {
+            "type": "object", "required": ["mode"],
+            "properties": {
+              "mode": { "type": "string", "enum": ["face_track", "center"] },
+              "cx": {
+                "type": "number", "minimum": 0, "maximum": 1,
+                "description": "Horizontal crop center, 0..1 fraction of source width. Mirrors pipeline/render.py's face_crop_x() — median face-center x inside the window when mode is face_track; 0.5 for center."
+              }
+            }
+          }
+        }
+      }
+    },
+    "effects": {
+      "type": "array",
+      "description": "FAST-FOLLOW: the effects-library manifest (architecture.md section 5 — sound/visual effects with name, type, duration, \"use when\" guidance) doesn't exist yet. This array's shape is illustrative until that manifest is built.",
+      "items": {
+        "type": "object",
+        "required": ["effectId", "type", "at", "duration"],
+        "properties": {
+          "effectId": { "type": "string", "description": "Reference into the (not-yet-built) effects library manifest." },
+          "type": { "type": "string", "enum": ["sound", "visual"] },
+          "at": { "type": "number", "description": "Timeline position, seconds." },
+          "duration": { "type": "number" },
+          "params": { "type": "object" }
+        }
+      }
+    },
+    "captions": {
+      "type": "object",
+      "required": ["source", "burnIn", "overlays"],
+      "properties": {
+        "source": { "type": "string", "const": "transcribe_word_timeline", "description": "Captions are cut directly from the Transcribe word/segment timeline (out/*/transcript.json), reformatted per platform by Bedrock at export time (architecture.md section 7-8)." },
+        "burnIn": { "type": "boolean" },
+        "style": {
+          "type": "object",
+          "description": "Real values pulled from pipeline/render.py's build_ass() ASS style line.",
+          "properties": {
+            "fontName": { "type": "string", "description": "e.g. \"PingFang TC\" (macOS); swap for a Noto Sans CJK TC on Linux render workers." },
+            "fontSize": { "type": "integer" },
+            "alignment": { "type": "integer", "description": "ASS alignment code; 2 = bottom-center." },
+            "marginV": { "type": "integer", "description": "Bottom margin in the 1080x1920 PlayRes, keeps captions clear of platform UI chrome." }
+          }
+        },
+        "overlays": {
+          "type": "array",
+          "description": "Caption lines with timeline-relative timestamps, sliced from transcript.json's `segments` (or `words` for karaoke-style word-level highlighting).",
+          "items": {
+            "type": "object",
+            "required": ["start", "end", "text"],
+            "properties": {
+              "start": { "type": "number" },
+              "end": { "type": "number" },
+              "text": { "type": "string" },
+              "speaker": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "hookOverlay": {
+      "type": ["object", "null"],
+      "description": "The <=12-char on-screen hook line, burned in for the opening seconds. Mirrors render.py's drawtext hook (enable='lt(t,2.5)').",
+      "properties": {
+        "text": { "type": "string" },
+        "start": { "type": "number" },
+        "duration": { "type": "number" },
+        "style": { "type": "object" }
+      }
+    },
+    "musicBed": {
+      "type": ["object", "null"],
+      "description": "FAST-FOLLOW: no music library exists yet; shape is illustrative.",
+      "properties": {
+        "trackId": { "type": "string" },
+        "mood": { "type": "string" },
+        "gainDb": { "type": "number" },
+        "startOffset": { "type": "number" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

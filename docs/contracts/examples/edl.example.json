@@ -1,0 +1,66 @@
+{
+  "edlId": "edl_clip_01_v1",
+  "jobId": "job_3654414",
+  "clipIds": ["clip_01"],
+  "status": "draft",
+  "canvas": { "width": 1080, "height": 1920, "fps": 30 },
+  "segments": [
+    {
+      "segmentId": "seg_01",
+      "clipId": "clip_01",
+      "sourceStart": 0,
+      "sourceEnd": 60,
+      "timelineStart": 0,
+      "timelineEnd": 60,
+      "transitionIn": null,
+      "crop": {
+        "mode": "face_track",
+        "cx": 0.4925
+      }
+    }
+  ],
+  "effects": [],
+  "captions": {
+    "source": "transcribe_word_timeline",
+    "burnIn": true,
+    "style": {
+      "fontName": "PingFang TC",
+      "fontSize": 64,
+      "alignment": 2,
+      "marginV": 220
+    },
+    "overlays": [
+      {
+        "start": 2.08,
+        "end": 8.159,
+        "text": "這個是香菜花生冰心粽，哇，你一定覺得很",
+        "speaker": "spk_2"
+      },
+      {
+        "start": 8.159,
+        "end": 8.909,
+        "text": "好吃。",
+        "speaker": "spk_1"
+      },
+      {
+        "start": 10.639,
+        "end": 11.08,
+        "text": "我。",
+        "speaker": "spk_1"
+      },
+      {
+        "start": 12.379,
+        "end": 15.439,
+        "text": "等一下等一下，好正經三觀哦，你看，Ohmy",
+        "speaker": "spk_1"
+      }
+    ]
+  },
+  "hookOverlay": {
+    "text": "香菜粽驚魂！",
+    "start": 0,
+    "duration": 2.5,
+    "style": { "fontSize": 88, "fontColor": "white", "borderWidth": 6, "borderColor": "black" }
+  },
+  "musicBed": null
+}
