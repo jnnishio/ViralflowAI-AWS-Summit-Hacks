@@ -55,6 +55,7 @@
     "hashtags": { "type": "array", "items": { "type": "string" } },
     "clipKey": { "type": "string", "description": "S3 key of the rendered 9:16 mp4 (presigned-GET by the API). Pipeline's local CLI emits a local path in `file` instead — swap at the Lambda/render layer, not in this schema." },
     "thumbKey": { "type": "string", "description": "S3 key of the peak-frame thumbnail jpg. Pipeline's local CLI emits a local path in `thumb`." },
+    "proxyKey": { "type": ["string", "null"], "description": "S3 key of the low-res proxy mp4 (~540x960) the browser editor loads and the UI can hover-preview. Null when no proxy was produced. Pipeline's local CLI emits a local path in `proxy`." },
     "createdAt": { "type": "string", "format": "date-time" }
   },
   "additionalProperties": false

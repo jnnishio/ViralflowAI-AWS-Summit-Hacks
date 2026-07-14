@@ -41,6 +41,11 @@ def run(argv=None):
     ap.add_argument("--visual-mode", choices=["fast", "full", "off"], default="fast",
                     help="fast: face-detect only candidate windows (default); "
                          "full: whole-VOD Rekognition (4-modal fusion); off: skip visual")
+    ap.add_argument("--emit-contracts", dest="emit_contracts", action="store_true", default=True,
+                    help="emit canonical clips.json + per-clip EDLs (default on)")
+    ap.add_argument("--no-emit-contracts", dest="emit_contracts", action="store_false")
+    ap.add_argument("--upload-s3", action="store_true", default=False,
+                    help="upload clips/thumbs/proxies/manifest/EDLs to S3 + presign (needs live creds)")
     args = ap.parse_args(argv)
 
     out = Path(args.outdir)
@@ -200,6 +205,27 @@ def run(argv=None):
         render_args += ["--visual", str(visual_json)]
     log("render: cutting vertical clips")
     render_mod.main(render_args)
+
+    # ---- 10. emit contract-shaped artifacts (canonical manifest + per-clip EDLs)
+    clips_dir = out / "clips"
+    if args.emit_contracts:
+        from pipeline import contracts, edl as edl_mod
+
+        log("contracts: emitting canonical clips.json")
+        contracts.emit(hl_json, clips_dir / "manifest.json", sid, clips_dir / "clips.json")
+        log("edl: emitting per-clip EDLs")
+        edl_mod.emit(hl_json, sid, out / "edl",
+                     transcript_path=str(transcript_json) if transcript_json.exists() else None,
+                     visual_path=str(visual_json) if visual_json.exists() else None,
+                     top=args.top_clips)
+
+    # ---- 11. publish to S3 (presigned GET URLs) — opt-in, needs live creds
+    if args.upload_s3:
+        from pipeline import publish as publish_mod
+
+        log("publish: uploading artifacts to S3 + presigning")
+        publish_mod.publish(sid, out, args.s3_bucket)
+
     log("DONE")
 
 

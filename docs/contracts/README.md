@@ -36,6 +36,7 @@ DynamoDB:
 | `caption_zh` / `caption_en` | `caption.zh` / `caption.en` |
 | `file` (local path) | `clipKey` (S3 key) |
 | `thumb` (local path) | `thumbKey` (S3 key) |
+| `proxy` (local path) | `proxyKey` (S3 key) |
 | `factors`, `hashtags`, `mood`, `category` | unchanged |
 
 `modalities`, `keep`, and `reason` come from `highlights.json` (the Director's raw output)
@@ -72,6 +73,21 @@ Everything else in the EDL schema is grounded in real pipeline behavior:
   2698s). The full 60s clip has more segments in the real transcript; the example is
   truncated for brevity.
 - `hookOverlay` mirrors `render.py`'s real drawtext hook behavior (first 2.5s).
+
+## Reconciliation with the webapp-skeleton spec
+
+The UI teammate's spec (`.kiro/specs/webapp-skeleton/requirements.md`) defines its own
+`Job` and `Clip` shapes for its stub Lambdas. They're close but not identical to these
+contracts — the deltas below need aligning before the stubs are swapped for real pipeline
+data, or the grid breaks. **These contracts are the canonical target; the stub should move
+toward them.**
+
+| Record | Spec (stub) | Canonical (here) | Action |
+|---|---|---|---|
+| `Clip.title` | flat string | `{zh, en}` object | **Highest-risk drift.** Grid must read `title.zh`/`title.en`, not a string. |
+| `Clip` fields | `score, factors, category, title, thumbKey` only | adds `mood, hook, caption{zh,en}, hashtags, clipKey, proxyKey, peak, modalities, keep` | Stub can omit extras; grid should tolerate them. `clipKey` (video) is separate from `thumbKey`. |
+| `Job.sourceKeys[]` | array (multi-VOD) | `sourceKey` (single) | Pipeline processes one VOD per job today; if multi-upload is kept, promote `sourceKey` → `sourceKeys[]` here. |
+| `Job` fields | no `stage/vertical/progress/counts` | has them | Additive — stub can ignore until wired to real progress. |
 
 ## Open questions / fast-follows
 

@@ -24,6 +24,7 @@
     "hashtags": ["#香菜粽", "#端午節", "#奇怪口味", "#食物挑戰", "#cilantro", "#funnyreaction", "#台灣美食"],
     "clipKey": "clips/3654414/clip_01_funny.mp4",
     "thumbKey": "clips/3654414/clip_01_funny.jpg",
+    "proxyKey": "clips/3654414/clip_01_funny.proxy.mp4",
     "createdAt": "2026-07-14T09:12:03Z"
   },
   {
@@ -51,6 +52,7 @@
     "hashtags": ["#浣熊", "#好笑瞬間", "#直播精華", "#funnymoment", "#livestream", "#台灣直播", "#raccoon"],
     "clipKey": "clips/3654414/clip_02_funny.mp4",
     "thumbKey": "clips/3654414/clip_02_funny.jpg",
+    "proxyKey": "clips/3654414/clip_02_funny.proxy.mp4",
     "createdAt": "2026-07-14T09:12:07Z"
   }
 ]
