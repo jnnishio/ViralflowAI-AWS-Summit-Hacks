@@ -1,0 +1,26 @@
+[Script Info]
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
+Style: zh,PingFang TC,64,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+
+[Events]
+Format: Layer, Start, End, Style, Text
+Dialogue: 0,0:00:00.04,0:00:00.85,zh,是了。
+Dialogue: 0,0:00:03.41,0:00:04.15,zh,山林。
+Dialogue: 0,0:00:06.08,0:00:08.59,zh,度過童明的生活。
+Dialogue: 0,0:00:09.18,0:00:10.95,zh,多走
+Dialogue: 0,0:00:12.09,0:00:12.39,zh,嗯。
+Dialogue: 0,0:00:15.87,0:00:21.52,zh,想想著你是否也曾在此雪下？
+Dialogue: 0,0:00:25.35,0:00:28.51,zh,用什麼詞彙描述
+Dialogue: 0,0:00:31.70,0:00:33.38,zh,大悅工會。
+Dialogue: 0,0:00:33.90,0:00:34.88,zh,不生。
+Dialogue: 0,0:00:36.75,0:00:37.31,zh,然後
+Dialogue: 0,0:00:37.95,0:00:39.99,zh,裡的雨上。
+Dialogue: 0,0:00:40.73,0:00:43.28,zh,最愛上的，
+Dialogue: 0,0:00:46.34,0:00:50.58,zh,此時風景又在你身上造客
+Dialogue: 0,0:00:53.35,0:00:53.57,zh,嗯。
+Dialogue: 0,0:00:56.08,0:00:57.84,zh,是我能
