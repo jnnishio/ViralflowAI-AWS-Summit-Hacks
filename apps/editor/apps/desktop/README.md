@@ -1,24 +1,47 @@
-# OpenCut Desktop
+# Desktop
 
-Built with [GPUI](https://www.gpui.rs).
+The native desktop app, built with [GPUI](https://gpui.rs).
 
-> [!WARNING]
-> Very early. Right now this is just a window that opens.
+## Getting started
 
-## Running
+**1. Install Rust:**
 
-Rust is pinned in `.prototools` at the repo root (`proto use` installs it).
-
-```sh
-moon run desktop:dev     # cargo run
-moon run desktop:check   # cargo check
-moon run desktop:build   # cargo build --release
+```bash
+# Linux / macOS / WSL
+./script/setup-rust
 ```
 
-The first build compiles GPUI from source and takes a while. The root `Cargo.lock` is committed.
+```powershell
+# Windows
+powershell -ExecutionPolicy Bypass -File .\script\setup-rust.ps1
+```
 
-## Platform requirements
+Both scripts skip installation if Rust is already present. On Linux/macOS/WSL only: after a fresh install, reload your shell with `source "$HOME/.cargo/env"`
 
-- **macOS**: Xcode command line tools (Metal renderer).
-- **Windows**: no extra dependencies (Win32 + DirectWrite).
-- **Linux**: renders via Vulkan (Blade), windows via Wayland or X11 (both enabled by default). System packages (Debian/Ubuntu names): `libvulkan1` + working Vulkan drivers, `libwayland-dev`, `libx11-xcb-dev`, `libxkbcommon-x11-dev`, `libfontconfig-dev`, plus a C toolchain and `cmake`.
+**2. Install native dependencies:**
+
+```bash
+# Linux / macOS / WSL
+./apps/desktop/script/setup
+```
+
+```powershell
+# Windows
+powershell -ExecutionPolicy Bypass -File .\apps\desktop\script\setup.ps1
+```
+
+**3. Run:**
+
+```bash
+cargo run -p opencut-desktop
+```
+
+## Platform notes
+
+**Linux:** supports apt (Debian/Ubuntu/Mint), dnf (Fedora/RHEL), and pacman (Arch).
+
+**macOS:** installs Xcode Command Line Tools if missing.
+
+**Windows:** the setup script checks for Visual Studio Build Tools. If missing, it prints the install link.
+
+**WSL:** runs the same scripts as Linux. Window rendering works via WSLg on Windows 11 and Windows 10 22H2+. If you're on an older build, test on the host instead.
