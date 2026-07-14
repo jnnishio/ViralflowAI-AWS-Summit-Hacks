@@ -1,4 +1,4 @@
-# StreamSmith — AI Highlight Clips from Livestream VODs · Proposal Briefing (提案簡報)
+# [Product Name] — AI Highlight Clips from Livestream VODs · Proposal Briefing (提案簡報)
 
 Created by The Waymakers: Jason Nishio, Nelson Nishio, Aaron Lin
 
@@ -6,7 +6,7 @@ Created by The Waymakers: Jason Nishio, Nelson Nishio, Aaron Lin
 https://docs.google.com/document/d/1U9w-FqNHhfgTD3M4OqbhWIHJUrrAoLOEVO5DSZ_FU6s/edit?tab=t.8co3t9wtql91 
 
 ## 1. Solution Overview
-Streamers produce hours of live content, but short-form platforms (TikTok / IG Reels / YouTube Shorts) are where audiences grow. Manually reviewing a 2-hour VOD to cut 5 vertical clips takes an editor half a day. **StreamSmith ingests a livestream VOD plus its platform event log and automatically produces ranked, captioned, 9:16 highlight clips with platform-ready titles and hashtags — in minutes, for dollars.**
+Streamers produce hours of live content, but short-form platforms (TikTok / IG Reels / YouTube Shorts) are where audiences grow. Manually reviewing a 2-hour VOD to cut 5 vertical clips takes an editor half a day. **[Product Name] ingests a livestream VOD plus its platform event log and automatically produces ranked, captioned, 9:16 highlight clips with platform-ready titles and hashtags — in minutes, for dollars.**
 
 Key idea: a highlight is a *cross-modal agreement event* — the chat erupts, the audio peaks, and the scene reacts at the same moment. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
@@ -30,7 +30,7 @@ Key idea: a highlight is a *cross-modal agreement event* — the chat erupts, th
     - Ranked output: clips sorted by virality score so creators publish the best first.
 
 ## 3. User flow (使用者流程)
-1. Creator (or agency) uploads a VOD + event log — or points StreamSmith at the platform's storage bucket.
+1. Creator (or agency) uploads a VOD + event log — or points [Product Name] at the platform's storage bucket.
 2. Pipeline runs automatically (~15 min for a 90-min VOD): signals → fusion → AI Director → render.
 3. Creator opens the gallery: ranked clips with virality scores, moods, captions, hashtags.
 4. One-click download / publish per platform; optional weight presets per content vertical (talk / gaming).
