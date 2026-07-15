@@ -7,7 +7,7 @@ node_modules
 .cursorignore
 .turbo
 
-.env*
+
 !*.env.example
 
 # cursor
