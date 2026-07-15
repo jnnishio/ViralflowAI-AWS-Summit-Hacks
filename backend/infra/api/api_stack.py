@@ -20,6 +20,7 @@ from aws_cdk import (
     Duration,
     RemovalPolicy,
     Stack,
+    IgnoreMode,
     aws_apigateway as apigateway,
     aws_apigatewayv2 as apigwv2,
     aws_apigatewayv2_authorizers as apigwv2_authorizers,
@@ -37,6 +38,7 @@ from aws_cdk import (
 from constructs import Construct
 
 BACKEND_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+REPO_ROOT = os.path.join(BACKEND_ROOT, "..")
 
 # Stage order matches architecture.md's fusion pipeline exactly (Req 6.1).
 NO_OP_STAGES = [
@@ -252,7 +254,12 @@ class ApiStack(Stack):
         
         render_task_def.add_container(
             "RenderContainer",
-            image=ecs.ContainerImage.from_asset(BACKEND_ROOT, file="pipeline/Dockerfile"),
+            image=ecs.ContainerImage.from_asset(
+                REPO_ROOT,
+                file="pipeline/Dockerfile",
+                exclude=["backend/cdk.out", "backend/.venv", ".git"],
+                ignore_mode=IgnoreMode.GIT,
+            ),
             logging=ecs.LogDrivers.aws_logs(stream_prefix="RenderContainer"),
             environment=self._table_env,
         )
@@ -291,8 +298,18 @@ class ApiStack(Stack):
             extra_env=progress_management_env,
         )
         
-        # Audio and visual analysis need the ffmpeg layer, but for now we just define it.
-        # We will add the ffmpeg layer to them later.
+        # Audio and visual analysis need the ffmpeg layer.
+        ffmpeg_layer = lambda_.LayerVersion(
+            self,
+            "FfmpegLayer",
+            code=lambda_.Code.from_asset(
+                os.path.join(BACKEND_ROOT, "lambdas/ffmpeg_layer")
+            ),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_12],
+            description="Static ffmpeg/ffprobe binaries in bin/",
+        )
+        audio_analysis_fn.add_layers(ffmpeg_layer)
+        visual_analysis_fn.add_layers(ffmpeg_layer)
         
         fusion_scoring_fn = self._py_fn(
             "FusionScoringFn",
@@ -403,11 +420,13 @@ class ApiStack(Stack):
 
         render_run_task = sfn_tasks.EcsRunTask(
             self,
-            "RenderClipsFargateTask",
+            "RenderFargateTask",
             integration_pattern=sfn.IntegrationPattern.RUN_JOB,
             cluster=cluster,
             task_definition=render_task_def,
-            launch_type=ecs.LaunchType.FARGATE,
+            launch_target=sfn_tasks.EcsFargateLaunchTarget(
+                platform_version=ecs.FargatePlatformVersion.LATEST,
+            ),
             container_overrides=[
                 sfn_tasks.ContainerOverride(
                     container_definition=render_task_def.default_container,
@@ -523,13 +542,14 @@ class ApiStack(Stack):
             code=lambda_.Code.from_asset(
                 BACKEND_ROOT,
                 exclude=[
-                    ".venv",
                     "cdk.out",
+                    ".venv",
                     "tests",
                     "__pycache__",
                     "*.pyc",
                     ".pytest_cache",
                 ],
+                ignore_mode=IgnoreMode.GIT,
             ),
             timeout=Duration.seconds(30),
             environment=env,

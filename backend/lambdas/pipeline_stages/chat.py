@@ -12,17 +12,14 @@ def handler(event, context):
     s3 = boto3.client('s3')
     
     prefix = f"raw/{job_id}"
-    # By convention, assume the chat log is either uploaded as chat_log.csv or we mock it if missing
-    log_key = f"{prefix}/chat_log.csv"
     out_key = f"{prefix}/chat_signals.json"
     
-    local_log = f"/tmp/{job_id}_chat.csv"
-    try:
-        s3.download_file(bucket, log_key, local_log)
-    except Exception as e:
-        print(f"Chat log not found at {log_key}, skipping or mocking... {e}")
-        # In a real scenario we'd fail or fallback
-        # For now, let's just write an empty result to continue the pipeline
+    # Find the CSV file in sourceKeys
+    source_keys = event.get('sourceKeys', [])
+    log_key = next((k for k in source_keys if k.endswith('.csv')), None)
+    
+    if not log_key:
+        print("No .csv file found in sourceKeys, skipping or mocking...")
         result = {"signal": "chat", "bin_seconds": 5, "series": {"t_s": [], "rate": [], "kappa": []}}
         
         local_out = f"/tmp/{job_id}_chat.json"
@@ -30,6 +27,13 @@ def handler(event, context):
             json.dump(result, f)
         s3.upload_file(local_out, bucket, out_key)
         return {"status": "skipped", "reason": "no chat log"}
+        
+    local_log = f"/tmp/{job_id}_chat.csv"
+    try:
+        s3.download_file(bucket, log_key, local_log)
+    except Exception as e:
+        print(f"Failed to download chat log: {e}")
+        return {"status": "failed", "reason": str(e)}
         
     result = chat.analyze(local_log)
     

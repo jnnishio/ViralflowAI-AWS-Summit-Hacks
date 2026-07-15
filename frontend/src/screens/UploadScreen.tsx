@@ -15,7 +15,7 @@ import {
   type UploadItem,
 } from '../state/uploadStore'
 
-const ACCEPTED_EXTENSIONS = ['mp4', 'mov', 'mkv']
+const ACCEPTED_EXTENSIONS = ['mp4', 'mov', 'mkv', 'csv']
 const MAX_FILES = 10
 
 function extensionOf(filename: string): string {
@@ -174,12 +174,12 @@ export function UploadScreen() {
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".mp4,.mov,.mkv"
+        accept=".mp4,.mov,.mkv,.csv"
         onChange={(event) => {
           handleFilesSelected(event.target.files)
           event.target.value = ''
         }}
-        aria-label="Select VOD files"
+        aria-label="Select VOD and Chat Log files"
         hidden
       />
       <button type="button" onClick={handleAddFilesClick}>
