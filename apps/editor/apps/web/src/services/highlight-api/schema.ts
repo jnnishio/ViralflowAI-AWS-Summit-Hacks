@@ -108,11 +108,11 @@ export const aiEditChipActionSchema = z.enum([
 ]);
 export type AiEditChipAction = z.infer<typeof aiEditChipActionSchema>;
 
-export const aiEditRequestSchema = z.object({
-	prompt: z.string().max(1000).optional(),
-	chipAction: aiEditChipActionSchema.optional(),
+export const aiEditChatMessageSchema = z.object({
+	role: z.enum(["user", "assistant"]),
+	content: z.string(),
 });
-export type AiEditRequest = z.infer<typeof aiEditRequestSchema>;
+export type AiEditChatMessage = z.infer<typeof aiEditChatMessageSchema>;
 
 const edlSegmentSchema = z.object({
 	segmentId: z.string(),
@@ -199,6 +199,19 @@ export const edlSchema = z.object({
 		.optional(),
 });
 export type Edl = z.infer<typeof edlSchema>;
+
+export const aiEditRequestSchema = z.object({
+	prompt: z.string().max(1000).optional(),
+	chipAction: aiEditChipActionSchema.optional(),
+	// Prior turns, sent statelessly by the client each request — there's no
+	// server-side conversation store, so the caller always resends the full
+	// (capped) transcript.
+	history: z.array(aiEditChatMessageSchema).max(20).optional(),
+	// The last-applied-or-proposed Edl, so follow-up prompts ("now also speed
+	// it up") build on the previous turn instead of resetting to the raw clip.
+	baselineEdl: edlSchema.optional(),
+});
+export type AiEditRequest = z.infer<typeof aiEditRequestSchema>;
 
 export const aiEditResponseSchema = z.object({
 	summary: z.string(),
