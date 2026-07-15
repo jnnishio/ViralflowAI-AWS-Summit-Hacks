@@ -6,3 +6,7 @@ AWSCLIV2.pkg
 *.wav
 .env
 data/
+node_modules/
+dist/
+target/
+.turbo/
