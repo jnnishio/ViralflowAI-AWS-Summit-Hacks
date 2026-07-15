@@ -45,4 +45,4 @@ def handler(event, context):
     print(f"Uploading to {out_key}")
     s3.upload_file(local_out, bucket, out_key)
     
-    return {"status": "success", "visual_signals_key": out_key}
+    return {**event, "status": "success", "visual_signals_key": out_key}

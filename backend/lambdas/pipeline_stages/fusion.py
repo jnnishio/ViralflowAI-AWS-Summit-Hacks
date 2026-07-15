@@ -29,7 +29,7 @@ def handler(event, context):
         with open(local_out, 'w') as f:
             json.dump(dummy, f)
         s3.upload_file(local_out, bucket, out_key)
-        return {"status": "skipped", "candidates_key": out_key}
+        return {**event, "status": "skipped", "candidates_key": out_key}
         
     print("Running fusion scoring...")
     
@@ -46,4 +46,4 @@ def handler(event, context):
     print(f"Uploading to {out_key}")
     s3.upload_file(local_out, bucket, out_key)
     
-    return {"status": "success", "candidates_key": out_key}
+    return {**event, "status": "success", "candidates_key": out_key}

@@ -30,7 +30,7 @@ def handler(event, context):
         with open(local_out, 'w') as f:
             json.dump(dummy, f)
         s3.upload_file(local_out, bucket, out_key)
-        return {"status": "skipped", "highlights_key": out_key}
+        return {**event, "status": "skipped", "highlights_key": out_key}
         
     print("Running Bedrock director...")
     
@@ -45,4 +45,4 @@ def handler(event, context):
     print(f"Uploading to {out_key}")
     s3.upload_file(local_out, bucket, out_key)
     
-    return {"status": "success", "highlights_key": out_key}
+    return {**event, "status": "success", "highlights_key": out_key}

@@ -26,14 +26,14 @@ def handler(event, context):
         with open(local_out, 'w') as f:
             json.dump(result, f)
         s3.upload_file(local_out, bucket, out_key)
-        return {"status": "skipped", "reason": "no chat log"}
+        return {**event, "status": "skipped", "reason": "no chat log"}
         
     local_log = f"/tmp/{job_id}_chat.csv"
     try:
         s3.download_file(bucket, log_key, local_log)
     except Exception as e:
         print(f"Failed to download chat log: {e}")
-        return {"status": "failed", "reason": str(e)}
+        return {**event, "status": "failed", "reason": str(e)}
         
     result = chat.analyze(local_log)
     
@@ -43,4 +43,4 @@ def handler(event, context):
         
     s3.upload_file(local_out, bucket, out_key)
     
-    return {"status": "success", "chat_signals_key": out_key}
+    return {**event, "status": "success", "chat_signals_key": out_key}
