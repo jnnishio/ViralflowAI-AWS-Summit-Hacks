@@ -1,0 +1,655 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Set up backend CDK project structure": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024512
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015042781
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015869931
+      }
+    ],
+    "1.2 Set up frontend project structure": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024543
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015043799
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015871281
+      }
+    ],
+    "1.3 Create fixed mood configuration": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024575
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015043890
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015872495
+      }
+    ],
+    "2.1 Define DynamoDB tables": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024598
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015877796
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016866569
+      }
+    ],
+    "2.2 Define S3 buckets": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024615
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015878873
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016867279
+      }
+    ],
+    "3.1 Define Cognito User Pool and App Client": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024640
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015879846
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016868294
+      }
+    ],
+    "3.2 Define REST API Gateway with Cognito authorizer": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024657
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016875096
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784017210363
+      }
+    ],
+    "3.3 Define WebSocket API Gateway with Cognito authorizer": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024690
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016876178
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784017210930
+      }
+    ],
+    "3.4 Implement shared ownership-scoping utility": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024706
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784017383905
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018546337
+      }
+    ],
+    "4. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024723
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018584595
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018709523
+      }
+    ],
+    "5.1 Implement presign handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024741
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018743641
+      }
+    ],
+    "5.3 Implement confirm handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024760
+      }
+    ],
+    "6.1 Implement create-job handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024786
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018744664
+      }
+    ],
+    "6.4 Implement get-job-status handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024802
+      }
+    ],
+    "7. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024823
+      }
+    ],
+    "8.1 Implement list-clips handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024840
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018745634
+      }
+    ],
+    "8.3 Implement crop-confirm handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024860
+      }
+    ],
+    "8.4 Implement refinements handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024889
+      }
+    ],
+    "8.6 Implement confirm-selection and handoff handlers": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024905
+      }
+    ],
+    "9. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024922
+      }
+    ],
+    "10.1 Implement $connect handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024940
+      }
+    ],
+    "10.2 Implement subscribe handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024957
+      }
+    ],
+    "10.3 Implement $disconnect handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024976
+      }
+    ],
+    "10.4 Implement progress push handler": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015024993
+      }
+    ],
+    "11.1 Implement deterministic seeded PRNG utility": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025014
+      }
+    ],
+    "11.2 Implement no-op stub stages and progress-event publishing": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025032
+      }
+    ],
+    "11.4 Implement FusionScoringStub Lambda": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025056
+      }
+    ],
+    "11.6 Implement CategorizationStub Lambda": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025078
+      }
+    ],
+    "11.8 Define Step Functions state machine": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025098
+      }
+    ],
+    "12. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025124
+      }
+    ],
+    "13.1 Wire REST routes to Lambda handlers": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025141
+      }
+    ],
+    "13.2 Wire WebSocket routes to Lambda handlers": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025171
+      }
+    ],
+    "13.3 Grant IAM permissions": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025191
+      }
+    ],
+    "14.1 Configure frontend static asset bucket access": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025207
+      }
+    ],
+    "14.2 Configure CloudFront distribution": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025231
+      }
+    ],
+    "15. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025253
+      }
+    ],
+    "16.1 Scaffold frontend routing and build config": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025276
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015879864
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016868544
+      }
+    ],
+    "16.2 Define shared TypeScript types": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025298
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016876462
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784017211153
+      }
+    ],
+    "16.3 Implement auth token wiring": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025319
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784017384435
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018546368
+      }
+    ],
+    "16.4 Implement API client modules": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025343
+      }
+    ],
+    "17.1 Implement file picker with extension/batch validation": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025365
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018746604
+      }
+    ],
+    "17.4 Implement per-file upload progress and retry": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025388
+      }
+    ],
+    "17.7 Implement PlatformSelectScreen": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025408
+      }
+    ],
+    "18. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025436
+      }
+    ],
+    "19.1 Implement WebSocket subscribe and progress event handling": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025460
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018747442
+      }
+    ],
+    "19.2 Implement polling fallback": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025481
+      }
+    ],
+    "19.4 Implement completion/failure navigation": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025498
+      }
+    ],
+    "20.1 Implement GridState store/reducer": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025522
+      },
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018747652
+      }
+    ],
+    "20.2 Implement deriveDisplayList pure function": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025547
+      }
+    ],
+    "21. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025564
+      }
+    ],
+    "22.1 Implement HighlightsGridScreen data loading and status mapping": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025589
+      }
+    ],
+    "22.3 Implement GridView and GridCard": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025614
+      }
+    ],
+    "22.4 Implement GalleryView and GalleryCard": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025635
+      }
+    ],
+    "22.7 Implement thumbnail/video presigned loading with fallback": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025654
+      }
+    ],
+    "23.1 Implement ScoreDetailsPanel": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025675
+      }
+    ],
+    "23.3 Implement selection toggle and SelectionBar": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025698
+      }
+    ],
+    "23.5 Implement CropView": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025714
+      }
+    ],
+    "24. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025742
+      }
+    ],
+    "25.1 Implement CompilationModeToggle": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025765
+      }
+    ],
+    "25.2 Implement quick-action chips": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025787
+      }
+    ],
+    "25.4 Implement freeform prompt input": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025825
+      }
+    ],
+    "25.6 Implement shared write-action error handling": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025848
+      }
+    ],
+    "25.8 Implement confirm-and-proceed control and HandoffStubScreen": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025865
+      }
+    ],
+    "26.1 Implement fresh refetch on reload/reconnect": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025882
+      }
+    ],
+    "26.3 Implement stale-state retention on fetch failure": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025901
+      }
+    ],
+    "27.1 Wire end-to-end screen navigation": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025922
+      }
+    ],
+    "28. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015025950
+      }
+    ],
+    "1. Set up backend and frontend project structure": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784015872524
+      }
+    ],
+    "2. Implement storage CDK constructs": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784016867311
+      }
+    ],
+    "3. Implement auth, API Gateway skeleton, and shared ownership utility": [
+      {
+        "executionId": "b764434f-f1ad-44b0-9a5f-4476a3568e58",
+        "chatSessionId": "sess_39f79b42-06db-4e87-8ac1-f5d70a2b88c4",
+        "timestamp": 1784018546385
+      }
+    ]
+  }
+}

@@ -40,15 +40,28 @@ navigable end-to-end; its internal behavior is not specified here.
 - **Progress_API**: The API Gateway WebSocket API that pushes `Job` status and
   stage-transition events to Frontend_App.
 - **Clip**: A DynamoDB record with attributes `jobId, clipId, start, end, score,
-  factors{}, category, title, thumbKey` representing one detected highlight.
-  Under Analysis_Stage_Stub, `score`, `factors{}`, and `category` hold
-  placeholder values rather than algorithm output.
+  factors{chat, audio, visual, speech}, mood, titleNative, titleEnglish,
+  caption, hashtags[], momentType, thumbKey, videoKey` representing one
+  detected highlight. `factors{}` always contains exactly the four numeric
+  entries `chat`, `audio`, `visual`, and `speech`, each of which may be
+  negative. `mood` (e.g. "emotional", "hype", "wholesome") is the renamed
+  successor to an earlier undifferentiated `category` concept: it is drawn
+  from a fixed configured list and is the field used for Compilation_Group
+  grouping. `momentType` is a separate, purely descriptive human-readable
+  label of the kind of moment shown (e.g. "song performance", "guest story &
+  song reveal"); it is not used for grouping or sorting. `titleNative` and
+  `titleEnglish` together replace an earlier single `title` field, holding
+  the highlight's title in its original language and in English respectively.
+  `videoKey` is an S3 key for the Clip's rendered video preview, analogous to
+  `thumbKey`. Under Analysis_Stage_Stub, `score`, `factors{}`, `mood`,
+  `titleNative`, `titleEnglish`, `caption`, `hashtags[]`, `momentType`, and
+  `videoKey` hold placeholder values rather than algorithm output.
 - **Highlights_API**: The Lambda-backed REST endpoint(s) that list `Clip` records
   for a `Job` and record user actions on them (crop, confirm, refine, group).
 - **Highlights_Grid**: The Frontend_App screen that renders `Clip` records for a
   completed or in-progress `Job`.
 - **Compilation_Group**: A named grouping of `Clip` records sharing the same
-  `category`, produced when Compilation Mode is active.
+  `mood`, produced when Compilation Mode is active.
 - **Refinement_Request**: A DynamoDB-persisted record capturing a quick-action
   chip selection or freeform prompt text submitted against one or more `Clip`
   records, with `status` reflecting stubbed processing.
@@ -142,11 +155,13 @@ navigable end-to-end; its internal behavior is not specified here.
 
 1. THE Pipeline_Orchestrator SHALL execute its stages as an ordered sequence of Analysis_Stage_Stub steps matching the stage names listed in `architecture.md` (normalize/proxy, transcript, visual analysis, audio analysis, chat analysis, fusion/scoring, categorization).
 2. WHEN an Analysis_Stage_Stub step runs, THE Analysis_Stage_Stub SHALL complete without invoking any real media-analysis AWS service (MediaConvert, Transcribe, Rekognition, or Bedrock inference for scoring).
-3. WHEN the fusion/scoring Analysis_Stage_Stub step runs for a Job, THE Analysis_Stage_Stub SHALL create between 3 and 10 Clip records for that Job, each with a deterministically generated placeholder `score` between 0 and 100 inclusive and a placeholder `factors{}` breakdown containing at least 2 labeled entries.
-4. WHEN the categorization Analysis_Stage_Stub step runs for a Job, THE Analysis_Stage_Stub SHALL assign one placeholder `category` value, drawn from a fixed configured list containing at least 2 possible values, to each Clip record belonging to that Job.
-5. IF a Job has 2 or more Clip records after the categorization Analysis_Stage_Stub step runs, THEN THE Analysis_Stage_Stub SHALL ensure at least 2 distinct `category` values are represented across that Job's Clip records.
-6. WHEN the fusion/scoring and categorization Analysis_Stage_Stub steps run more than once for a Job with identical inputs, THE Analysis_Stage_Stub SHALL produce an identical number of Clip records and identical `score`, `factors{}`, and `category` values across runs.
-7. THE Analysis_Stage_Stub SHALL produce Job and Clip records that conform exactly to the field names and structure defined for Job_API, Highlights_API, and Frontend_App contracts in the Glossary.
+3. WHEN the fusion/scoring Analysis_Stage_Stub step runs for a Job, THE Analysis_Stage_Stub SHALL create between 3 and 10 Clip records for that Job, each with a deterministically generated placeholder `score` between 0 and 100 inclusive and a placeholder `factors{}` breakdown containing exactly the 4 entries `chat`, `audio`, `visual`, and `speech`, each a numeric value between -100 and 100 inclusive.
+4. WHEN the categorization Analysis_Stage_Stub step runs for a Job, THE Analysis_Stage_Stub SHALL assign to each Clip record belonging to that Job one placeholder `mood` value drawn from a fixed configured list containing at least 2 possible values, and one placeholder `momentType` value that is a non-empty string of at most 100 characters.
+5. IF a Job has 2 or more Clip records after the categorization Analysis_Stage_Stub step runs, THEN THE Analysis_Stage_Stub SHALL ensure at least 2 distinct `mood` values are represented across that Job's Clip records.
+6. WHEN the fusion/scoring and categorization Analysis_Stage_Stub steps run more than once for a Job whose `jobId`, `sourceKeys[]`, and `targets[]` attribute values are unchanged between runs, THE Analysis_Stage_Stub SHALL produce an identical number of Clip records and identical `score`, `factors{}`, `mood`, and `momentType` values across those runs.
+7. WHEN the fusion/scoring Analysis_Stage_Stub step runs for a Job, THE Analysis_Stage_Stub SHALL also generate, for each created Clip record, deterministic placeholder values for `titleNative` (a non-empty string of at most 100 characters), `titleEnglish` (a non-empty string of at most 100 characters), `caption` (a non-empty string of at most 500 characters), `hashtags[]` (an array containing between 1 and 10 non-empty string entries, each of at most 30 characters), and `videoKey` (a non-empty string).
+8. WHEN the Analysis_Stage_Stub steps run more than once for a Job whose `jobId`, `sourceKeys[]`, and `targets[]` attribute values are unchanged between runs, THE Analysis_Stage_Stub SHALL produce identical `titleNative`, `titleEnglish`, `caption`, `hashtags[]`, and `videoKey` values across those runs.
+9. THE Analysis_Stage_Stub SHALL produce Job and Clip records that conform exactly to the field names and structure defined for Job_API, Highlights_API, and Frontend_App contracts in the Glossary.
 
 ### Requirement 7: Highlights Grid Display
 
@@ -154,13 +169,15 @@ navigable end-to-end; its internal behavior is not specified here.
 
 #### Acceptance Criteria
 
-1. WHEN Frontend_App navigates to Highlights_Grid for a Job, THE Highlights_API SHALL return all Clip records associated with that Job's `jobId`, ordered by `score` in descending order.
+1. WHEN Frontend_App navigates to Highlights_Grid for a Job, THE Highlights_API SHALL return all Clip records associated with that Job's `jobId`, ordered by `score` in descending order, applying `clipId` ascending order as a secondary sort key for any Clip records with equal `score` values.
 2. IF the requested Job's `jobId` does not exist or does not belong to the authenticated user, THEN THE Highlights_API SHALL return an authorization/not-found error, and THE Highlights_Grid SHALL display an error message instead of a grid.
-3. WHEN Highlights_API returns Clip records for a Job, THE Highlights_Grid SHALL render one grid cell per Clip, showing at minimum its thumbnail, `title`, `category`, and `score`.
+3. WHEN Highlights_API returns Clip records for a Job, THE Highlights_Grid SHALL render one grid cell per Clip, showing at minimum its thumbnail, `titleNative`, `mood`, and `score`.
 4. IF the Job's status is completed and the Job has zero associated Clip records, THEN THE Highlights_Grid SHALL display an empty-state message indicating no highlights were found, instead of an empty grid.
-5. WHILE the Job's status indicates analysis is still in progress, THE Highlights_Grid SHALL display a processing indicator instead of the empty-state message or grid.
-6. WHEN Highlights_Grid renders a Clip thumbnail, THE Frontend_App SHALL load the thumbnail image via a presigned S3 GET URL obtained from Highlights_API.
+5. WHILE the Job's status is a pending or in-progress value, THE Highlights_Grid SHALL display a processing indicator instead of the empty-state message or grid.
+6. WHEN Highlights_Grid renders a Clip thumbnail, THE Frontend_App SHALL load the thumbnail image via a presigned S3 GET URL obtained from Highlights_API, valid for at least 5 minutes from issuance.
 7. IF a Clip thumbnail image fails to load, THEN THE Highlights_Grid SHALL display a placeholder image in that grid cell instead of leaving it blank.
+8. WHEN Highlights_Grid renders a Clip's video preview in Gallery view (Requirement 18), THE Frontend_App SHALL load that video preview via a presigned S3 GET URL for the Clip's `videoKey`, obtained from Highlights_API, following the same presigned-URL pattern used for thumbnails.
+9. IF the Job's status is a failed value, THEN THE Highlights_Grid SHALL display an error message indicating that processing failed, instead of a grid, empty-state message, or processing indicator.
 
 ### Requirement 8: Sort Highlights by Score
 
@@ -180,10 +197,11 @@ navigable end-to-end; its internal behavior is not specified here.
 #### Acceptance Criteria
 
 1. WHEN the user activates the score control on a Clip in Highlights_Grid, THE Highlights_Grid SHALL display the `factors{}` breakdown for that Clip in a detail view, without opening the crop view described in Requirement 11.
-2. THE score details view SHALL display exactly the entries present in that Clip's `factors{}`, each as a labeled value, with no additional or omitted entries.
-3. IF a Clip's `factors{}` contains zero entries, THEN THE score details view SHALL display an empty-state message instead of an empty breakdown.
+2. THE score details view SHALL display exactly the 4 entries present in that Clip's `factors{}`, in the fixed order `chat`, `audio`, `visual`, `speech`, each as a labeled numeric value rounded to 2 decimal places, with no additional or omitted entries.
+3. THE score details view SHALL display each `factors{}` value prefixed with its sign (`+` for values greater than or equal to 0, `-` for negative values) followed by the value's absolute magnitude rounded to 2 decimal places.
 4. THE score details view SHALL provide a close control.
 5. WHEN the user activates the close control or otherwise dismisses the score details view, THE Highlights_Grid SHALL return to the grid without altering the Clip's data.
+6. WHEN the user activates the score control on a Clip while the score details view is already open for a different Clip, THE Highlights_Grid SHALL replace the displayed breakdown in place with the newly activated Clip's `factors{}` breakdown, without requiring the view to be closed and reopened.
 
 ### Requirement 10: Multi-Select Highlights
 
@@ -215,12 +233,12 @@ navigable end-to-end; its internal behavior is not specified here.
 
 ### Requirement 12: Compilation Mode Grouping
 
-**User Story:** As a content creator, I want highlights automatically grouped by category, so that I can build a compilation instead of picking clips one by one.
+**User Story:** As a content creator, I want highlights automatically grouped by mood, so that I can build a compilation instead of picking clips one by one.
 
 #### Acceptance Criteria
 
 1. THE Highlights_Grid SHALL provide a menu control to toggle Compilation Mode on and off.
-2. WHEN Compilation Mode is toggled on, THE Highlights_Grid SHALL organize displayed Clip records into Compilation_Group sections, one per distinct `category` value present among that Job's Clips, ordered alphabetically by `category` value.
+2. WHEN Compilation Mode is toggled on, THE Highlights_Grid SHALL organize displayed Clip records into Compilation_Group sections, one per distinct `mood` value present among that Job's Clips, ordered alphabetically by `mood` value.
 3. WHILE Compilation Mode is on, THE Highlights_Grid SHALL allow multi-select of Clips within and across Compilation_Group sections.
 4. WHEN Compilation Mode is toggled off, THE Highlights_Grid SHALL display Clip records as a single ungrouped grid instead of Compilation_Group sections.
 5. WHEN the user toggles Compilation Mode, THE Highlights_Grid SHALL preserve the current Clip selection state across the transition.
@@ -261,7 +279,7 @@ navigable end-to-end; its internal behavior is not specified here.
 1. THE Highlights_Grid SHALL provide a control to confirm the current Clip selection and proceed.
 2. IF the user activates the confirm-and-proceed control with zero Clips selected, THEN THE Frontend_App SHALL display a validation message and SHALL prevent proceeding.
 3. WHEN the user activates the confirm-and-proceed control with one or more Clips selected, THE Highlights_API SHALL record the confirmed selection, scoped to the Job's `jobId` and the selected Clip identifiers, and SHALL respond with a Handoff_Stub reference.
-4. WHEN Frontend_App receives a Handoff_Stub reference, THE Frontend_App SHALL navigate to the Handoff_Stub screen and SHALL display, for each confirmed Clip, at minimum its thumbnail and `title`.
+4. WHEN Frontend_App receives a Handoff_Stub reference, THE Frontend_App SHALL navigate to the Handoff_Stub screen and SHALL display, for each confirmed Clip, at minimum its thumbnail and `titleNative`.
 5. IF Highlights_API fails to record the confirmed selection after the user activates the confirm-and-proceed control, THEN THE Frontend_App SHALL display an error message, SHALL retain the current Clip selection, and SHALL allow the user to retry.
 6. THE Handoff_Stub screen SHALL indicate that AI auto-editing and the built-in editor are not yet implemented.
 
@@ -289,3 +307,17 @@ navigable end-to-end; its internal behavior is not specified here.
 2. THE Frontend_App static asset bucket SHALL be served to end users exclusively through a CloudFront distribution, such that direct end-user requests to the S3 bucket's endpoint are denied.
 3. THE CloudFront distribution SHALL deliver the Frontend_App content to end users only over HTTPS connections.
 4. WHEN the CloudFront distribution receives a request for a path that does not match an existing file in the Frontend_App static asset bundle, THE CloudFront distribution SHALL return the Frontend_App's entry page instead of an error response, so that client-side routing can resolve the path.
+
+### Requirement 18: Highlights Grid View Modes
+
+**User Story:** As a content creator, I want to switch between a compact grid and a richer scrolling gallery of my highlights, so that I can pick the browsing style that suits what I am doing.
+
+#### Acceptance Criteria
+
+1. THE Highlights_Grid SHALL support exactly two view modes, "Gallery" and "Grid", and SHALL provide a control that lets the user switch the active view mode to either value at any time.
+2. WHEN Highlights_Grid first renders Clip records for a Job, THE Highlights_Grid SHALL default the active view mode to "Gallery".
+3. WHILE the active view mode is "Gallery", THE Highlights_Grid SHALL render Clip records as a horizontally scrollable row of cards in which more than one card is at least partially visible at once, instead of restricting display to one card at a time, ordered according to the currently active sort order (Requirement 8) and, while Compilation Mode is on, grouped into Compilation_Group sections (Requirement 12) consistent with Grid view.
+4. WHILE the active view mode is "Gallery", THE Highlights_Grid SHALL render each Clip card at a height that is at least 60% and at most 95% of the viewport's vertical height.
+5. WHILE the active view mode is "Grid", THE Highlights_Grid SHALL render Clip records using the compact multi-column grid layout described in Requirement 7.
+6. WHEN the user switches the active view mode, THE Highlights_Grid SHALL preserve the current Clip selection state, the currently selected sort order, and the current Compilation Mode state unchanged across the transition, consistent with the persistence behavior described in Requirements 8.4, 10.4, and 12.5.
+7. THE Highlights_Grid SHALL support sort (Requirement 8), score details (Requirement 9), multi-select (Requirement 10), crop and confirm (Requirement 11), Compilation Mode (Requirement 12), quick-action chips (Requirement 13), and freeform prompt refinement (Requirement 14) identically regardless of whether the active view mode is "Gallery" or "Grid".
