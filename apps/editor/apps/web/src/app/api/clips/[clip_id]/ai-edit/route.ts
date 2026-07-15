@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
-import { aiEditRequestSchema, type AiEditResponse } from "@/services/highlight-api/schema";
+import { aiEditRequestSchema, type AiEditResponse, type Clip } from "@/services/highlight-api/schema";
 import { getClipFixture } from "@/services/highlight-api/fixtures";
-import { generateMockAiEditResponse } from "@/services/highlight-api/ai-edit-mock";
+import { buildBaseEdl, generateMockAiEditResponse } from "@/services/highlight-api/ai-edit-mock";
+import {
+	AiEditGenerationError,
+	generateBedrockAiEditResponse,
+	isBedrockConfigured,
+} from "@/services/highlight-api/bedrock-ai-edit";
+import { searchMusicBed } from "@/services/highlight-api/freesound";
 
 export async function POST(
 	request: Request,
@@ -22,30 +28,71 @@ export async function POST(
 		);
 	}
 
-	const response = await getAiEditResponse({ clip, request: result.data });
-	return NextResponse.json(response);
+	try {
+		const response = await getAiEditResponse({ clip, request: result.data });
+		return NextResponse.json(response);
+	} catch (error) {
+		if (error instanceof AiEditGenerationError) {
+			return NextResponse.json(
+				{ error: "AI edit generation failed", details: error.message },
+				{ status: 502 },
+			);
+		}
+		throw error;
+	}
 }
 
 /**
- * Two-tier by design (see plan's troubleshooting notes): real Bedrock when
- * configured, deterministic mock otherwise. The real branch is intentionally
- * NOT wired here — `@aws-sdk/client-bedrock-runtime` isn't a dependency of
- * this app yet, and no AWS credentials are available to verify a real call
- * against in this environment. Wiring it is: add the SDK dependency, then
- * replace this branch with a ConverseCommand call using a system prompt
- * that forces a single JSON object matching aiEditResponseSchema (mirroring
- * pipeline/director.py's "reply with ONLY a JSON object" pattern), zod-
- * parsed before ever reaching the client — never swap that validation step
- * out, it's the actual safety boundary described in schema.ts.
+ * Two-tier by design: real Bedrock when AWS is configured, deterministic
+ * mock otherwise (keeps the request → review → apply loop demoable without
+ * AWS access — see ai-edit-mock.ts). A real Bedrock failure does NOT fall
+ * back to the mock; that would silently hide bugs, so it surfaces as a 502
+ * instead (see the try/catch in POST above).
  */
 async function getAiEditResponse({
 	clip,
 	request,
 }: Parameters<typeof generateMockAiEditResponse>[0]): Promise<AiEditResponse> {
-	if (process.env.AWS_REGION) {
-		console.warn(
-			"AWS_REGION is set but real Bedrock calling isn't wired yet (no SDK dependency) — using the mock AI-edit generator.",
-		);
+	if (!isBedrockConfigured()) {
+		return generateMockAiEditResponse({ clip, request });
 	}
-	return generateMockAiEditResponse({ clip, request });
+
+	const baselineEdl = request.baselineEdl ?? buildBaseEdl({ clip });
+	const bedrockResult = await generateBedrockAiEditResponse({ clip, baselineEdl, request });
+
+	const musicIntent = bedrockResult.musicIntent;
+	if (!musicIntent) {
+		const { musicIntent: _musicIntent, ...response } = bedrockResult;
+		return response;
+	}
+
+	const musicBed = await resolveMusicBed({ clip, mood: musicIntent.mood, query: musicIntent.query });
+	return {
+		summary:
+			musicBed !== undefined
+				? bedrockResult.summary
+				: `${bedrockResult.summary} (Couldn't find a matching music bed — leaving audio as-is.)`,
+		edl: { ...bedrockResult.edl, musicBed: musicBed ?? null },
+	};
+}
+
+async function resolveMusicBed({
+	clip,
+	mood,
+	query,
+}: {
+	clip: Clip;
+	mood: string;
+	query?: string;
+}) {
+	try {
+		return await searchMusicBed({ mood, query });
+	} catch (error) {
+		console.warn(
+			`Music bed search failed for clip ${clip.id}, leaving musicBed unset: ${
+				error instanceof Error ? error.message : String(error)
+			}`,
+		);
+		return undefined;
+	}
 }

@@ -25,7 +25,7 @@ export function generateMockAiEditResponse({
 	return generateForPrompt({ clip, base, prompt: request.prompt ?? "" });
 }
 
-function buildBaseEdl({ clip }: { clip: Clip }): Edl {
+export function buildBaseEdl({ clip }: { clip: Clip }): Edl {
 	const duration = clip.end - clip.start;
 
 	return {

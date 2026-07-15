@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type {
 	AiEditChipAction,
-	AiEditResponse,
+	Edl,
 	RenderStatusValue,
 } from "@/services/highlight-api/schema";
 
@@ -22,6 +22,14 @@ const AI_EDIT_CHIPS: { action: AiEditChipAction; label: string }[] = [
 	{ action: "swap_intro", label: "Swap intro" },
 	{ action: "more_reactions", label: "More reactions" },
 ];
+
+type ChatMessage = {
+	id: string;
+	role: "user" | "assistant";
+	content: string;
+	edl?: Edl;
+	resolution?: "applied" | "discarded";
+};
 
 /**
  * Clip-level metadata panel: hook/caption/hashtags in 中文 + English for the
@@ -46,8 +54,9 @@ export function ClipMetadataPanel() {
 	const [isSaving, setIsSaving] = useState(false);
 
 	const [aiPrompt, setAiPrompt] = useState("");
-	const [aiStatus, setAiStatus] = useState<"idle" | "thinking" | "review">("idle");
-	const [aiResponse, setAiResponse] = useState<AiEditResponse | null>(null);
+	const [aiStatus, setAiStatus] = useState<"idle" | "thinking">("idle");
+	const [messages, setMessages] = useState<ChatMessage[]>([]);
+	const [appliedEdl, setAppliedEdl] = useState<Edl | undefined>(undefined);
 
 	useEffect(() => {
 		if (!clip) return;
@@ -56,6 +65,8 @@ export function ClipMetadataPanel() {
 		setCaption(clip.caption);
 		setCaptionEn(clip.captionEn);
 		setHashtagsText(clip.hashtags.join(", "));
+		setMessages([]);
+		setAppliedEdl(undefined);
 	}, [clip?.id]);
 
 	if (!activeSceneId || !clip) {
@@ -78,37 +89,53 @@ export function ClipMetadataPanel() {
 		});
 	};
 
-	const requestAiEdit = async (request: { prompt?: string; chipAction?: AiEditChipAction }) => {
+	const sendAiEdit = async ({
+		label,
+		request,
+	}: {
+		label: string;
+		request: { prompt?: string; chipAction?: AiEditChipAction };
+	}) => {
+		const userMessage: ChatMessage = { id: crypto.randomUUID(), role: "user", content: label };
+		const history = messages.map(({ role, content }) => ({ role, content }));
+		setMessages((prev) => [...prev, userMessage]);
 		setAiStatus("thinking");
-		setAiResponse(null);
 		try {
 			const response = await editor.remoteClips.requestAiEdit({
 				clipId: clip.id,
-				request,
+				request: { ...request, history, baselineEdl: appliedEdl },
 			});
-			setAiResponse(response);
-			setAiStatus("review");
+			setMessages((prev) => [
+				...prev,
+				{ id: crypto.randomUUID(), role: "assistant", content: response.summary, edl: response.edl },
+			]);
 		} catch (error) {
-			setAiStatus("idle");
 			toast.error("AI edit request failed", {
 				description: error instanceof Error ? error.message : "Please try again",
 			});
+		} finally {
+			setAiStatus("idle");
 		}
 	};
 
-	const handleApplyAiEdit = () => {
-		if (!aiResponse) return;
-		editor.remoteClips.applyEdl({ edl: aiResponse.edl });
+	const handleApplyAiEdit = (messageId: string) => {
+		const message = messages.find((m) => m.id === messageId);
+		if (!message?.edl) return;
+		editor.remoteClips.applyEdl({ edl: message.edl });
+		setAppliedEdl(message.edl);
+		setMessages((prev) =>
+			prev.map((m) => (m.id === messageId ? { ...m, resolution: "applied" } : m)),
+		);
 		toast.success("AI edit applied — Ctrl+Z to undo");
-		setAiStatus("idle");
-		setAiResponse(null);
-		setAiPrompt("");
 	};
 
-	const handleDiscardAiEdit = () => {
-		setAiStatus("idle");
-		setAiResponse(null);
+	const handleDiscardAiEdit = (messageId: string) => {
+		setMessages((prev) =>
+			prev.map((m) => (m.id === messageId ? { ...m, resolution: "discarded" } : m)),
+		);
 	};
+
+	const lastAssistantMessage = [...messages].reverse().find((m) => m.role === "assistant");
 
 	const handleSaveAndRender = async () => {
 		editor.remoteClips.updateClipMetadataDraft({
@@ -193,6 +220,51 @@ export function ClipMetadataPanel() {
 
 				<div className="flex flex-col gap-2 border-t pt-3">
 					<label className="text-xs text-muted-foreground">AI Edit</label>
+
+					{messages.length > 0 && (
+						<div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-md border p-2">
+							{messages.map((message) => (
+								<div
+									key={message.id}
+									className={
+										message.role === "user"
+											? "self-end rounded-md bg-primary/10 px-2 py-1 text-xs"
+											: "flex flex-col gap-1.5 self-start rounded-md bg-accent/50 px-2 py-1.5 text-xs"
+									}
+								>
+									<p>{message.content}</p>
+									{message.role === "assistant" &&
+										message.edl &&
+										!message.resolution &&
+										message.id === lastAssistantMessage?.id && (
+											<div className="flex gap-2 pt-0.5">
+												<Button
+													size="sm"
+													className="flex-1"
+													onClick={() => handleApplyAiEdit(message.id)}
+												>
+													Apply
+												</Button>
+												<Button
+													size="sm"
+													variant="outline"
+													className="flex-1"
+													onClick={() => handleDiscardAiEdit(message.id)}
+												>
+													Discard
+												</Button>
+											</div>
+										)}
+									{message.resolution && (
+										<Badge variant="secondary" className="w-fit text-[10px]">
+											{message.resolution === "applied" ? "Applied" : "Discarded"}
+										</Badge>
+									)}
+								</div>
+							))}
+						</div>
+					)}
+
 					<div className="flex flex-wrap gap-1">
 						{AI_EDIT_CHIPS.map((chip) => (
 							<Button
@@ -200,7 +272,7 @@ export function ClipMetadataPanel() {
 								variant="outline"
 								size="sm"
 								disabled={aiStatus === "thinking"}
-								onClick={() => requestAiEdit({ chipAction: chip.action })}
+								onClick={() => sendAiEdit({ label: chip.label, request: { chipAction: chip.action } })}
 							>
 								{chip.label}
 							</Button>
@@ -216,29 +288,14 @@ export function ClipMetadataPanel() {
 						variant="outline"
 						size="sm"
 						disabled={aiStatus === "thinking" || !aiPrompt.trim()}
-						onClick={() => requestAiEdit({ prompt: aiPrompt })}
+						onClick={() => {
+							const prompt = aiPrompt;
+							setAiPrompt("");
+							sendAiEdit({ label: prompt, request: { prompt } });
+						}}
 					>
 						{aiStatus === "thinking" ? "Thinking..." : "Ask AI"}
 					</Button>
-
-					{aiStatus === "review" && aiResponse && (
-						<div className="flex flex-col gap-2 rounded-md bg-accent/50 p-2">
-							<p className="text-xs">{aiResponse.summary}</p>
-							<div className="flex gap-2">
-								<Button size="sm" className="flex-1" onClick={handleApplyAiEdit}>
-									Apply
-								</Button>
-								<Button
-									size="sm"
-									variant="outline"
-									className="flex-1"
-									onClick={handleDiscardAiEdit}
-								>
-									Discard
-								</Button>
-							</div>
-						</div>
-					)}
 				</div>
 
 				<div className="flex flex-col gap-2 pt-2">
