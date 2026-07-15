@@ -1,0 +1,56 @@
+{
+ "runs": [
+  {
+   "mode": "fast",
+   "runDir": "out\\3654414-fast",
+   "vodDurationSeconds": 4440.0,
+   "vodDurationMinutes": 74.0,
+   "modalitiesPresent": [
+    "audio",
+    "chat",
+    "speech"
+   ],
+   "candidateCount": 12,
+   "clipCount": 5,
+   "wallClockSeconds": null,
+   "wallClockMinutes": null,
+   "stageSeconds": [],
+   "rekognitionWorkloadMinutes": {
+    "face": 15.67
+   },
+   "rekognitionMinutesTotal": 15.67,
+   "estimatedRekognitionCostUsd": 1.567
+  },
+  {
+   "mode": "full",
+   "runDir": "out\\3654414",
+   "vodDurationSeconds": 4440.0,
+   "vodDurationMinutes": 74.0,
+   "modalitiesPresent": [
+    "audio",
+    "chat",
+    "speech",
+    "visual"
+   ],
+   "candidateCount": 7,
+   "clipCount": 5,
+   "wallClockSeconds": null,
+   "wallClockMinutes": null,
+   "stageSeconds": [],
+   "rekognitionWorkloadMinutes": {
+    "segment": 74.0,
+    "face": 74.0
+   },
+   "rekognitionMinutesTotal": 148.0,
+   "estimatedRekognitionCostUsd": 11.1
+  }
+ ],
+ "costModelNote": "ASSUMPTION: AWS Rekognition Video list price, us-east-1 (SegmentDetection ~$0.05/min, FaceDetection ~$0.10/min). Verify at https://aws.amazon.com/rekognition/pricing/ before quoting dollars. The analyzed-MINUTES figures are computed from real run data; only the per-minute rate is an assumption.",
+ "currency": "USD",
+ "deltas": {
+  "rekognitionMinutesRatio": 9.44,
+  "rekognitionCostRatio": 7.08,
+  "rekognitionCostSavedUsd": 9.533,
+  "wallClockNote": "wall-clock not captured for one/both runs (no timings.json) — run with --execute to measure it"
+ }
+}

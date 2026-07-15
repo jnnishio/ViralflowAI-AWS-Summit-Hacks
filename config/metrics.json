@@ -4,6 +4,11 @@
     "currency": "USD",
     "perVod": { "transcribe": 1.8, "rekognition": 1.0, "bedrock": 0.3, "render": 1.0 }
   },
+  "rekognition": {
+    "ratesPerMinute": { "segment": 0.05, "face": 0.10 },
+    "facePadSeconds": 10.0,
+    "sourceNote": "ASSUMPTION: AWS Rekognition Video list price, us-east-1 (SegmentDetection ~$0.05/min, FaceDetection ~$0.10/min). Verify at https://aws.amazon.com/rekognition/pricing/ before quoting dollars. The analyzed-MINUTES figures are computed from real run data; only the per-minute rate is an assumption."
+  },
   "workflowStages": { "automated": 7, "total": 8 },
   "qualityWeights": { "virality": 0.6, "crossModal": 0.4 },
   "precision": { "k": 5, "iouMatchThreshold": 0.3, "maxModalities": 3 },
