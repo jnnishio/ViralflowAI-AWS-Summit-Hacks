@@ -35,7 +35,7 @@ if IS_WINDOWS:
     ZH_FONT = "MingLiU"
     _SYSTEM_FONT_FILE = Path(r"C:\Windows\Fonts\mingliu.ttc")
 else:
-    ZH_FONT = "PingFang TC"  # macOS built-in; Linux: swap for Noto Sans CJK TC
+    ZH_FONT = "Noto Sans CJK TC"  # Linux/Docker compatibility (Fargate); macOS: swap for PingFang TC
     _SYSTEM_FONT_FILE = None
 
 # Caption style, shared with pipeline/edl.py so the burned-in captions and the

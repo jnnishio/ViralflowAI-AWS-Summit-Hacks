@@ -18,6 +18,8 @@ export interface UploadItem {
   key: string | null
   status: FileStatus
   progress: number
+  /** Seconds remaining at the current transfer rate, or null if not yet known. */
+  etaSeconds: number | null
 }
 
 let items: UploadItem[] = []
@@ -38,6 +40,11 @@ export function addUploadItems(newItems: UploadItem[]): void {
 
 export function updateUploadItem(id: string, patch: Partial<UploadItem>): void {
   items = items.map((item) => (item.id === id ? { ...item, ...patch } : item))
+  notify()
+}
+
+export function removeUploadItem(id: string): void {
+  items = items.filter((item) => item.id !== id)
   notify()
 }
 
