@@ -189,6 +189,27 @@ describe('Task 5: /media serves real files with HTTP Range', () => {
   })
 })
 
+describe('live path: stream-id derivation for demo clips', () => {
+  async function createJob(sourceKeys) {
+    const res = await fetch(`${base}/jobs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sourceKeys, targets: [] }),
+    })
+    return (await res.json()).jobId
+  }
+
+  it('pins a known demo video to a filename-derived stream-id', async () => {
+    const jobId = await createJob(['d/6910008_video.mp4', 'd/6910008_log.csv'])
+    expect(handle._state.jobs.get(jobId).streamId).toBe('6910008')
+  })
+
+  it('keeps a unique UUID stream-id (== jobId) for non-allowlisted uploads', async () => {
+    const jobId = await createJob(['d/random-clip.mp4', 'd/chat.csv'])
+    expect(handle._state.jobs.get(jobId).streamId).toBe(jobId)
+  })
+})
+
 describe('live path guard: a job missing the video or chat log fails fast', () => {
   it('fails a job with only a CSV (no video)', async () => {
     const res = await fetch(`${base}/jobs`, {

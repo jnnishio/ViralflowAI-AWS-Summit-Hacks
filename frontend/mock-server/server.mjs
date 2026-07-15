@@ -40,6 +40,7 @@ import {
   editorClipPreviewUrl,
 } from './lib/editor-api.mjs'
 import { contentTypeFor, parseRange } from './lib/media-range.mjs'
+import { deriveStreamId } from './lib/stream-id.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = resolve(__dirname, '../..')
@@ -252,14 +253,20 @@ export function startServer(opts = {}) {
     if (req.method === 'POST' && path === '/jobs') {
       const jobId = randomUUID()
       const sourceKeys = body?.sourceKeys ?? []
-      const { videoKey, chatLogKey, videoName } = resolveRoles(sourceKeys)
+      const { videoKey, chatLogKey, videoName, chatLogName } = resolveRoles(sourceKeys)
+
+      // For the known demo clips (6910008 / 3654414), pin the live run to a
+      // stable, filename-derived out/<id> so a re-upload reuses that run's
+      // output (and binds to it via the cache path once rendered). Any other
+      // upload keeps the unique-per-job UUID so runs can't collide.
+      const streamId = deriveStreamId([videoName, chatLogName]) ?? jobId
 
       const job = {
         jobId,
         status: 'pending',
         targets: body?.targets ?? [],
         createdAt: new Date().toISOString(),
-        streamId: jobId,
+        streamId,
         source: 'live',
       }
       jobs.set(jobId, job)
