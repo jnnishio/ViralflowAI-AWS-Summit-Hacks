@@ -83,8 +83,16 @@ def fuse(chat=None, audio=None, visual=None, transcript_feats=None,
         modal["audio"] = _z(_resample(audio["series"]["t_s"], audio["series"]["excitement"], n_bins, bin_seconds))
     if visual:
         v = visual["series"]
-        vis = 0.5 * _z(_resample(v["t_s"], v["scene_change"], n_bins, bin_seconds)) + \
-              0.5 * _z(_resample(v["t_s"], v["emotion_hot"], n_bins, bin_seconds))
+        components = [
+            (0.30, _z(_resample(v["t_s"], v["scene_change"], n_bins, bin_seconds))),
+            (0.30, _z(_resample(v["t_s"], v["emotion_hot"], n_bins, bin_seconds))),
+        ]
+        if "face_count" in v:
+            components.append((0.15, _z(_resample(v["t_s"], v["face_count"], n_bins, bin_seconds))))
+        if "smile_avg" in v:
+            components.append((0.25, _z(_resample(v["t_s"], v["smile_avg"], n_bins, bin_seconds))))
+        total_w = sum(w for w, _ in components)
+        vis = sum(w / total_w * c for w, c in components)
         modal["visual"] = vis
     if transcript_feats:
         modal["speech"] = _z(_resample(transcript_feats["t_s"], transcript_feats["word_rate"], n_bins, bin_seconds))
@@ -96,9 +104,53 @@ def fuse(chat=None, audio=None, visual=None, transcript_feats=None,
     return curve, modal, n_bins
 
 
+def snap_to_boundaries(start_s, end_s, transcript=None, shots=None,
+                       snap_window=3.0, min_gap_s=0.3):
+    """Nudge clip start/end to the nearest speech gap or shot boundary.
+
+    Searches within ±snap_window seconds of the raw boundary for:
+    1. A gap between transcript words > min_gap_s (sentence/breath boundary)
+    2. A Rekognition shot boundary
+    Prefers whichever is closest to the original boundary.
+    """
+    def nearest_gap(boundary):
+        if not transcript or not transcript.get("words"):
+            return boundary
+        words = transcript["words"]
+        best = boundary
+        best_dist = snap_window + 1
+        for i in range(len(words) - 1):
+            gap_start = words[i]["end_s"]
+            gap_end = words[i + 1]["start_s"]
+            if gap_end - gap_start < min_gap_s:
+                continue
+            midpoint = (gap_start + gap_end) / 2
+            dist = abs(midpoint - boundary)
+            if dist <= snap_window and dist < best_dist:
+                best = midpoint
+                best_dist = dist
+        return best
+
+    snapped_start = nearest_gap(start_s)
+    snapped_end = nearest_gap(end_s)
+
+    if shots:
+        for shot in shots:
+            sb = shot["start_s"]
+            dist_start = abs(sb - start_s)
+            dist_end = abs(sb - end_s)
+            if dist_start <= snap_window and dist_start < abs(snapped_start - start_s):
+                snapped_start = sb
+            if dist_end <= snap_window and dist_end < abs(snapped_end - end_s):
+                snapped_end = sb
+
+    return round(snapped_start, 2), round(snapped_end, 2)
+
+
 def candidates_from_curve(curve, modal, bin_seconds=BIN_SECONDS, top=12,
                           min_modalities=2, modality_bar=0.75,
-                          edge_threshold=0.3, max_len_s=75, min_len_s=15):
+                          edge_threshold=0.3, max_len_s=75, min_len_s=15,
+                          transcript=None, shots=None):
     peaks, _ = find_peaks(curve, height=0.8, distance=int(60 // bin_seconds))
     out = []
     for p in peaks:
@@ -115,6 +167,7 @@ def candidates_from_curve(curve, modal, bin_seconds=BIN_SECONDS, top=12,
         while hi < len(curve) - 1 and curve[hi + 1] > edge_threshold and (hi - p) * bin_seconds < max_len_s / 2:
             hi += 1
         start_s, end_s = lo * bin_seconds, (hi + 1) * bin_seconds
+        start_s, end_s = snap_to_boundaries(start_s, end_s, transcript, shots)
         if end_s - start_s < min_len_s:
             pad = (min_len_s - (end_s - start_s)) / 2
             start_s, end_s = max(0, start_s - pad), end_s + pad
@@ -170,7 +223,14 @@ def main(argv=None):
 
     curve, modal, n_bins = fuse(chat, audio, visual, transcript_feats,
                                 vertical=args.vertical, chat_offset_s=args.chat_offset)
-    cands = candidates_from_curve(curve, modal, top=args.top, min_modalities=args.min_modalities)
+    transcript_parsed = (json.loads(Path(args.transcript).read_text())
+                         if args.transcript and Path(args.transcript).exists() else None)
+    visual_data = (json.loads(Path(args.visual).read_text())
+                   if args.visual and Path(args.visual).exists() else None)
+    visual_shots = visual_data.get("shots", []) if visual_data else []
+
+    cands = candidates_from_curve(curve, modal, top=args.top, min_modalities=args.min_modalities,
+                                  transcript=transcript_parsed, shots=visual_shots)
 
     result = {
         "vertical": args.vertical,

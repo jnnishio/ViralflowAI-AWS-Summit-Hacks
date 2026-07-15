@@ -37,6 +37,32 @@ def caption_overlays(transcript, start_s, end_s):
     return overlays
 
 
+def word_overlays(transcript, start_s, end_s, words_per_group=4):
+    """Word-level overlays grouped into short phrases for karaoke display."""
+    clip_words = [
+        w for w in transcript.get("words", [])
+        if w["end_s"] >= start_s and w["start_s"] <= end_s
+    ]
+    overlays = []
+    for g in range(0, len(clip_words), words_per_group):
+        group = clip_words[g:g + words_per_group]
+        if not group:
+            continue
+        overlays.append({
+            "start": round(max(0.0, group[0]["start_s"] - start_s), 3),
+            "end": round(group[-1]["end_s"] - start_s, 3),
+            "words": [
+                {"text": w["text"],
+                 "start": round(max(0.0, w["start_s"] - start_s), 3),
+                 "end": round(w["end_s"] - start_s, 3)}
+                for w in group
+            ],
+            "text": "".join(w["text"] for w in group),
+            "speaker": group[0].get("speaker", ""),
+        })
+    return overlays
+
+
 def build_edl(hl, clip_id, job_id, transcript=None, visual=None, fps=30):
     start_s, end_s = hl["start_s"], hl["end_s"]
     duration = round(end_s - start_s, 3)
@@ -59,13 +85,18 @@ def build_edl(hl, clip_id, job_id, transcript=None, visual=None, fps=30):
             "timelineEnd": duration,
             "transitionIn": None,
             "crop": {"mode": "face_track" if has_faces else "center", "cx": round(cx, 4)},
+            "vodStart": start_s,
+            "vodEnd": end_s,
         }],
         "effects": [],
         "captions": {
-            "source": "transcribe_word_timeline",
+            "source": "transcribe_word_karaoke" if transcript and transcript.get("words") else "transcribe_word_timeline",
             "burnIn": True,
             "style": dict(CAPTION_STYLE),
-            "overlays": caption_overlays(transcript, start_s, end_s) if transcript else [],
+            "overlays": (word_overlays(transcript, start_s, end_s)
+                         if transcript and transcript.get("words")
+                         else caption_overlays(transcript, start_s, end_s) if transcript
+                         else []),
         },
         "hookOverlay": None,
         "musicBed": None,

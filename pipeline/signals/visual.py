@@ -170,11 +170,24 @@ def parse_results(shot_pages, face_pages, bin_seconds=BIN_SECONDS):
         if b < n_bins:
             scene_change[b] += 1
     emotion_hot = np.zeros(n_bins)
+    face_count = np.zeros(n_bins)
+    face_size = np.zeros(n_bins)
+    face_size_n = np.zeros(n_bins)
+    smile = np.zeros(n_bins)
+    smile_n = np.zeros(n_bins)
     for f in faces:
-        if f["emotion"] in ("SURPRISED", "HAPPY") and f["emotion_conf"] > 70:
-            b = int(f["t_s"] // bin_seconds)
-            if b < n_bins:
+        b = int(f["t_s"] // bin_seconds)
+        if 0 <= b < n_bins:
+            face_count[b] += 1
+            face_size[b] += f["box"]["Width"] * f["box"]["Height"]
+            face_size_n[b] += 1
+            if f["smile"] > 0:
+                smile[b] += f["smile"]
+                smile_n[b] += 1
+            if f["emotion"] in ("SURPRISED", "HAPPY") and f["emotion_conf"] > 70:
                 emotion_hot[b] += 1
+    face_size_n[face_size_n == 0] = 1
+    smile_n[smile_n == 0] = 1
 
     return {
         "signal": "visual",
@@ -183,6 +196,9 @@ def parse_results(shot_pages, face_pages, bin_seconds=BIN_SECONDS):
             "t_s": [b * bin_seconds for b in range(n_bins)],
             "scene_change": scene_change.tolist(),
             "emotion_hot": emotion_hot.tolist(),
+            "face_count": face_count.tolist(),
+            "face_size_avg": (face_size / face_size_n).tolist(),
+            "smile_avg": (smile / smile_n).tolist(),
         },
         "shots": shots,
         "faces": faces,
