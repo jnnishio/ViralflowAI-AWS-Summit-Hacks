@@ -21,7 +21,49 @@ EDITOR_BASE_URL = "http://localhost:3000"
 EDITOR_VIDEO_ID = "video_6910008"
 
 
-def render(manifest, clips_dir):
+def render_kpi_strip(metrics):
+    """KPI header strip from a metrics document (pipeline.metrics). Renders the
+    five headline indicators; projection values are labeled as projections."""
+    if not metrics:
+        return ""
+
+    def kpi(label, value, note=""):
+        note_html = f"<span class='kpi-note'>{html.escape(note)}</span>" if note else ""
+        return (f"<div class='kpi'><div class='kpi-val'>{html.escape(str(value))}</div>"
+                f"<div class='kpi-label'>{html.escape(label)}</div>{note_html}</div>")
+
+    cards = []
+    if "editingTimeSavedPct" in metrics:
+        cards.append(kpi("editing time saved", f"{metrics['editingTimeSavedPct']:.0f}%"))
+    if "automationLevel" in metrics:
+        cards.append(kpi("automation", f"{metrics['automationLevel'] * 100:.0f}%"))
+    if "clipsPerHour" in metrics:
+        cards.append(kpi("clips / hour", metrics["clipsPerHour"]))
+    if "costPerVod" in metrics:
+        c = metrics["costPerVod"]
+        cards.append(kpi("cost / VOD", f"{c['amount']} {c['currency']}"))
+    if "qualityScore" in metrics:
+        cards.append(kpi("quality score", f"{metrics['qualityScore']:.2f}"))
+    if "detectionPrecision" in metrics:
+        p = metrics["detectionPrecision"]
+        cards.append(kpi(f"precision@{p['k']}", f"{p['precisionAtK']:.2f}"))
+    mon = (metrics.get("projections") or {}).get("monetization")
+    if mon:
+        cards.append(kpi("est. revenue", f"{mon['amount']} {mon['currency']}", "projection"))
+
+    return (
+        "<style>"
+        ".kpis{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 24px}"
+        ".kpi{background:#181a21;border-radius:12px;padding:14px 18px;min-width:120px}"
+        ".kpi-val{font-size:24px;font-weight:700;color:#6cf}"
+        ".kpi-label{font-size:12px;color:#9aa;margin-top:2px}"
+        ".kpi-note{display:block;font-size:10px;color:#f4c542;margin-top:2px}"
+        "</style>"
+        f"<div class='kpis'>{''.join(cards)}</div>"
+    )
+
+
+def render(manifest, clips_dir, metrics=None):
     cards = []
     for i, c in enumerate(manifest, 1):
         factors = c.get("factors") or {}
@@ -73,6 +115,7 @@ def render(manifest, clips_dir):
  .btn:hover{{background:#8fd6ff}}
 </style>
 <h1>StreamSmith — auto-generated highlights</h1>
+{render_kpi_strip(metrics)}
 <div class="grid">{''.join(cards)}</div>"""
 
 
@@ -80,12 +123,16 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("clips_dir")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--metrics", default=None, help="out/metrics.json for the KPI header strip")
     args = ap.parse_args(argv)
 
     clips_dir = Path(args.clips_dir)
     manifest = json.loads((clips_dir / "manifest.json").read_text(encoding="utf-8"))
+    metrics = None
+    if args.metrics and Path(args.metrics).exists():
+        metrics = json.loads(Path(args.metrics).read_text(encoding="utf-8"))
     out = Path(args.out) if args.out else clips_dir / "gallery.html"
-    out.write_text(render(manifest, clips_dir), encoding="utf-8")
+    out.write_text(render(manifest, clips_dir, metrics), encoding="utf-8")
     print(f"gallery ({len(manifest)} clips) -> {out}")
 
 

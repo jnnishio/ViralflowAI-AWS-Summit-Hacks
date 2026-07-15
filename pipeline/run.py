@@ -29,6 +29,37 @@ def log(msg):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+class StageTimer:
+    """Records a timestamp at the start of each pipeline stage. Non-invasive:
+    stages call `mark(name)` and durations are derived from consecutive marks
+    (a skipped stage lands next to its neighbour, so it reads as ~zero-length).
+    Consumed by pipeline.metrics via out/timings.json."""
+
+    def __init__(self):
+        self.marks = []  # list of (name, epoch_seconds)
+
+    def mark(self, name):
+        self.marks.append((name, time.time()))
+
+
+def write_timings(timer, outdir, stream_id=None):
+    """Turn stage marks into out/timings.json: {streamId, stages:[{name,startS,endS}]}.
+    Each stage ends where the next begins; the last ends at the current time."""
+    if not timer.marks:
+        return None
+    t0 = timer.marks[0][1]
+    final = time.time()
+    stages = []
+    for i, (name, t) in enumerate(timer.marks):
+        start = t - t0
+        end = (timer.marks[i + 1][1] - t0) if i + 1 < len(timer.marks) else (final - t0)
+        stages.append({"name": name, "startS": round(start, 2), "endS": round(max(end, start), 2)})
+    doc = {"streamId": stream_id, "stages": stages}
+    path = Path(outdir) / "timings.json"
+    path.write_text(json.dumps(doc, indent=1))
+    return path
+
+
 def run(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--video", required=True)
@@ -52,6 +83,7 @@ def run(argv=None):
     out.mkdir(exist_ok=True)
     video = Path(args.video)
     sid = args.stream_id
+    timer = StageTimer()
 
     from pipeline import fusion
     from pipeline.signals import audio as audio_mod
@@ -60,6 +92,7 @@ def run(argv=None):
     from pipeline.signals import visual as vis_mod
 
     # ---- 1. chat signals (instant, local)
+    timer.mark("chat")
     chat_json = out / "chat_signals.json"
     if not chat_json.exists():
         log("chat: analyzing event log")
@@ -70,6 +103,7 @@ def run(argv=None):
     log(f"chat: {chat_json}")
 
     # ---- 2. audio track extract + upload (Transcribe's 2GB limit -> audio-only)
+    timer.mark("audio")
     audio_file = video.with_suffix(".m4a")
     if not audio_file.exists():
         log("audio: extracting track from VOD")
@@ -83,6 +117,7 @@ def run(argv=None):
         s3.upload_file(str(audio_file), args.s3_bucket, audio_key)
 
     # ---- 3. start async AWS jobs (Transcribe + Rekognition) up front
+    timer.mark("aws_jobs_start")
     transcript_json = out / "transcript.json"
     job_name = f"vod-{sid}-{int(audio_file.stat().st_size) % 100000}"
     if not transcript_json.exists():
@@ -105,6 +140,7 @@ def run(argv=None):
             rek_jobs_file.write_text(json.dumps(rek_jobs))
 
     # ---- 4. local audio energy while cloud jobs run
+    timer.mark("audio_energy")
     audio_json = out / "audio_signals.json"
     if not audio_json.exists():
         log("audio: RMS energy analysis")
@@ -112,6 +148,7 @@ def run(argv=None):
     log(f"audio: {audio_json}")
 
     # ---- 5. collect Transcribe
+    timer.mark("transcribe")
     if not transcript_json.exists():
         log("transcribe: waiting for completion")
         job = tx_mod.wait_job(job_name)
@@ -159,6 +196,7 @@ def run(argv=None):
             fusion_args += ["--visual", str(visual_json)]
     if transcript_json.exists():
         fusion_args += ["--transcript", str(transcript_json)]
+    timer.mark("fusion")
     log("fusion: building excitement curve + candidates")
     fusion.main(fusion_args)
 
@@ -182,6 +220,7 @@ def run(argv=None):
                 "--video", str(video), "--out", str(hl_json)]
     if transcript_json.exists():
         dir_args += ["--transcript", str(transcript_json)]
+    timer.mark("director")
     log("director: judging candidates with Bedrock")
     director.main(dir_args)
 
@@ -203,12 +242,14 @@ def run(argv=None):
         render_args += ["--transcript", str(transcript_json)]
     if visual_json.exists():
         render_args += ["--visual", str(visual_json)]
+    timer.mark("render")
     log("render: cutting vertical clips")
     render_mod.main(render_args)
 
     # ---- 10. emit contract-shaped artifacts (canonical manifest + per-clip EDLs)
     clips_dir = out / "clips"
     if args.emit_contracts:
+        timer.mark("contracts")
         from pipeline import contracts, edl as edl_mod
 
         log("contracts: emitting canonical clips.json")
@@ -225,6 +266,11 @@ def run(argv=None):
 
         log("publish: uploading artifacts to S3 + presigning")
         publish_mod.publish(sid, out, args.s3_bucket)
+
+    # ---- stage timings for the metrics aggregator (pipeline.metrics)
+    timings_path = write_timings(timer, out, sid)
+    if timings_path:
+        log(f"timings: {timings_path}")
 
     log("DONE")
 

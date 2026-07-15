@@ -267,3 +267,65 @@ exists in the file. Status tracking for render jobs is therefore entirely
    `pipeline/render.py`'s `--engine mediaconvert` mention is aspirational
    text only — no such CLI flag or MediaConvert client call actually exists
    in that file.
+
+---
+
+## 5. Batch manifest [PIPELINE]
+
+The local batch orchestrator (`pipeline/batch.py`) runs the per-VOD pipeline over
+multiple `(video, chat-log)` pairs and writes a single aggregate
+`out/batch_manifest.json`. Example: `docs/contracts/examples/batch-manifest.example.json`.
+
+Shape:
+
+- `targets[]` — one entry per processed VOD: `streamId`, `status`
+  (`"completed"` | `"failed"`), `durationSeconds` (wall-clock for that VOD), and
+  `clipCount`. Failed entries also carry a `reason` string.
+- `excludedStreamIds[]` — videos discovered without a matching chat-log stem,
+  skipped rather than processed.
+- `totals` — `targets` (count processed), `clipsTotal` (sum of per-target
+  `clipCount`), and `wallClockSeconds` (first-target-start → last-target-completion).
+- `summary` — machine-readable rollup consumed by the metrics-dashboard spec:
+  `vods`, `clipsTotal`, `wallClockSeconds`, and `clipsPerHour`
+  (`clipsTotal / (wallClockSeconds / 3600)`, reported as `0` when wall-clock is `0`).
+
+The backend fan-out surface (`POST /batches`, `GET /batches/{batchId}`, a `Batch`
+DynamoDB record) is specified in `.kiro/specs/batch-processing/` but is **deferred**
+— not built for the hackathon demo, which runs off the local CLI.
+
+---
+
+## 6. Metrics document [PIPELINE]
+
+The local metrics aggregator (`pipeline/metrics.py`) reads the pipeline's outputs
+plus `config/metrics.json` and writes `out/metrics.json` — the quantitative
+performance indicators for deliverable Req 6. Example:
+`docs/contracts/examples/metrics.example.json`.
+
+Inputs: `out/timings.json` (per-stage timings captured by `run.py`), the clip
+contract (`out/clips/clips.json` — `virality_score`, `factors`, `modalities`),
+optionally `out/batch/batch_manifest.json` (for the batch aggregate), and
+`config/metrics.json` (all tunable heuristics/assumptions — config over redeploy).
+
+Fields:
+
+- `streamId`, `clipCount`, `wallClockSeconds`.
+- `editingTimeSavedPct` — `(baseline − wallClock) / baseline` where
+  `baseline = clipCount × editorMinutesPerClip`; `0` when baseline is `0`.
+- `automationLevel` — `workflowStages.automated / workflowStages.total`, in `[0,1]`.
+- `clipsPerHour` — `clipCount / (wallClockSeconds / 3600)`; `0` when wall-clock is `0`.
+- `costPerVod` — `{amount, currency}`, summed from `costModel.perVod`.
+- `qualityScore` — weighted mean of normalized clip virality and normalized
+  cross-modal agreement (`len(modalities)`), in `[0,1]`; `0` for an empty clip set.
+- `detectionPrecision` — `{k, precisionAtK, meanBestIou}` from the ground-truth
+  fixture (`pipeline/fixtures/ground_truth.json`); **omitted** when the VOD has no
+  labeled window set.
+- `projections.monetization` / `projections.contentReuse` — clearly marked
+  `"kind": "projection"` with the `assumptions` used; never presented as measured.
+- `batch` — present only when a batch manifest is supplied.
+
+Timing-derived fields (`editingTimeSavedPct`, `automationLevel`, `clipsPerHour`)
+are omitted when `timings.json` is absent (graceful degradation). The backend
+`GET /jobs/{jobId}/metrics` endpoint is specified in `.kiro/specs/metrics-dashboard/`
+but **abandoned** with the rest of the AWS backend; the demo surfaces metrics via
+`pipeline/gallery.py`'s KPI strip.
