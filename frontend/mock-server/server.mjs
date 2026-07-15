@@ -31,6 +31,14 @@ import { spawnPipeline } from './lib/runner.mjs'
 import { parseLogLine, toProgressEvent } from './lib/progress.mjs'
 import { loadManifestClips, clipsDir } from './lib/manifest.mjs'
 import { scanCachedStreams, matchCachedStream } from './lib/cache.mjs'
+import {
+  listEditorVideos,
+  loadEditorClips,
+  resolveStreamId,
+  getEditorAiEdit,
+  getEditorClip,
+  editorClipPreviewUrl,
+} from './lib/editor-api.mjs'
 import { contentTypeFor, parseRange } from './lib/media-range.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -286,19 +294,45 @@ export function startServer(opts = {}) {
     const jobMatch = path.match(/^\/jobs\/([^/]+)$/)
     if (req.method === 'GET' && jobMatch) {
       const job = jobs.get(jobMatch[1])
-      if (!job) return sendJson(res, 404, { error: 'job not found' })
-      return sendJson(res, 200, {
-        jobId: job.jobId,
-        status: job.status,
-        targets: job.targets,
-        createdAt: job.createdAt,
-      })
+      if (job) {
+        return sendJson(res, 200, {
+          jobId: job.jobId,
+          status: job.status,
+          targets: job.targets,
+          createdAt: job.createdAt,
+        })
+      }
+      // Fallback: an already-rendered run on disk (e.g. after a server
+      // restart, or opening /highlights/<streamId> for a prior run) is still
+      // addressable by its out/<id> dir name.
+      if (existsSync(join(outRoot, jobMatch[1], 'clips', 'manifest.json'))) {
+        return sendJson(res, 200, {
+          jobId: jobMatch[1],
+          status: 'completed',
+          targets: [],
+          createdAt: new Date().toISOString(),
+        })
+      }
+      return sendJson(res, 404, { error: 'job not found' })
     }
 
     // GET /jobs/:jobId/clips
     const clipsMatch = path.match(/^\/jobs\/([^/]+)\/clips$/)
     if (req.method === 'GET' && clipsMatch) {
-      return sendJson(res, 200, { clips: clipsByJob.get(clipsMatch[1]) ?? [] })
+      const jobId = clipsMatch[1]
+      if (clipsByJob.has(jobId)) {
+        return sendJson(res, 200, { clips: clipsByJob.get(jobId) })
+      }
+      // Fallback: load straight from an on-disk run's manifest.
+      if (existsSync(join(outRoot, jobId, 'clips', 'manifest.json'))) {
+        try {
+          const clips = await loadManifestClips(outRoot, jobId, baseUrl())
+          return sendJson(res, 200, { clips })
+        } catch {
+          return sendJson(res, 200, { clips: [] })
+        }
+      }
+      return sendJson(res, 200, { clips: [] })
     }
 
     // PATCH /jobs/:jobId/clips/:clipId  (crop-confirm)
@@ -361,6 +395,68 @@ export function startServer(opts = {}) {
       const clips = handoffs.get(handoffMatch[1])
       if (!clips) return sendJson(res, 404, { error: 'handoff not found' })
       return sendJson(res, 200, { clips })
+    }
+
+    // === Editor-shaped API (apps/editor points here via
+    // NEXT_PUBLIC_BACKEND_API_URL). Serves the real pipeline output in the
+    // editor's highlight-api schema so any processed VOD opens in the editor
+    // with that run's real auto-edit. See lib/editor-api.mjs. ===
+
+    // GET /api/videos  — list every stream with a manifest (+ live-job aliases)
+    if (req.method === 'GET' && path === '/api/videos') {
+      return sendJson(res, 200, await listEditorVideos(outRoot, jobs))
+    }
+
+    // GET /api/videos/:videoId/clips
+    const evClipsMatch = path.match(/^\/api\/videos\/([^/]+)\/clips$/)
+    if (req.method === 'GET' && evClipsMatch) {
+      const videoId = decodeURIComponent(evClipsMatch[1])
+      const idPart = videoId.replace(/^video_/, '')
+      const streamId = await resolveStreamId(idPart, outRoot, jobs)
+      if (!streamId) return sendJson(res, 404, { error: 'video not found' })
+      const clips = await loadEditorClips(outRoot, idPart, streamId, baseUrl())
+      return sendJson(res, 200, { clips })
+    }
+
+    // POST /api/clips/:clipId/ai-edit
+    const aiEditMatch = path.match(/^\/api\/clips\/([^/]+)\/ai-edit$/)
+    if (req.method === 'POST' && aiEditMatch) {
+      const scopedClipId = decodeURIComponent(aiEditMatch[1])
+      const out = await getEditorAiEdit({
+        outRoot, jobs, baseUrl: baseUrl(), scopedClipId, request: body ?? {},
+      })
+      if (out.error) return sendJson(res, 404, { error: out.error })
+      return sendJson(res, 200, out.response)
+    }
+
+    // GET /api/clips/:clipId/status  — stub: renders are pre-baked, so ready.
+    const clipStatusMatch = path.match(/^\/api\/clips\/([^/]+)\/status$/)
+    if (req.method === 'GET' && clipStatusMatch) {
+      const scopedClipId = decodeURIComponent(clipStatusMatch[1])
+      const previewUrl = await editorClipPreviewUrl({ outRoot, jobs, baseUrl: baseUrl(), scopedClipId })
+      return sendJson(res, 200, { status: 'ready', previewUrl })
+    }
+
+    // POST /api/clips/:clipId/render  — stub: return the clip marked ready.
+    const clipRenderMatch = path.match(/^\/api\/clips\/([^/]+)\/render$/)
+    if (req.method === 'POST' && clipRenderMatch) {
+      const scopedClipId = decodeURIComponent(clipRenderMatch[1])
+      const clip = await getEditorClip({ outRoot, jobs, baseUrl: baseUrl(), scopedClipId })
+      if (!clip) return sendJson(res, 404, { error: 'clip not found' })
+      const previewUrl = await editorClipPreviewUrl({ outRoot, jobs, baseUrl: baseUrl(), scopedClipId })
+      return sendJson(res, 200, { ...clip, renderStatus: 'ready', previewUrl })
+    }
+
+    // PATCH /api/clips/:clipId  — accept metadata/trim edits, echo the clip.
+    const clipPatchMatch = path.match(/^\/api\/clips\/([^/]+)$/)
+    if (req.method === 'PATCH' && clipPatchMatch) {
+      const scopedClipId = decodeURIComponent(clipPatchMatch[1])
+      const clip = await getEditorClip({ outRoot, jobs, baseUrl: baseUrl(), scopedClipId })
+      if (!clip) return sendJson(res, 404, { error: 'clip not found' })
+      const patch = body ?? {}
+      const allowed = ['start', 'end', 'hook', 'hookEn', 'caption', 'captionEn', 'hashtags']
+      for (const k of allowed) if (k in patch) clip[k] = patch[k]
+      return sendJson(res, 200, clip)
     }
 
     sendJson(res, 404, { error: 'not found' })
