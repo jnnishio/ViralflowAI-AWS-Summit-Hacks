@@ -196,80 +196,23 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		const baseUrl = "https://freesound.org/apiv2/search/text/";
-
-		const sortParam = buildSortParameter({ query, sort });
-
-		const params = new URLSearchParams({
-			query: query || "",
-			token: webEnv.FREESOUND_API_KEY,
-			page: page.toString(),
-			page_size: pageSize.toString(),
-			sort: sortParam,
-			fields:
-				"id,name,description,url,previews,download,duration,filesize,type,channels,bitrate,bitdepth,samplerate,username,tags,license,created,num_downloads,avg_rating,num_ratings",
-		});
-
-		const isEffectsSearch = type === "effects" || !type;
-		if (isEffectsSearch) {
-			applyEffectsFilters({ params, min_rating, commercial_only });
-		}
-
-		const response = await fetch(`${baseUrl}?${params.toString()}`);
-
-		if (!response.ok) {
-			const errorText = await response.text();
-			console.error("Freesound API error:", response.status, errorText);
-			return NextResponse.json(
-				{ error: "Failed to search sounds" },
-				{ status: response.status },
-			);
-		}
-
-		const rawData = await response.json();
-
-		const freesoundValidation = freesoundResponseSchema.safeParse(rawData);
-		if (!freesoundValidation.success) {
-			console.error(
-				"Invalid Freesound API response:",
-				freesoundValidation.error,
-			);
-			return NextResponse.json(
-				{ error: "Invalid response from Freesound API" },
-				{ status: 502 },
-			);
-		}
-
-		const data = freesoundValidation.data;
-
-		const transformedResults = data.results.map(transformFreesoundResult);
-
+		// Freesound API integration is not yet available
+		// Return empty results with a message
 		const responseData = {
-			count: data.count,
-			next: data.next,
-			previous: data.previous,
-			results: transformedResults,
+			count: 0,
+			next: null,
+			previous: null,
+			results: [],
 			query: query || "",
 			type: type || "effects",
 			page,
 			pageSize,
 			sort,
 			minRating: min_rating,
+			message: "Sound effects are coming soon. Freesound integration is not yet available.",
 		};
 
-		const responseValidation = apiResponseSchema.safeParse(responseData);
-		if (!responseValidation.success) {
-			console.error(
-				"Invalid API response structure:",
-				responseValidation.error,
-			);
-			return NextResponse.json(
-				{ error: "Internal response formatting error" },
-				{ status: 500 },
-			);
-		}
-
-		return NextResponse.json(responseValidation.data);
+		return NextResponse.json(responseData);
 	} catch (error) {
 		console.error("Error searching sounds:", error);
 		return NextResponse.json(

@@ -287,8 +287,15 @@ function SoundEffectsView() {
 							/>
 						))}
 						{!isLoading && !isSearching && displayedSounds.length === 0 && (
-							<div className="text-muted-foreground text-sm">
-								{searchQuery ? "No sounds found" : "No sounds available"}
+							<div className="flex flex-col items-center justify-center gap-3 py-8">
+								<p className="text-muted-foreground text-sm">
+									{searchQuery ? "No sounds found" : "Sound effects coming soon"}
+								</p>
+								{!searchQuery && (
+									<p className="text-muted-foreground max-w-md text-center text-xs">
+										Freesound sound effects library coming soon.
+									</p>
+								)}
 							</div>
 						)}
 						{isLoadingMore && (
