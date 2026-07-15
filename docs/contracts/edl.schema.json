@@ -34,6 +34,8 @@
           "sourceEnd": { "type": "number" },
           "timelineStart": { "type": "number", "description": "Position on the assembled output timeline." },
           "timelineEnd": { "type": "number" },
+          "vodStart": { "type": "number", "description": "Original VOD timestamp (seconds) of the clip start. Enables the editor to expand the clip boundaries beyond the auto-generated window back into the full VOD." },
+          "vodEnd": { "type": "number", "description": "Original VOD timestamp (seconds) of the clip end." },
           "transitionIn": {
             "type": ["object", "null"],
             "properties": {
@@ -74,7 +76,7 @@
       "type": "object",
       "required": ["source", "burnIn", "overlays"],
       "properties": {
-        "source": { "type": "string", "const": "transcribe_word_timeline", "description": "Captions are cut directly from the Transcribe word/segment timeline (out/*/transcript.json), reformatted per platform by Bedrock at export time (architecture.md section 7-8)." },
+        "source": { "type": "string", "enum": ["transcribe_word_timeline", "transcribe_word_karaoke"], "description": "transcribe_word_timeline = segment-level captions; transcribe_word_karaoke = word-level karaoke with per-word timing in overlays[].words[]." },
         "burnIn": { "type": "boolean" },
         "style": {
           "type": "object",
@@ -88,7 +90,7 @@
         },
         "overlays": {
           "type": "array",
-          "description": "Caption lines with timeline-relative timestamps, sliced from transcript.json's `segments` (or `words` for karaoke-style word-level highlighting).",
+          "description": "Caption lines with timeline-relative timestamps. When source is transcribe_word_karaoke, each overlay includes a words[] array for per-word karaoke highlighting.",
           "items": {
             "type": "object",
             "required": ["start", "end", "text"],
@@ -96,7 +98,20 @@
               "start": { "type": "number" },
               "end": { "type": "number" },
               "text": { "type": "string" },
-              "speaker": { "type": "string" }
+              "speaker": { "type": "string" },
+              "words": {
+                "type": "array",
+                "description": "Per-word karaoke timing. Present when source is transcribe_word_karaoke; omitted for segment-level captions.",
+                "items": {
+                  "type": "object",
+                  "required": ["start", "end", "text"],
+                  "properties": {
+                    "start": { "type": "number", "description": "Word start, seconds, clip-relative." },
+                    "end": { "type": "number", "description": "Word end, seconds, clip-relative." },
+                    "text": { "type": "string" }
+                  }
+                }
+              }
             }
           }
         }

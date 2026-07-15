@@ -94,6 +94,63 @@ def build_ass(transcript, start_s, end_s, path, play_res=(1080, 1920)):
     return path
 
 
+def build_ass_karaoke(transcript, start_s, end_s, path, play_res=(1080, 1920),
+                      words_per_group=4, highlight_color="00FFFF"):
+    """ASS subtitles with karaoke-style word highlighting.
+
+    Groups words into short phrases (words_per_group), shows them as one
+    dialogue line, and uses ASS \\kf (smooth fill) tags to highlight
+    each word as it's spoken.  highlight_color is BGR hex for the filled
+    (spoken) colour; unsaid words show in white.
+    """
+    w, h = play_res
+
+    def ts(t):
+        t = max(0.0, t)
+        hh, rem = divmod(t, 3600)
+        mm, ss = divmod(rem, 60)
+        return f"{int(hh)}:{int(mm):02d}:{ss:05.2f}"
+
+    lines = [
+        "[Script Info]",
+        f"PlayResX: {w}",
+        f"PlayResY: {h}",
+        "WrapStyle: 0",
+        "",
+        "[V4+ Styles]",
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour,"
+        " OutlineColour, BackColour, Bold, Outline, Shadow, Alignment,"
+        " MarginL, MarginR, MarginV",
+        f"Style: karaoke,{CAPTION_STYLE['fontName']},{CAPTION_STYLE['fontSize']},"
+        f"&H00{highlight_color},&H00FFFFFF,&H00000000,&H80000000,1,3,1,"
+        f"{CAPTION_STYLE['alignment']},60,60,{CAPTION_STYLE['marginV']}",
+        "",
+        "[Events]",
+        "Format: Layer, Start, End, Style, Text",
+    ]
+
+    clip_words = [
+        cw for cw in transcript.get("words", [])
+        if cw["end_s"] >= start_s and cw["start_s"] <= end_s
+    ]
+
+    for g in range(0, len(clip_words), words_per_group):
+        group = clip_words[g:g + words_per_group]
+        if not group:
+            continue
+        g_start = group[0]["start_s"] - start_s
+        g_end = group[-1]["end_s"] - start_s
+        parts = []
+        for cw in group:
+            dur_cs = max(1, round((cw["end_s"] - cw["start_s"]) * 100))
+            parts.append(f"{{\\kf{dur_cs}}}{cw['text']}")
+        text = "".join(parts)
+        lines.append(f"Dialogue: 0,{ts(g_start)},{ts(g_end)},karaoke,{text}")
+
+    Path(path).write_text("\n".join(lines))
+    return path
+
+
 def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path("out/tmp")):
     start_s, end_s = hl["start_s"], hl["end_s"]
     workdir.mkdir(parents=True, exist_ok=True)
@@ -105,7 +162,10 @@ def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path(
     vf = [crop, "scale=1080:1920"]
 
     if transcript:
-        ass = build_ass(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
+        if transcript.get("words"):
+            ass = build_ass_karaoke(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
+        else:
+            ass = build_ass(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
         vf.append(f"ass={ass}")
 
     hook = (hl.get("hook_zh") or "").replace("'", "").replace(":", "")
