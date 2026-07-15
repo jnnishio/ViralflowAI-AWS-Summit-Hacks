@@ -1,0 +1,8 @@
+{
+  "6910008": [
+    { "label": "performer entrance", "start": 1645.0, "end": 1675.0 },
+    { "label": "joke landing", "start": 2700.0, "end": 2730.0 },
+    { "label": "song performance peak", "start": 3755.0, "end": 3785.0 },
+    { "label": "prize announcement", "start": 5025.0, "end": 5055.0 }
+  ]
+}

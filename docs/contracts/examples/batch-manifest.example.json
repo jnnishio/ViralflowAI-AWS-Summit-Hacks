@@ -1,0 +1,29 @@
+{
+  "targets": [
+    {
+      "streamId": "6910008",
+      "status": "completed",
+      "durationSeconds": 512.4,
+      "clipCount": 5
+    },
+    {
+      "streamId": "3654414",
+      "status": "failed",
+      "durationSeconds": 41.0,
+      "clipCount": 0,
+      "reason": "transcribe job failed"
+    }
+  ],
+  "excludedStreamIds": [],
+  "totals": {
+    "targets": 2,
+    "clipsTotal": 5,
+    "wallClockSeconds": 553.4
+  },
+  "summary": {
+    "vods": 2,
+    "clipsTotal": 5,
+    "wallClockSeconds": 553.4,
+    "clipsPerHour": 32.5
+  }
+}

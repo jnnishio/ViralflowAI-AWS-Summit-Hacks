@@ -1,0 +1,12 @@
+{
+  "editorMinutesPerClip": 45,
+  "costModel": {
+    "currency": "USD",
+    "perVod": { "transcribe": 1.8, "rekognition": 1.0, "bedrock": 0.3, "render": 1.0 }
+  },
+  "workflowStages": { "automated": 7, "total": 8 },
+  "qualityWeights": { "virality": 0.6, "crossModal": 0.4 },
+  "precision": { "k": 5, "iouMatchThreshold": 0.3, "maxModalities": 3 },
+  "platformRpm": { "tiktok": 0.4, "reels": 0.5, "shorts": 0.3 },
+  "projectionAssumptions": { "projectedViewsPerClip": 5000, "reuseSourceHours": 1.5 }
+}

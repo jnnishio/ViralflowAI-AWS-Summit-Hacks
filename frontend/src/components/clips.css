@@ -1,0 +1,218 @@
+/*
+ * Clip display styling — mirrors out/clips/gallery.html so the in-app
+ * highlights screen matches the static gallery preview one-to-one.
+ * Everything is scoped under `.highlights` and pinned to the gallery's dark
+ * palette (independent of the OS light/dark theme) so the look is identical.
+ */
+
+.highlights {
+  --clip-bg: #0e0f13;
+  --clip-card: #181a21;
+  --clip-fg: #eee;
+  --clip-muted: #9aa;
+  --clip-accent: #6cf;
+  background: var(--clip-bg);
+  color: var(--clip-fg);
+  min-height: 100vh;
+  margin: -2rem calc(50% - 50vw) 0;
+  padding: 24px max(24px, calc(50vw - 640px)) 96px;
+  box-sizing: border-box;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+.highlights h1 {
+  font-weight: 600;
+  color: var(--clip-fg);
+}
+
+/* --- layout ---------------------------------------------------------- */
+.clip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* gallery variant: a horizontally scrollable row of the same cards */
+.clip-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 8px;
+}
+.clip-row .clip-card {
+  flex: 0 0 clamp(240px, 30vw, 320px);
+  scroll-snap-align: start;
+}
+
+.clip-section {
+  margin: 0 0 28px;
+}
+.clip-section > h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--clip-fg);
+  margin: 0 0 12px;
+  text-transform: capitalize;
+}
+
+/* --- card ------------------------------------------------------------ */
+.clip-card {
+  position: relative;
+  background: var(--clip-card);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.clip-card[data-selected='true'] {
+  outline: 2px solid var(--clip-accent);
+  outline-offset: -2px;
+}
+
+.clip-card video,
+.clip-card .clip-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  object-fit: cover;
+}
+
+/* selection checkbox, floated over the top-left of the media */
+.clip-select {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(14, 15, 19, 0.72);
+  border-radius: 8px;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+.clip-select input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--clip-accent);
+  cursor: pointer;
+}
+
+.clip-meta {
+  padding: 12px 14px;
+}
+.clip-meta h2 {
+  font-size: 15px;
+  margin: 6px 0 2px;
+  color: var(--clip-fg);
+}
+.clip-en {
+  color: var(--clip-muted);
+  font-size: 12px;
+  margin: 0;
+}
+.clip-cap {
+  font-size: 13px;
+  color: #ccd;
+}
+.clip-tags {
+  color: var(--clip-accent);
+  font-size: 12px;
+  word-break: break-word;
+}
+
+.clip-score {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.clip-mood {
+  font-size: 11px;
+  font-weight: 500;
+  background: #2a2f3a;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: capitalize;
+}
+.clip-badge {
+  font-size: 10px;
+  background: #2d6b3f;
+  color: #7fef9a;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+/* --- score-details factor bars (mirrors gallery.html) ---------------- */
+.clip-details summary {
+  cursor: pointer;
+  color: var(--clip-muted);
+  font-size: 12px;
+  margin-top: 6px;
+}
+.factor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  margin: 3px 0;
+}
+.factor > span {
+  width: 44px;
+  color: var(--clip-muted);
+}
+.factor em {
+  color: var(--clip-muted);
+  font-style: normal;
+}
+.bar {
+  flex: 1;
+  height: 6px;
+  background: #2a2f3a;
+  border-radius: 3px;
+}
+.bar > div {
+  height: 100%;
+  background: var(--clip-accent);
+  border-radius: 3px;
+}
+.clip-range {
+  color: #889;
+  font-size: 11px;
+}
+
+/* --- actions --------------------------------------------------------- */
+.clip-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn {
+  flex: 1;
+  display: block;
+  padding: 8px 12px;
+  background: var(--clip-accent);
+  color: #0e0f13;
+  text-align: center;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+.btn:hover {
+  background: #8fd6ff;
+}
+.btn--ghost {
+  background: #1e2130;
+  color: #8899aa;
+}
+.btn--ghost:hover {
+  background: #262a3b;
+}
+.btn--ghost[data-done='true'] {
+  color: #7fef9a;
+}

@@ -5,7 +5,10 @@ AWSCLIV2.pkg
 *.mp4
 *.wav
 .env
-data/
+# Anchor to the repo-root sample-VOD dir only. Unanchored `data/` also matched
+# nested source dirs like apps/editor/apps/web/src/data/, which silently
+# dropped the editor's color data files and broke the /editor route.
+/data/
 node_modules/
 dist/
 target/

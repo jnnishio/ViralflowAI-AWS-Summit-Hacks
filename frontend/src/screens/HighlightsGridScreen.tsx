@@ -22,6 +22,8 @@ import {
   initialGridState,
 } from '../state/gridState'
 import type { ChipType, JobStatus } from '../types'
+import { EDITOR_VIDEO_ID } from '../api/config'
+import '../components/clips.css'
 
 /** Task 22.1: maps Job status to exactly one of: processing indicator
  * (pending/in_progress), error message (failed), empty-state message
@@ -66,6 +68,13 @@ export function HighlightsGridScreen() {
 
   const displayClips = deriveDisplayList(state)
   const groups = state.compilationMode ? deriveCompilationGroups(state) : null
+
+  // "Open in Editor" target video id. The editor is a self-contained fixture
+  // demo (currently only video_3654414), so prefer the configured
+  // VITE_EDITOR_VIDEO_ID; fall back to video_{jobId} for a future dynamic
+  // per-job integration.
+  const editorVideoId =
+    EDITOR_VIDEO_ID || (jobId ? `video_${jobId}` : undefined)
 
   const activeScoreDetailsClip = state.clips.find(
     (clip) => clip.clipId === state.activeScoreDetailsClipId,
@@ -189,7 +198,7 @@ export function HighlightsGridScreen() {
   }
 
   return (
-    <section>
+    <section className="highlights">
       <h1>Highlights</h1>
       {fetchError && <p role="alert">{fetchError}</p>}
 
@@ -213,6 +222,7 @@ export function HighlightsGridScreen() {
           clips={displayClips}
           groups={groups}
           selectedClipIds={state.selectedClipIds}
+          videoId={editorVideoId}
           onToggleSelect={handleToggleSelect}
           onOpenCrop={handleOpenCrop}
           onOpenScoreDetails={handleOpenScoreDetails}
@@ -222,6 +232,7 @@ export function HighlightsGridScreen() {
           clips={displayClips}
           groups={groups}
           selectedClipIds={state.selectedClipIds}
+          videoId={editorVideoId}
           onToggleSelect={handleToggleSelect}
           onOpenCrop={handleOpenCrop}
           onOpenScoreDetails={handleOpenScoreDetails}

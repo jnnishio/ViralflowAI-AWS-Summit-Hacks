@@ -5,7 +5,10 @@ export function initialGridState(clips: Clip[] = []): GridState {
   return {
     clips,
     sortOrder: 'desc', // Req 8.3
-    viewMode: 'gallery', // Req 18.2
+    // Default to the responsive card grid so the clip display matches
+    // out/clips/gallery.html; the gallery (horizontal) view is still one
+    // toggle away via ViewModeSwitch (Req 18.2).
+    viewMode: 'grid',
     compilationMode: false,
     selectedClipIds: new Set(),
     activeScoreDetailsClipId: null,
