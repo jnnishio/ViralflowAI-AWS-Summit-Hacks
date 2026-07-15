@@ -18,11 +18,25 @@ Usage:
 
 import argparse
 import json
+import platform
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-ZH_FONT = "Noto Sans CJK TC"  # Changed from PingFang TC for Linux/Docker compatibility
+IS_WINDOWS = platform.system() == "Windows"
+
+if IS_WINDOWS:
+    # Gyan's ffmpeg-for-Windows build has no working fontconfig, so both the
+    # `ass` filter's family-name lookup and drawtext's `font=` family-name
+    # lookup segfault instead of failing gracefully. Sidestep fontconfig
+    # entirely: address a font by file, not by family-name resolution.
+    # MingLiU (Traditional Chinese) ships with every Windows install.
+    ZH_FONT = "MingLiU"
+    _SYSTEM_FONT_FILE = Path(r"C:\Windows\Fonts\mingliu.ttc")
+else:
+    ZH_FONT = "Noto Sans CJK TC"  # Linux/Docker compatibility (Fargate); macOS: swap for PingFang TC
+    _SYSTEM_FONT_FILE = None
 
 # Caption style, shared with pipeline/edl.py so the burned-in captions and the
 # EDL's caption.style stay in lockstep (edit here, both follow).
@@ -34,6 +48,20 @@ CAPTION_STYLE = {
 }
 CAPTION_CHUNK = 16    # max chars per burned caption line
 HOOK_DURATION_S = 2.5  # hook overlay shows for the opening seconds
+
+
+def _local_font_file(workdir):
+    """Copy the system CJK font next to the render workdir so it can be
+    addressed by a short relative path — ffmpeg's filter-option parser
+    can't reliably carry a drive-letter colon (C:\\...) inside a filter's
+    sub-option value (e.g. ass=...:fontsdir=...), but a relative path
+    sidesteps the ambiguity entirely."""
+    fonts_dir = workdir / "fonts"
+    fonts_dir.mkdir(parents=True, exist_ok=True)
+    dest = fonts_dir / _SYSTEM_FONT_FILE.name
+    if not dest.exists():
+        shutil.copy(_SYSTEM_FONT_FILE, dest)
+    return dest
 
 
 def face_crop_x(visual, start_s, end_s):
@@ -161,17 +189,28 @@ def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path(
     crop = f"crop=w=ih*9/16:h=ih:x=clip(iw*{cx:.4f}-(ih*9/16)/2\\,0\\,iw-ih*9/16):y=0"
     vf = [crop, "scale=1080:1920"]
 
+    font_file = _local_font_file(workdir) if IS_WINDOWS else None
+
     if transcript:
         if transcript.get("words"):
             ass = build_ass_karaoke(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
         else:
             ass = build_ass(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
-        vf.append(f"ass={ass}")
+        # ffmpeg filtergraph syntax treats "\" as an escape char, so a native
+        # Windows path (out\tmp\x.ass) gets mangled when embedded in -vf;
+        # forward slashes parse correctly on Windows ffmpeg builds too.
+        ass_filter = f"ass={Path(ass).as_posix()}"
+        if font_file:
+            # Sidestep the broken fontconfig lookup (see IS_WINDOWS block
+            # above) by pointing libass straight at a local font file.
+            ass_filter += f":fontsdir={font_file.parent.as_posix()}"
+        vf.append(ass_filter)
 
     hook = (hl.get("hook_zh") or "").replace("'", "").replace(":", "")
     if hook:
+        font_arg = f"fontfile='{font_file.as_posix()}'" if font_file else f"font='{ZH_FONT}'"
         vf.append(
-            f"drawtext=font='{ZH_FONT}':text='{hook}':fontsize=88:fontcolor=white:"
+            f"drawtext={font_arg}:text='{hook}':fontsize=88:fontcolor=white:"
             "borderw=6:bordercolor=black:x=(w-text_w)/2:y=h*0.18:"
             f"enable='lt(t,{HOOK_DURATION_S})'"
         )

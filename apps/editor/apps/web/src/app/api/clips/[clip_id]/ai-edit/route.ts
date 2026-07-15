@@ -53,6 +53,13 @@ async function getAiEditResponse({
 	clip,
 	request,
 }: Parameters<typeof generateMockAiEditResponse>[0]): Promise<AiEditResponse> {
+	// The "auto" action applies the pipeline's pre-computed, deterministic AI
+	// edits (reaction zooms / onomatopoeia / SFX from pipeline/autoedit.py). It
+	// is NOT an LLM task, so it always uses the fixture-backed generator —
+	// never Bedrock — regardless of whether AWS is configured.
+	if (request.chipAction === "auto") {
+		return generateMockAiEditResponse({ clip, request });
+	}
 	if (!isBedrockConfigured()) {
 		return generateMockAiEditResponse({ clip, request });
 	}

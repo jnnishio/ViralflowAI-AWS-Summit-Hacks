@@ -34,7 +34,7 @@ import type {
 	RenderStatusValue,
 	ShotBoundary,
 } from "@/services/highlight-api/schema";
-import { ApplyEdlCommand } from "@/commands/timeline/element/apply-edl";
+import { ApplyEdlCommand, applyEdlEffectsToTracks } from "@/commands/timeline/element/apply-edl";
 
 const RENDER_POLL_INTERVAL_MS = 2500;
 const RENDER_POLL_TIMEOUT_MS = 60_000;
@@ -81,6 +81,10 @@ export class RemoteClipsManager {
 
 			// Each clip owns its own footage (see fixtures.ts) — fetch + probe
 			// one media asset per clip, in parallel, rather than one shared VOD.
+			// Also fetch each clip's AI-edit EDL (the "auto" action returns the
+			// pipeline's pre-computed reaction-zoom / onomatopoeia / SFX effects)
+			// so we can bake them into every scene up front — every clip opens
+			// with its AI edits already laid down as editable timeline elements.
 			const sceneBuildInputs = await Promise.all(
 				clips.map(async (clip) => {
 					const blob = await fetch(clip.sourceVideoUrl).then((res) => res.blob());
@@ -99,7 +103,24 @@ export class RemoteClipsManager {
 						seconds: processed.duration ?? asset.duration ?? 0,
 					});
 
-					return { clip, asset, sourceDuration };
+					// Non-blocking: a missing/failed AI edit shouldn't break load,
+					// but log failures so they're diagnosable in the console.
+					let aiEdl: Edl | null = null;
+					try {
+						const resp = await requestAiEdit({
+							clipId: clip.id,
+							request: { chipAction: "auto" },
+						});
+						aiEdl = resp.edl;
+						console.info(
+							`[AI auto-edit] ${clip.id}: ${resp.edl.effects?.length ?? 0} effects`,
+						);
+					} catch (err) {
+						console.warn(`[AI auto-edit] ${clip.id} failed:`, err);
+						aiEdl = null;
+					}
+
+					return { clip, asset, sourceDuration, aiEdl };
 				}),
 			);
 
@@ -108,13 +129,25 @@ export class RemoteClipsManager {
 			);
 
 			const scenes: TScene[] = sceneBuildInputs.map(
-				({ clip, asset, sourceDuration }, index) =>
-					this.buildSceneForClip({
+				({ clip, asset, sourceDuration, aiEdl }, index) => {
+					const scene = this.buildSceneForClip({
 						clip,
 						mediaAssetId: asset.id,
 						sourceDuration,
 						isMain: index === 0,
-					}),
+					});
+					// Bake the AI edits into the scene's tracks as editable elements.
+					if (aiEdl?.effects && aiEdl.effects.length > 0) {
+						return {
+							...scene,
+							tracks: applyEdlEffectsToTracks({
+								tracks: scene.tracks,
+								effects: aiEdl.effects,
+							}),
+						};
+					}
+					return scene;
+				},
 			);
 
 			const currentSceneId =

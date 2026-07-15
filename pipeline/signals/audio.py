@@ -32,14 +32,24 @@ def extract_audio(video_path, out_path):
     return out_path
 
 
-def rms_series(media_path, bin_seconds=BIN_SECONDS):
-    """Per-bin RMS level (dB) via ffmpeg astats metadata prints."""
+def rms_series_window(media_path, start_s=None, end_s=None, bin_seconds=BIN_SECONDS):
+    """Per-bin RMS level (dB) via ffmpeg astats metadata prints, optionally
+    scoped to [start_s, end_s] of media_path via input-seeking (same -ss/-to
+    -i ordering pipeline.render.render_clip() already uses for cutting, so
+    behavior stays consistent between what's measured and what's rendered).
+    """
     # asetnsamples groups audio into bin-sized frames; astats+ametadata print
     # one Overall.RMS_level per frame on stderr-free stdout (pipe via -f null).
-    cmd = [
-        "ffmpeg", "-v", "error", "-i", str(media_path), "-vn",
+    n_samples = int(round(8000 * bin_seconds))
+    cmd = ["ffmpeg", "-v", "error"]
+    if start_s is not None:
+        cmd += ["-ss", str(start_s)]
+    if end_s is not None:
+        cmd += ["-to", str(end_s)]
+    cmd += [
+        "-i", str(media_path), "-vn",
         "-af",
-        f"aresample=8000,asetnsamples=n={8000 * bin_seconds}:p=0,"
+        f"aresample=8000,asetnsamples=n={n_samples}:p=0,"
         "astats=metadata=1:reset=1,"
         "ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-",
         "-f", "null", "-",
@@ -51,6 +61,31 @@ def rms_series(media_path, bin_seconds=BIN_SECONDS):
             v = line.split("=", 1)[1]
             levels.append(float(v) if v not in ("-inf", "nan") else -90.0)
     return np.clip(np.array(levels), -90.0, 0.0)
+
+
+def rms_series(media_path, bin_seconds=BIN_SECONDS):
+    """Per-bin RMS level (dB) for the whole media file."""
+    return rms_series_window(media_path, bin_seconds=bin_seconds)
+
+
+def clip_energy_series(video_path, start_s, end_s, bin_seconds=0.2):
+    """Fine-grained RMS energy envelope scoped to one highlight clip's window
+    (start_s/end_s are original-VOD timestamps, same convention as
+    highlights.json). Clips are short (<=60s) so fine bins here are cheap,
+    unlike a full-VOD fine-grained pass would be. t_s stays in original-VOD
+    time (not clip-relative) to match highlights.json/transcript.json's
+    convention; callers subtract start_s themselves, same as edl.py does.
+
+    Feeds pipeline.autoedit's reaction-zoom / onomatopoeia spike detection.
+    """
+    levels = rms_series_window(video_path, start_s, end_s, bin_seconds)
+    t_s = [round(start_s + i * bin_seconds, 3) for i in range(len(levels))]
+    jump = np.diff(levels, prepend=levels[0] if len(levels) else 0.0)
+    return {
+        "t_s": t_s,
+        "rms_db": [round(float(v), 2) for v in levels],
+        "jump_db": [round(float(v), 2) for v in jump],
+    }
 
 
 def audio_features(levels_db, bin_seconds=BIN_SECONDS, smooth_sigma=2.0):

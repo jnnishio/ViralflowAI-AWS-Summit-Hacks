@@ -4,28 +4,30 @@ PlayResY: 1920
 WrapStyle: 0
 
 [V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
-Style: zh,PingFang TC,64,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
+Style: karaoke,MingLiU,64,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
 
 [Events]
 Format: Layer, Start, End, Style, Text
-Dialogue: 0,0:00:00.00,0:00:04.12,zh,是什麼東西？感覺他們要說很荒唐，
-Dialogue: 0,0:00:04.12,0:00:08.24,zh,誰比較可能會把浣熊當成貓帶回家，
-Dialogue: 0,0:00:10.37,0:00:17.04,zh,321，這什麼東西啦，我想跟你說
-Dialogue: 0,0:00:17.04,0:00:18.29,zh,，當成
-Dialogue: 0,0:00:18.29,0:00:21.18,zh,貓是怎樣，但因為我，我不會，我就
-Dialogue: 0,0:00:21.18,0:00:24.08,zh,算把它當成貓，我也不會帶它回家，
-Dialogue: 0,0:00:24.08,0:00:26.97,zh,因為我超嚴重的貓過敏，所以我肯定
-Dialogue: 0,0:00:26.97,0:00:29.87,zh,是投你啊。對啊，對啊，你家貓也蠻
-Dialogue: 0,0:00:29.87,0:00:30.77,zh,像浣熊的。
-Dialogue: 0,0:00:32.84,0:00:34.74,zh,好。
-Dialogue: 0,0:00:35.61,0:00:38.50,zh,哦，我們那個也稱倒數1分鐘，時間
-Dialogue: 0,0:00:38.50,0:00:39.22,zh,比較清。
-Dialogue: 0,0:00:39.91,0:00:42.32,zh,好，等一下，我們現在目前的那個榜
-Dialogue: 0,0:00:42.32,0:00:44.27,zh,前3的話，倒數最後1分鐘，
-Dialogue: 0,0:00:44.71,0:00:46.15,zh,最後咯，加油
-Dialogue: 0,0:00:46.15,0:00:50.35,zh,加油，好，題目是，誰會自信滿滿地
-Dialogue: 0,0:00:50.35,0:00:53.24,zh,唱錯歌詞，3、2、1。
-Dialogue: 0,0:00:55.80,0:00:57.45,zh,承認，
-Dialogue: 0,0:00:58.72,0:01:02.60,zh,沒有沒有這回事，但其實我們兩個都
-Dialogue: 0,0:01:02.60,0:01:05.76,zh,蠻不常唱錯的，對，意外的，
+Dialogue: 0,0:00:00.00,0:00:00.99,karaoke,{\kf16}說{\kf16}它{\kf44}是{\kf20}它
+Dialogue: 0,0:00:00.99,0:00:01.75,karaoke,{\kf4}是{\kf28}冰{\kf24}的{\kf12}它
+Dialogue: 0,0:00:01.75,0:00:05.11,karaoke,{\kf4}是{\kf28}冰{\kf16}的{\kf7}它
+Dialogue: 0,0:00:05.19,0:00:07.19,karaoke,{\kf32}有點{\kf31}像{\kf24}對{\kf12}我
+Dialogue: 0,0:00:07.19,0:00:08.15,karaoke,{\kf26}剛剛{\kf34}看{\kf1}它{\kf20}它
+Dialogue: 0,0:00:08.15,0:00:08.91,karaoke,{\kf40}顏色{\kf12}也{\kf12}很{\kf12}像
+Dialogue: 0,0:00:08.91,0:00:15.25,karaoke,{\kf49}葷{\kf12}他{\kf1}他{\kf37}剛剛
+Dialogue: 0,0:00:15.28,0:00:16.72,karaoke,{\kf16}有{\kf32}那個{\kf48}咕嘟{\kf48}咕嘟
+Dialogue: 0,0:00:16.72,0:00:19.65,karaoke,{\kf16}的{\kf28}聲音{\kf1}很{\kf44}可愛的
+Dialogue: 0,0:00:19.81,0:00:20.89,karaoke,{\kf28}小心{\kf20}他會{\kf44}划走{\kf16}哦
+Dialogue: 0,0:00:21.58,0:00:23.25,karaoke,{\kf49}剛那個{\kf34}鬥{\kf8}讓{\kf16}大家
+Dialogue: 0,0:00:24.29,0:00:26.63,karaoke,{\kf24}很{\kf16}可{\kf2}愛{\kf74}並沒有
+Dialogue: 0,0:00:29.01,0:00:30.33,karaoke,{\kf19}不要{\kf5}再{\kf29}欺騙{\kf28}自己
+Dialogue: 0,0:00:30.37,0:00:31.32,karaoke,{\kf4}了{\kf16}好{\kf4}嗎{\kf35}各位
+Dialogue: 0,0:00:32.37,0:00:32.93,karaoke,{\kf1}那{\kf4}你{\kf15}把{\kf1}它
+Dialogue: 0,0:00:32.93,0:00:34.20,karaoke,{\kf6}拋{\kf18}拋{\kf1}3{\kf2}公尺
+Dialogue: 0,0:00:38.38,0:00:41.72,karaoke,{\kf1}好{\kf1}嗎{\kf51}有{\kf4}誒
+Dialogue: 0,0:00:41.72,0:00:42.57,karaoke,{\kf4}有{\kf1}誒{\kf32}沒{\kf12}到
+Dialogue: 0,0:00:47.81,0:00:49.57,karaoke,{\kf1}好{\kf23}我們{\kf20}把{\kf5}它
+Dialogue: 0,0:00:50.12,0:00:52.43,karaoke,{\kf20}一下{\kf7}對{\kf20}啊{\kf1}很
+Dialogue: 0,0:00:52.56,0:00:53.92,karaoke,{\kf16}像{\kf55}布丁{\kf12}很{\kf12}好
+Dialogue: 0,0:00:58.47,0:00:59.12,karaoke,{\kf1}嗯{\kf13}我們{\kf12}來{\kf36}開動

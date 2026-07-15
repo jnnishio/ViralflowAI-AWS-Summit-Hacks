@@ -1,4 +1,5 @@
 import type { AiEditRequest, AiEditResponse, Clip, Edl, EdlSegment } from "./schema";
+import { PIPELINE_EDL_EFFECTS } from "./edl-fixtures";
 
 /**
  * Deterministic stand-in for a real Bedrock call producing an EDL (see
@@ -86,6 +87,9 @@ function generateForChip({
 
 		case "more_reactions":
 			return buildEmphasisResponse({ clip, base });
+
+		case "auto":
+			return buildAutoEditResponse({ clip, base });
 	}
 }
 
@@ -214,5 +218,20 @@ function generateForPrompt({
 		summary:
 			"Couldn't determine a specific edit from that prompt — try a quick action, or mention trim/speed/captions/zoom/reorder directly.",
 		edl: base,
+	};
+}
+
+function buildAutoEditResponse({ clip, base }: { clip: Clip; base: Edl }): AiEditResponse {
+	const effects = PIPELINE_EDL_EFFECTS[clip.id] ?? [];
+	const effectCount = effects.length;
+	const zoomCount = effects.filter((e) => e.effectId === "punch-in-zoom").length;
+	const captionCount = effects.filter((e) => e.effectId === "onomatopoeia-caption").length;
+	const sfxCount = effects.filter((e) => e.type === "sound").length;
+
+	return {
+		summary: effectCount > 0
+			? `Applied AI auto-edit: ${zoomCount} reaction zoom(s), ${captionCount} burst caption(s), ${sfxCount} sound effect(s). All edits are user-adjustable on the timeline.`
+			: "No auto-edit effects detected for this clip.",
+		edl: { ...base, effects },
 	};
 }

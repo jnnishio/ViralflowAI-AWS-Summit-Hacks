@@ -5,42 +5,37 @@ WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
-Style: karaoke,Noto Sans CJK TC,64,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+Style: karaoke,MingLiU,64,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
 
 [Events]
 Format: Layer, Start, End, Style, Text
-Dialogue: 0,0:00:02.06,0:00:02.94,karaoke,{\kf12}我覺{\kf48}得馬來{\kf13}西亞{\kf15}好像
-Dialogue: 0,0:00:02.94,0:00:04.34,karaoke,{\kf34}蠻多{\kf24}就是{\kf43}那種{\kf33}呃
-Dialogue: 0,0:00:04.34,0:00:05.58,karaoke,{\kf20}怎麼{\kf16}說{\kf20}就是{\kf60}音樂季
-Dialogue: 0,0:00:05.58,0:00:06.10,karaoke,{\kf24}那種{\kf8}對{\kf8}不{\kf8}對
-Dialogue: 0,0:00:07.38,0:00:08.42,karaoke,{\kf20}對{\kf19}啊{\kf16}我{\kf32}想到
-Dialogue: 0,0:00:08.42,0:00:09.14,karaoke,{\kf8}了{\kf16}我{\kf28}7月{\kf16}5
-Dialogue: 0,0:00:09.14,0:00:10.50,karaoke,{\kf56}號有{\kf28}一場{\kf12}在{\kf40}貓咪
-Dialogue: 0,0:00:10.50,0:00:11.30,karaoke,{\kf36}咖啡{\kf16}廳{\kf8}你{\kf16}可以
-Dialogue: 0,0:00:11.30,0:00:12.74,karaoke,{\kf16}來{\kf8}哦{\kf8}對{\kf4}我
-Dialogue: 0,0:00:12.74,0:00:14.07,karaoke,{\kf21}那天{\kf20}就是{\kf28}呃{\kf40}我
-Dialogue: 0,0:00:14.07,0:00:15.47,karaoke,{\kf63}算是{\kf33}生日{\kf12}前{\kf12}的
-Dialogue: 0,0:00:15.47,0:00:17.51,karaoke,{\kf34}那種{\kf46}音樂會{\kf24}貓咪{\kf28}咖啡
-Dialogue: 0,0:00:17.51,0:00:18.55,karaoke,{\kf20}廳裡{\kf28}面有{\kf20}很多{\kf36}只貓
-Dialogue: 0,0:00:18.55,0:00:21.49,karaoke,{\kf16}咪{\kf19}誒{\kf24}有人{\kf34}說
-Dialogue: 0,0:00:21.74,0:00:23.52,karaoke,{\kf93}呃{\kf52}新加坡{\kf16}和{\kf17}那個
-Dialogue: 0,0:00:23.52,0:00:25.10,karaoke,{\kf27}貓咪{\kf36}咖啡{\kf28}廳{\kf67}是
-Dialogue: 0,0:00:25.55,0:00:27.45,karaoke,{\kf67}幾時{\kf32}幾點{\kf16}的{\kf74}時候
-Dialogue: 0,0:00:27.96,0:00:29.36,karaoke,{\kf1}哦{\kf28}這邊{\kf12}有{\kf49}那個
-Dialogue: 0,0:00:30.43,0:00:31.95,karaoke,{\kf66}晚上{\kf23}7{\kf16}到{\kf16}9
-Dialogue: 0,0:00:31.95,0:00:34.39,karaoke,{\kf22}點{\kf12}對{\kf8}在{\kf24}貓咪
-Dialogue: 0,0:00:34.39,0:00:35.59,karaoke,{\kf28}咖啡{\kf16}廳{\kf23}在{\kf52}新莊
-Dialogue: 0,0:00:36.51,0:00:37.56,karaoke,{\kf16}對{\kf38}那地點{\kf14}在{\kf12}那
-Dialogue: 0,0:00:37.56,0:00:38.24,karaoke,{\kf11}我{\kf14}我{\kf16}有點{\kf20}忘
-Dialogue: 0,0:00:38.24,0:00:42.20,karaoke,{\kf8}了{\kf20}對{\kf17}來{\kf27}私訊
-Dialogue: 0,0:00:42.20,0:00:42.72,karaoke,{\kf8}我{\kf12}好{\kf4}了{\kf20}不然
-Dialogue: 0,0:00:42.72,0:00:43.84,karaoke,{\kf23}我{\kf32}我現{\kf19}在{\kf24}突然
-Dialogue: 0,0:00:43.84,0:00:46.64,karaoke,{\kf12}間{\kf28}忘記{\kf39}了{\kf16}對
-Dialogue: 0,0:00:46.68,0:00:51.16,karaoke,{\kf12}在{\kf28}北部{\kf4}直{\kf24}直播
-Dialogue: 0,0:00:51.16,0:00:52.48,karaoke,{\kf1}對{\kf1}對{\kf33}對{\kf32}順便
-Dialogue: 0,0:00:52.48,0:00:53.99,karaoke,{\kf44}支持{\kf16}一下{\kf8}對{\kf15}還有
-Dialogue: 0,0:00:53.99,0:00:54.76,karaoke,{\kf29}偉青{\kf12}要{\kf28}支持{\kf8}一下
-Dialogue: 0,0:00:54.76,0:00:56.76,karaoke,{\kf32}偉青{\kf11}對{\kf20}對{\kf34}Okay
-Dialogue: 0,0:00:56.80,0:00:57.67,karaoke,{\kf13}好{\kf15}那{\kf12}我們{\kf35}今天
-Dialogue: 0,0:00:57.67,0:00:58.72,karaoke,{\kf1}第{\kf8}1{\kf16}集{\kf24}算是
-Dialogue: 0,0:00:58.72,0:00:59.40,karaoke,{\kf12}很{\kf40}成功{\kf16}哦
+Dialogue: 0,0:00:00.08,0:00:02.60,karaoke,{\kf12}是{\kf20}什麼{\kf14}東西{\kf32}感覺
+Dialogue: 0,0:00:02.60,0:00:03.08,karaoke,{\kf4}他們{\kf8}要{\kf16}說{\kf4}很
+Dialogue: 0,0:00:03.08,0:00:04.12,karaoke,{\kf24}荒唐{\kf20}誰{\kf16}比{\kf20}較
+Dialogue: 0,0:00:04.12,0:00:05.40,karaoke,{\kf32}可能{\kf16}會{\kf20}把{\kf60}浣熊
+Dialogue: 0,0:00:05.40,0:00:06.81,karaoke,{\kf40}當成{\kf28}貓{\kf20}帶{\kf53}回家
+Dialogue: 0,0:00:11.09,0:00:13.85,karaoke,{\kf72}321{\kf1}這{\kf4}什麼{\kf3}東西
+Dialogue: 0,0:00:14.25,0:00:15.98,karaoke,{\kf1}啦{\kf1}我{\kf1}想{\kf1}跟
+Dialogue: 0,0:00:16.27,0:00:18.61,karaoke,{\kf1}你{\kf1}說{\kf5}當成{\kf32}貓
+Dialogue: 0,0:00:18.61,0:00:19.61,karaoke,{\kf20}是{\kf28}怎樣{\kf20}但{\kf16}因為
+Dialogue: 0,0:00:19.61,0:00:20.53,karaoke,{\kf8}我{\kf20}我{\kf36}不會{\kf16}我
+Dialogue: 0,0:00:20.53,0:00:21.33,karaoke,{\kf20}就算{\kf12}把{\kf8}它{\kf40}當成貓
+Dialogue: 0,0:00:21.37,0:00:21.85,karaoke,{\kf8}我{\kf4}也{\kf20}不會{\kf16}帶
+Dialogue: 0,0:00:21.85,0:00:22.81,karaoke,{\kf16}它{\kf24}回家{\kf12}因為{\kf40}我
+Dialogue: 0,0:00:22.81,0:00:24.45,karaoke,{\kf48}超{\kf19}嚴重{\kf17}的{\kf80}貓過敏
+Dialogue: 0,0:00:24.69,0:00:25.77,karaoke,{\kf28}所以{\kf32}我{\kf36}肯定{\kf12}是
+Dialogue: 0,0:00:25.77,0:00:27.06,karaoke,{\kf32}投{\kf24}你{\kf20}啊{\kf13}對
+Dialogue: 0,0:00:27.13,0:00:29.45,karaoke,{\kf16}啊{\kf19}對{\kf5}啊{\kf24}你家
+Dialogue: 0,0:00:29.49,0:00:30.57,karaoke,{\kf24}貓也{\kf24}蠻{\kf10}像{\kf50}浣熊
+Dialogue: 0,0:00:30.57,0:00:36.17,karaoke,{\kf20}的{\kf23}好{\kf20}哦{\kf20}我們
+Dialogue: 0,0:00:36.17,0:00:36.85,karaoke,{\kf16}那個{\kf12}也{\kf12}稱{\kf28}倒數
+Dialogue: 0,0:00:36.85,0:00:37.81,karaoke,{\kf8}1{\kf40}分鐘{\kf1}時間{\kf12}比
+Dialogue: 0,0:00:37.81,0:00:40.30,karaoke,{\kf12}較{\kf4}清{\kf13}好{\kf15}等
+Dialogue: 0,0:00:40.30,0:00:41.39,karaoke,{\kf13}一下{\kf20}我們{\kf40}現在{\kf32}目前
+Dialogue: 0,0:00:41.39,0:00:42.91,karaoke,{\kf20}的{\kf28}那個{\kf76}榜前{\kf28}3
+Dialogue: 0,0:00:42.91,0:00:43.75,karaoke,{\kf12}的話{\kf24}倒數{\kf28}最後{\kf12}1
+Dialogue: 0,0:00:43.75,0:00:46.15,karaoke,{\kf52}分鐘{\kf52}最後{\kf28}咯{\kf52}加油
+Dialogue: 0,0:00:46.15,0:00:48.03,karaoke,{\kf52}加油{\kf24}好{\kf52}題目{\kf24}是
+Dialogue: 0,0:00:48.47,0:00:50.07,karaoke,{\kf32}誰{\kf28}會{\kf44}自信{\kf56}滿滿地
+Dialogue: 0,0:00:50.07,0:00:52.47,karaoke,{\kf64}唱錯{\kf48}歌詞{\kf44}3{\kf36}2
+Dialogue: 0,0:00:52.65,0:00:57.45,karaoke,{\kf34}1{\kf113}承認
