@@ -4,29 +4,43 @@ PlayResY: 1920
 WrapStyle: 0
 
 [V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
-Style: zh,PingFang TC,64,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
+Style: karaoke,Noto Sans CJK TC,64,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
 
 [Events]
 Format: Layer, Start, End, Style, Text
-Dialogue: 0,0:00:00.00,0:00:00.00,zh,那這個，好，下一題，誰會在吵架的
-Dialogue: 0,0:00:00.00,0:00:03.39,zh,時候，假哭來獲得優勢？3、
-Dialogue: 0,0:00:03.59,0:00:05.54,zh,2、1，好傷人哦。
-Dialogue: 0,0:00:06.92,0:00:07.87,zh,你是假哭了，
-Dialogue: 0,0:00:11.09,0:00:12.15,zh,罵的，
-Dialogue: 0,0:00:13.00,0:00:16.11,zh,我覺得他比較可能都是真哭。對，但
-Dialogue: 0,0:00:16.11,0:00:19.23,zh,是你哭這件事情來說，就不可能指向
-Dialogue: 0,0:00:19.23,0:00:21.56,zh,我，所以，哦，對吧？嗯，
-Dialogue: 0,0:00:24.35,0:00:24.92,zh,這什麼題目
-Dialogue: 0,0:00:24.92,0:00:26.80,zh,啊，這是挑不離間好嗎。
-Dialogue: 0,0:00:28.15,0:00:31.83,zh,所以我們這邊精挑細選，細，OKO
-Dialogue: 0,0:00:31.83,0:00:35.50,zh,K，沒問題，好，沒有，都沒有很好
-Dialogue: 0,0:00:35.50,0:00:38.03,zh,笑，已經要到這樣子，我
-Dialogue: 0,0:00:38.03,0:00:41.35,zh,這邊很好笑的感覺不能播。
-Dialogue: 0,0:00:42.01,0:00:42.92,zh,不對，
-Dialogue: 0,0:00:45.23,0:00:45.88,zh,感覺不太
-Dialogue: 0,0:00:45.97,0:00:47.04,zh,對。
-Dialogue: 0,0:00:47.76,0:00:50.41,zh,姐姐已經
-Dialogue: 0,0:00:51.28,0:00:53.23,zh,默默的。
-Dialogue: 0,0:00:53.76,0:00:55.72,zh,怎麼樣怎麼樣，你說，諸位
-Dialogue: 0,0:00:55.72,0:01:00.52,zh,好，誰65歲還會被要求點兒童餐，
+Dialogue: 0,0:00:02.06,0:00:02.94,karaoke,{\kf12}我覺{\kf48}得馬來{\kf13}西亞{\kf15}好像
+Dialogue: 0,0:00:02.94,0:00:04.34,karaoke,{\kf34}蠻多{\kf24}就是{\kf43}那種{\kf33}呃
+Dialogue: 0,0:00:04.34,0:00:05.58,karaoke,{\kf20}怎麼{\kf16}說{\kf20}就是{\kf60}音樂季
+Dialogue: 0,0:00:05.58,0:00:06.10,karaoke,{\kf24}那種{\kf8}對{\kf8}不{\kf8}對
+Dialogue: 0,0:00:07.38,0:00:08.42,karaoke,{\kf20}對{\kf19}啊{\kf16}我{\kf32}想到
+Dialogue: 0,0:00:08.42,0:00:09.14,karaoke,{\kf8}了{\kf16}我{\kf28}7月{\kf16}5
+Dialogue: 0,0:00:09.14,0:00:10.50,karaoke,{\kf56}號有{\kf28}一場{\kf12}在{\kf40}貓咪
+Dialogue: 0,0:00:10.50,0:00:11.30,karaoke,{\kf36}咖啡{\kf16}廳{\kf8}你{\kf16}可以
+Dialogue: 0,0:00:11.30,0:00:12.74,karaoke,{\kf16}來{\kf8}哦{\kf8}對{\kf4}我
+Dialogue: 0,0:00:12.74,0:00:14.07,karaoke,{\kf21}那天{\kf20}就是{\kf28}呃{\kf40}我
+Dialogue: 0,0:00:14.07,0:00:15.47,karaoke,{\kf63}算是{\kf33}生日{\kf12}前{\kf12}的
+Dialogue: 0,0:00:15.47,0:00:17.51,karaoke,{\kf34}那種{\kf46}音樂會{\kf24}貓咪{\kf28}咖啡
+Dialogue: 0,0:00:17.51,0:00:18.55,karaoke,{\kf20}廳裡{\kf28}面有{\kf20}很多{\kf36}只貓
+Dialogue: 0,0:00:18.55,0:00:21.49,karaoke,{\kf16}咪{\kf19}誒{\kf24}有人{\kf34}說
+Dialogue: 0,0:00:21.74,0:00:23.52,karaoke,{\kf93}呃{\kf52}新加坡{\kf16}和{\kf17}那個
+Dialogue: 0,0:00:23.52,0:00:25.10,karaoke,{\kf27}貓咪{\kf36}咖啡{\kf28}廳{\kf67}是
+Dialogue: 0,0:00:25.55,0:00:27.45,karaoke,{\kf67}幾時{\kf32}幾點{\kf16}的{\kf74}時候
+Dialogue: 0,0:00:27.96,0:00:29.36,karaoke,{\kf1}哦{\kf28}這邊{\kf12}有{\kf49}那個
+Dialogue: 0,0:00:30.43,0:00:31.95,karaoke,{\kf66}晚上{\kf23}7{\kf16}到{\kf16}9
+Dialogue: 0,0:00:31.95,0:00:34.39,karaoke,{\kf22}點{\kf12}對{\kf8}在{\kf24}貓咪
+Dialogue: 0,0:00:34.39,0:00:35.59,karaoke,{\kf28}咖啡{\kf16}廳{\kf23}在{\kf52}新莊
+Dialogue: 0,0:00:36.51,0:00:37.56,karaoke,{\kf16}對{\kf38}那地點{\kf14}在{\kf12}那
+Dialogue: 0,0:00:37.56,0:00:38.24,karaoke,{\kf11}我{\kf14}我{\kf16}有點{\kf20}忘
+Dialogue: 0,0:00:38.24,0:00:42.20,karaoke,{\kf8}了{\kf20}對{\kf17}來{\kf27}私訊
+Dialogue: 0,0:00:42.20,0:00:42.72,karaoke,{\kf8}我{\kf12}好{\kf4}了{\kf20}不然
+Dialogue: 0,0:00:42.72,0:00:43.84,karaoke,{\kf23}我{\kf32}我現{\kf19}在{\kf24}突然
+Dialogue: 0,0:00:43.84,0:00:46.64,karaoke,{\kf12}間{\kf28}忘記{\kf39}了{\kf16}對
+Dialogue: 0,0:00:46.68,0:00:51.16,karaoke,{\kf12}在{\kf28}北部{\kf4}直{\kf24}直播
+Dialogue: 0,0:00:51.16,0:00:52.48,karaoke,{\kf1}對{\kf1}對{\kf33}對{\kf32}順便
+Dialogue: 0,0:00:52.48,0:00:53.99,karaoke,{\kf44}支持{\kf16}一下{\kf8}對{\kf15}還有
+Dialogue: 0,0:00:53.99,0:00:54.76,karaoke,{\kf29}偉青{\kf12}要{\kf28}支持{\kf8}一下
+Dialogue: 0,0:00:54.76,0:00:56.76,karaoke,{\kf32}偉青{\kf11}對{\kf20}對{\kf34}Okay
+Dialogue: 0,0:00:56.80,0:00:57.67,karaoke,{\kf13}好{\kf15}那{\kf12}我們{\kf35}今天
+Dialogue: 0,0:00:57.67,0:00:58.72,karaoke,{\kf1}第{\kf8}1{\kf16}集{\kf24}算是
+Dialogue: 0,0:00:58.72,0:00:59.40,karaoke,{\kf12}很{\kf40}成功{\kf16}哦

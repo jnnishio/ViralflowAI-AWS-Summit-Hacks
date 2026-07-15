@@ -4,8 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:mock": "concurrently -k -n mock,vite -c yellow,cyan \"npm:mock-server\" \"vite --mode mock\"",
+    "dev": "concurrently -k -n server,vite -c yellow,cyan \"npm:local-server\" \"vite --mode demo\"",
+    "dev:cloud": "vite",
+    "dev:mock": "concurrently -k -n mock,vite -c yellow,cyan \"npm:local-server\" \"vite --mode mock\"",
+    "local-server": "node mock-server/server.mjs",
     "mock-server": "node mock-server/server.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",

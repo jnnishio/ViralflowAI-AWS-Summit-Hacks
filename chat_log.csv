@@ -1,0 +1,7 @@
+@timestamp,message,msg
+2026-07-15T14:00:00.000Z,"{""time"": ""2026-07-15T14:00:00Z"", ""msg"": ""onRoomCreated""}",onRoomCreated
+2026-07-15T14:00:01.000Z,"{""time"": ""2026-07-15T14:00:01Z"", ""msg"": ""join"", ""pfid"": ""u001"", ""user_name"": ""Alice""}",join
+2026-07-15T14:00:02.000Z,"{""time"": ""2026-07-15T14:00:02Z"", ""msg"": ""msg"", ""c"": {""pfid"": ""u001"", ""name"": ""Alice"", ""msg"": ""first!"", ""vip_lvl"": 2, ""uglv"": 10, ""is_admin"": false}}",msg
+2026-07-15T14:00:03.000Z,"{""time"": ""2026-07-15T14:00:03Z"", ""msg"": ""msg_join"", ""c"": {""pfid"": ""u002"", ""name"": ""Bob""}}",msg_join
+2026-07-15T14:00:04.000Z,"{""time"": ""2026-07-15T14:00:04Z"", ""msg"": ""msg_dirty"", ""c"": {""pfid"": ""u002"", ""name"": ""Bob"", ""msg"": ""笑死 太扯了 🤣🤣"", ""vip_lvl"": 0, ""uglv"": 3, ""is_admin"": false}}",msg_dirty
+2026-07-15T14:00:05.000Z,"{""time"": ""2026-07-15T14:00:05Z"", ""msg"": ""owner_leave""}",owner_leave
