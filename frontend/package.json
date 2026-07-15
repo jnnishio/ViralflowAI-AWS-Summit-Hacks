@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:mock": "concurrently -k -n mock,vite -c yellow,cyan \"npm:mock-server\" \"npm:dev\"",
+    "dev:mock": "concurrently -k -n mock,vite -c yellow,cyan \"npm:mock-server\" \"vite --mode mock\"",
     "mock-server": "node mock-server/server.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
