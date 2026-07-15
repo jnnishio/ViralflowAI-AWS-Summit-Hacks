@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   confirmUpload,
@@ -9,6 +9,7 @@ import {
   addUploadItems,
   getUploadItems,
   nextUploadItemId,
+  removeUploadItem,
   updateUploadItem,
   useUploadItems,
   type UploadItem,
@@ -49,30 +50,78 @@ function partitionSelection(files: File[]): {
   }
 }
 
+function formatEta(seconds: number): string {
+  const whole = Math.max(1, Math.round(seconds))
+  if (whole < 60) return `${whole}s`
+  const minutes = Math.floor(whole / 60)
+  const secs = whole % 60
+  return `${minutes}m ${secs}s`
+}
+
+/** In-flight XHRs keyed by upload item id, so a removed/cancelled item can
+ * abort its underlying request instead of uploading bytes nobody wants. */
+const abortControllers = new Map<string, AbortController>()
+
 /** Property 3: every attempt (including retries) requests a fresh
  * presigned URL. */
 function startUpload(item: UploadItem): void {
-  updateUploadItem(item.id, { status: 'uploading', progress: 0 })
+  updateUploadItem(item.id, { status: 'uploading', progress: 0, etaSeconds: null })
+  const controller = new AbortController()
+  abortControllers.set(item.id, controller)
+  const startedAt = Date.now()
+
   requestPresignedUpload(item.file.name)
     .then(({ uploadUrl, key }) =>
-      uploadFileToPresignedUrl(uploadUrl, item.file, (percent) => {
-        updateUploadItem(item.id, { progress: percent })
-      }).then(() => confirmUpload(key).then(() => key)),
+      uploadFileToPresignedUrl(
+        uploadUrl,
+        item.file,
+        (percent, loaded, total) => {
+          const elapsedSeconds = (Date.now() - startedAt) / 1000
+          const bytesPerSecond = elapsedSeconds > 0 ? loaded / elapsedSeconds : 0
+          const etaSeconds =
+            bytesPerSecond > 0 ? (total - loaded) / bytesPerSecond : null
+          updateUploadItem(item.id, { progress: percent, etaSeconds })
+        },
+        controller.signal,
+      ).then(() => confirmUpload(key).then(() => key)),
     )
     .then((key) => {
-      updateUploadItem(item.id, { status: 'uploaded', progress: 100, key })
+      updateUploadItem(item.id, {
+        status: 'uploaded',
+        progress: 100,
+        etaSeconds: null,
+        key,
+      })
     })
     .catch(() => {
-      updateUploadItem(item.id, { status: 'error' })
+      // The item may have already been removed (cancelled) by the user;
+      // don't resurrect it as an error in that case.
+      if (getUploadItems().some((it) => it.id === item.id)) {
+        updateUploadItem(item.id, { status: 'error', etaSeconds: null })
+      }
     })
+    .finally(() => {
+      abortControllers.delete(item.id)
+    })
+}
+
+function cancelUpload(id: string): void {
+  abortControllers.get(id)?.abort()
+  abortControllers.delete(id)
+  removeUploadItem(id)
 }
 
 export function UploadScreen() {
   const navigate = useNavigate()
   const items = useUploadItems()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
   )
+
+  const handleAddFilesClick = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
 
   const handleFilesSelected = useCallback((fileList: FileList | null) => {
     if (!fileList) return
@@ -98,6 +147,7 @@ export function UploadScreen() {
       key: null,
       status: 'pending',
       progress: 0,
+      etaSeconds: null,
     }))
     addUploadItems(newItems)
     newItems.forEach(startUpload)
@@ -106,6 +156,10 @@ export function UploadScreen() {
   const retry = useCallback((id: string) => {
     const item = getUploadItems().find((it) => it.id === id)
     if (item) startUpload(item)
+  }, [])
+
+  const remove = useCallback((id: string) => {
+    cancelUpload(id)
   }, [])
 
   const canProceed =
@@ -117,12 +171,20 @@ export function UploadScreen() {
       <p>Upload one or more VOD files to generate highlights.</p>
 
       <input
+        ref={fileInputRef}
         type="file"
         multiple
         accept=".mp4,.mov,.mkv"
-        onChange={(event) => handleFilesSelected(event.target.files)}
+        onChange={(event) => {
+          handleFilesSelected(event.target.files)
+          event.target.value = ''
+        }}
         aria-label="Select VOD files"
+        hidden
       />
+      <button type="button" onClick={handleAddFilesClick}>
+        Add files
+      </button>
 
       {validationMessage && <p role="alert">{validationMessage}</p>}
 
@@ -131,17 +193,26 @@ export function UploadScreen() {
           <li key={item.id}>
             <span>{item.file.name}</span>{' '}
             {item.status === 'error' ? (
-              <>
-                <span role="alert">Upload failed</span>{' '}
-                <button type="button" onClick={() => retry(item.id)}>
-                  Retry
-                </button>
-              </>
+              <span role="alert">Upload failed</span>
             ) : (
               <span>
-                {item.status === 'uploaded' ? 'Uploaded' : `${item.progress}%`}
+                {item.status === 'uploaded'
+                  ? 'Uploaded'
+                  : `${item.progress}%${
+                      item.etaSeconds != null
+                        ? ` · ${formatEta(item.etaSeconds)} remaining`
+                        : ''
+                    }`}
               </span>
-            )}
+            )}{' '}
+            {item.status === 'error' && (
+              <button type="button" onClick={() => retry(item.id)}>
+                Retry
+              </button>
+            )}{' '}
+            <button type="button" onClick={() => remove(item.id)}>
+              {item.status === 'uploading' ? 'Cancel' : 'Remove'}
+            </button>
           </li>
         ))}
       </ul>

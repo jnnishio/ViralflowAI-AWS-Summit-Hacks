@@ -31,6 +31,8 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as sfn_tasks,
+    aws_ecs as ecs,
+    aws_ec2 as ec2,
 )
 from constructs import Construct
 
@@ -238,7 +240,29 @@ class ApiStack(Stack):
             f"{self.websocket_api.api_id}/{self.websocket_stage.stage_name}/POST/@connections/*"
         )
 
-        # ---- Task 11: Analysis_Stage_Stub Lambdas + state machine ---------
+        # ---- Task 11: ECS Fargate Setup for Pipeline Rendering -------------
+        vpc = ec2.Vpc(self, "PipelineVpc", max_azs=2, nat_gateways=1)
+        cluster = ecs.Cluster(self, "PipelineCluster", vpc=vpc)
+        
+        render_task_def = ecs.FargateTaskDefinition(
+            self, "RenderTaskDef",
+            memory_limit_mib=4096,
+            cpu=1024,
+        )
+        
+        render_task_def.add_container(
+            "RenderContainer",
+            image=ecs.ContainerImage.from_asset(BACKEND_ROOT, file="pipeline/Dockerfile"),
+            logging=ecs.LogDrivers.aws_logs(stream_prefix="RenderContainer"),
+            environment=self._table_env,
+        )
+        raw_bucket.grant_read_write(render_task_def.task_role)
+
+        # ---- Task 12: Analysis_Stage_Stub Lambdas + state machine ---------
+        NO_OP_STAGES = [
+            "normalize/proxy",
+            "transcript",
+        ]
         no_op_fns = []
         for stage_name in NO_OP_STAGES:
             fn = self._py_fn(
@@ -251,14 +275,33 @@ class ApiStack(Stack):
             )
             no_op_fns.append((stage_name, fn))
 
+        chat_analysis_fn = self._py_fn(
+            "ChatAnalysisFn",
+            "lambdas/pipeline_stages/chat.py:handler",
+            extra_env=progress_management_env,
+        )
+        audio_analysis_fn = self._py_fn(
+            "AudioAnalysisFn",
+            "lambdas/pipeline_stages/audio.py:handler",
+            extra_env=progress_management_env,
+        )
+        visual_analysis_fn = self._py_fn(
+            "VisualAnalysisFn",
+            "lambdas/pipeline_stages/visual.py:handler",
+            extra_env=progress_management_env,
+        )
+        
+        # Audio and visual analysis need the ffmpeg layer, but for now we just define it.
+        # We will add the ffmpeg layer to them later.
+        
         fusion_scoring_fn = self._py_fn(
-            "StubFusionScoringFn",
-            "lambdas/stage_stubs/fusion_scoring_stub.py:handler",
+            "FusionScoringFn",
+            "lambdas/pipeline_stages/fusion.py:handler",
             extra_env=progress_management_env,
         )
         categorization_fn = self._py_fn(
-            "StubCategorizationFn",
-            "lambdas/stage_stubs/categorization_stub.py:handler",
+            "DirectorCategorizationFn",
+            "lambdas/pipeline_stages/director.py:handler",
             extra_env=progress_management_env,
         )
         set_status_in_progress_fn = self._py_fn(
@@ -279,6 +322,9 @@ class ApiStack(Stack):
 
         for fn in (
             *[f for _, f in no_op_fns],
+            chat_analysis_fn,
+            audio_analysis_fn,
+            visual_analysis_fn,
             fusion_scoring_fn,
             categorization_fn,
             set_status_in_progress_fn,
@@ -292,6 +338,12 @@ class ApiStack(Stack):
                     resources=[management_connections_arn],
                 )
             )
+        raw_bucket.grant_read_write(chat_analysis_fn)
+        raw_bucket.grant_read_write(audio_analysis_fn)
+        raw_bucket.grant_read_write(visual_analysis_fn)
+        raw_bucket.grant_read_write(fusion_scoring_fn)
+        raw_bucket.grant_read_write(categorization_fn)
+        
         job_table.grant_read_write_data(set_status_in_progress_fn)
         job_table.grant_read_write_data(set_status_completed_fn)
         job_table.grant_read_write_data(set_status_failed_fn)
@@ -328,12 +380,61 @@ class ApiStack(Stack):
                 )
             )
             chain = chain.next(step)
+            
+        chain = chain.next(
+            _with_catch(
+                sfn_tasks.LambdaInvoke(
+                    self,
+                    "ChatAnalysis",
+                    lambda_function=chat_analysis_fn,
+                    payload_response_only=True,
+                )
+            )
+        ).next(
+            _with_catch(
+                sfn_tasks.LambdaInvoke(
+                    self,
+                    "AudioAnalysis",
+                    lambda_function=audio_analysis_fn,
+                    payload_response_only=True,
+                )
+            )
+        )
+
+        render_run_task = sfn_tasks.EcsRunTask(
+            self,
+            "RenderClipsFargateTask",
+            integration_pattern=sfn.IntegrationPattern.RUN_JOB,
+            cluster=cluster,
+            task_definition=render_task_def,
+            launch_type=ecs.LaunchType.FARGATE,
+            container_overrides=[
+                sfn_tasks.ContainerOverride(
+                    container_definition=render_task_def.default_container,
+                    environment=[
+                        sfn_tasks.TaskEnvironmentVariable(
+                            name="JOB_ID", value=sfn.JsonPath.string_at("$.jobId")
+                        )
+                    ],
+                )
+            ],
+            result_path="$.renderResult",
+        )
 
         chain = chain.next(
             _with_catch(
                 sfn_tasks.LambdaInvoke(
                     self,
-                    "FusionScoringStub",
+                    "VisualAnalysis",
+                    lambda_function=visual_analysis_fn,
+                    payload_response_only=True,
+                )
+            )
+        ).next(
+            _with_catch(
+                sfn_tasks.LambdaInvoke(
+                    self,
+                    "FusionScoring",
                     lambda_function=fusion_scoring_fn,
                     payload_response_only=True,
                 )
@@ -342,11 +443,13 @@ class ApiStack(Stack):
             _with_catch(
                 sfn_tasks.LambdaInvoke(
                     self,
-                    "CategorizationStub",
+                    "CategorizationAndDirector",
                     lambda_function=categorization_fn,
                     payload_response_only=True,
                 )
             )
+        ).next(
+            _with_catch(render_run_task)
         ).next(
             sfn_tasks.LambdaInvoke(
                 self,

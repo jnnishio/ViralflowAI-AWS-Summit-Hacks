@@ -22,7 +22,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ZH_FONT = "PingFang TC"  # macOS built-in; Linux: swap for Noto Sans CJK TC
+ZH_FONT = "Noto Sans CJK TC"  # Changed from PingFang TC for Linux/Docker compatibility
 
 # Caption style, shared with pipeline/edl.py so the burned-in captions and the
 # EDL's caption.style stay in lockstep (edit here, both follow).
