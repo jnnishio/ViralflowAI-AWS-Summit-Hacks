@@ -1,0 +1,277 @@
+{
+ "model": "us.anthropic.claude-sonnet-4-6",
+ "highlights": [
+  {
+   "start_s": 3119.0,
+   "end_s": 3179.0,
+   "peak_s": 3155,
+   "score": 1.646,
+   "modalities": [
+    "chat",
+    "audio"
+   ],
+   "factors": {
+    "chat": 2.787,
+    "audio": 1.772,
+    "speech": -0.164
+   },
+   "keep": true,
+   "reason": "Singer delivers an emotionally expressive acoustic guitar performance of an original love song, with closed-eyes singing and enthusiastic live-chat reactions praising the song.",
+   "virality_score": 72,
+   "mood": "emotional",
+   "category": "song performance",
+   "title_zh": "韋綸自創曲《愛情旅行》現場演唱",
+   "title_en": "Original Song Live Performance – 'Love Journey'",
+   "hook_zh": "自創曲好好聽❤️",
+   "caption_zh": "黃韋綸直播現場演唱自創曲《愛情旅行》，閉眼深情投入，觀眾直呼「好好聽」🎸❤️",
+   "caption_en": "韋綸 performs his original song 'Love Journey' live on stream – heartfelt acoustic vocals that moved the whole chat 🎸❤️",
+   "hashtags": [
+    "#黃韋綸",
+    "#愛情旅行",
+    "#原創歌曲",
+    "#直播演唱",
+    "#acousticcover",
+    "#liveperformance",
+    "#台灣歌手"
+   ]
+  },
+  {
+   "start_s": 2943.0,
+   "end_s": 3003.0,
+   "peak_s": 2975,
+   "score": 1.112,
+   "modalities": [
+    "chat",
+    "audio"
+   ],
+   "factors": {
+    "chat": 1.672,
+    "audio": 1.565,
+    "speech": -0.164
+   },
+   "keep": true,
+   "reason": "Singer delivers an emotionally expressive acoustic guitar performance with eyes closed, drawing a flood of heart emojis and 'so good' comments from live chat viewers.",
+   "virality_score": 72,
+   "mood": "emotional",
+   "category": "song performance",
+   "title_zh": "韋綸深情吉他彈唱🎸",
+   "title_en": "Soulful Acoustic Live Performance 🎸",
+   "hook_zh": "閉眼深情唱🎶",
+   "caption_zh": "閉上眼睛，用靈魂唱歌🎸✨ 這首太甜了吧！#韋綸 #直播精華",
+   "caption_en": "Eyes closed, singing from the soul 🎸✨ This acoustic moment is pure magic — chat went crazy! #liveperformance",
+   "hashtags": [
+    "#韋綸",
+    "#吉他彈唱",
+    "#直播精華",
+    "#acoustic",
+    "#liveperformance",
+    "#翻唱",
+    "#好聽"
+   ]
+  },
+  {
+   "start_s": 1940.0,
+   "end_s": 2000.0,
+   "peak_s": 1980,
+   "score": 0.88,
+   "modalities": [
+    "chat",
+    "audio"
+   ],
+   "factors": {
+    "chat": 1.637,
+    "audio": 1.241,
+    "speech": -0.645
+   },
+   "keep": true,
+   "reason": "Singer delivers an emotionally resonant acoustic guitar performance that draws consistent heart/love reactions from live chat, peaking around the song's climax before transitioning to post-song conversation.",
+   "virality_score": 72,
+   "mood": "emotional",
+   "category": "song performance",
+   "title_zh": "黃韋綸深情吉他彈唱🎸",
+   "title_en": "Heartfelt Acoustic Performance That Had the Chat Going Crazy",
+   "hook_zh": "這一刻太美了🩷",
+   "caption_zh": "黃韋綸現場彈唱，每一句都唱進心裡❤️ 聊天室瞬間被愛心淹沒！#直播精華",
+   "caption_en": "Live acoustic performance that stopped the chat in its tracks 🎸🩷 Pure emotion from start to finish.",
+   "hashtags": [
+    "#黃韋綸",
+    "#吉他彈唱",
+    "#直播精華",
+    "#acoustic",
+    "#liveperformance",
+    "#翻唱",
+    "#感動瞬間"
+   ]
+  },
+  {
+   "start_s": 1779.0,
+   "end_s": 1839.0,
+   "peak_s": 1815,
+   "score": 1.277,
+   "modalities": [
+    "chat",
+    "audio"
+   ],
+   "factors": {
+    "chat": 2.503,
+    "audio": 1.337,
+    "speech": -0.485
+   },
+   "keep": true,
+   "reason": "Streamer delivers an emotional acoustic guitar self-accompanied performance that draws sustained fan praise and heart reactions in live chat, making it a strong song-performance clip.",
+   "virality_score": 68,
+   "mood": "emotional",
+   "category": "song performance",
+   "title_zh": "韋綸自彈自唱超感人🎸",
+   "title_en": "Heartfelt Acoustic Performance by 韋綸",
+   "hook_zh": "自彈自唱太帥了",
+   "caption_zh": "韋綸現場自彈自唱，歌聲溫柔動人，粉絲瘋狂刷愛心❤️ 這樣的他你怎麼能不愛？",
+   "caption_en": "韋綸delivers a soulful live acoustic performance that has fans flooding the chat with hearts — pure talent on display 🎸✨",
+   "hashtags": [
+    "#韋綸",
+    "#自彈自唱",
+    "#acoustic",
+    "#直播",
+    "#翻唱",
+    "#吉他",
+    "#歌聲好聽"
+   ]
+  },
+  {
+   "start_s": 4394.0,
+   "end_s": 4454.0,
+   "peak_s": 4430,
+   "score": 1.388,
+   "modalities": [
+    "chat",
+    "speech"
+   ],
+   "factors": {
+    "chat": 2.749,
+    "audio": -0.005,
+    "speech": 1.28
+   },
+   "keep": true,
+   "reason": "韋倫announces upcoming events (Malaysia show, July 5 cat café birthday concert) then hilariously admits he forgot the venue and tells fans to DM him, ending with a cheerful wrap-up of the first episode — a relatable, funny closing moment fans will enjoy.",
+   "virality_score": 62,
+   "mood": "funny",
+   "category": "funny moment",
+   "title_zh": "忘記地點叫你私訊他😂貓咪咖啡廳音樂會",
+   "title_en": "He Forgot the Venue Mid-Announcement 😂 Just DM Him",
+   "hook_zh": "地點我忘了😂",
+   "caption_zh": "韋倫宣布7月5號在貓咪咖啡廳辦生日音樂會，結果現場突然忘記地址，只好叫大家私訊他🐱🎵 第一集完美收尾！",
+   "caption_en": "Wei Lun announces his July 5 cat café birthday concert live… then completely blanks on the address and tells everyone to just DM him 😂 Episode 1 wrapped!",
+   "hashtags": [
+    "#黃韋倫",
+    "#貓咪咖啡廳",
+    "#直播精華",
+    "#忘記地點",
+    "#生日音樂會",
+    "#WeeklyLive",
+    "#TaiwanSinger"
+   ]
+  },
+  {
+   "start_s": 3982.0,
+   "end_s": 4042.0,
+   "peak_s": 4015,
+   "score": 1.167,
+   "modalities": [
+    "chat",
+    "audio"
+   ],
+   "factors": {
+    "chat": 2.191,
+    "audio": 1.352,
+    "speech": -0.164
+   },
+   "keep": true,
+   "reason": "Two performers doing a live acoustic guitar + keyboard self-accompanied performance with active fan chat engagement, creating a genuine music moment worth clipping.",
+   "virality_score": 62,
+   "mood": "wholesome",
+   "category": "song performance",
+   "title_zh": "自彈自唱現場直播！吉他+鋼琴雙人合奏",
+   "title_en": "Live Acoustic Duo Performance – Guitar & Keyboard",
+   "hook_zh": "自彈自唱🎸🎹",
+   "caption_zh": "兩位男神現場自彈自唱，吉他配鋼琴超有感覺✨直播現場粉絲瘋狂刷屏！",
+   "caption_en": "Live acoustic duo performance with guitar and keyboard – fans went wild in the chat! 🎸🎹✨",
+   "hashtags": [
+    "#自彈自唱",
+    "#直播音樂",
+    "#吉他",
+    "#鋼琴",
+    "#liveperformance",
+    "#acousticcover",
+    "#黃韋綸"
+   ]
+  },
+  {
+   "start_s": 3526.0,
+   "end_s": 3580.0,
+   "peak_s": 3560,
+   "score": 0.879,
+   "modalities": [
+    "chat",
+    "audio"
+   ],
+   "factors": {
+    "chat": 1.667,
+    "audio": 1.228,
+    "speech": -0.485
+   },
+   "keep": true,
+   "reason": "The streamer is performing a heartfelt live piano-vocal piece, visually compelling with strong audio signal and engaged chat reactions.",
+   "virality_score": 62,
+   "mood": "emotional",
+   "category": "song performance",
+   "title_zh": "韋綸直播鋼琴彈唱太暖了",
+   "title_en": "Heartfelt Live Piano Performance",
+   "hook_zh": "這歌聲太療癒😭",
+   "caption_zh": "韋綸直播現場鋼琴彈唱，聲音超暖，網友直呼「最暖的憂傷」💙",
+   "caption_en": "Heartfelt live piano performance that moved the whole chat 🎹✨",
+   "hashtags": [
+    "#黃韋綸",
+    "#鋼琴彈唱",
+    "#直播現場",
+    "#療癒音樂",
+    "#liveperformance",
+    "#piano",
+    "#台灣直播"
+   ]
+  },
+  {
+   "start_s": 2081.0,
+   "end_s": 2141.0,
+   "peak_s": 2100,
+   "score": 1.365,
+   "modalities": [
+    "chat",
+    "speech"
+   ],
+   "factors": {
+    "chat": 2.744,
+    "audio": -0.172,
+    "speech": 2.403
+   },
+   "keep": true,
+   "reason": "The host reveals he was a college basketball player who even performed on main stage at 18, then jokes about now doing combat sports and threatening to make his co-host tap out, generating laughs from both hosts and chat — a fun, relatable backstory moment with a comedic payoff.",
+   "virality_score": 58,
+   "mood": "funny",
+   "category": "funny moment",
+   "title_zh": "18歲就上主場！偉倫籃球往事大公開",
+   "title_en": "He Was on the Main Stage at 18 — Basketball Stories Revealed!",
+   "hook_zh": "18歲就上主場😱",
+   "caption_zh": "偉倫分享大學打籃球的青春往事，18歲就站上主場，現在卻改練格鬥？還嗆說對方會先趴地板🤣 這反差也太大了！",
+   "caption_en": "Weilun shares his college basketball days — hit the main stage at 18, but now he's into combat sports and threatening to make his co-host tap out 🤣 The glow-up is real.",
+   "hashtags": [
+    "#韋綸",
+    "#籃球",
+    "#格鬥",
+    "#直播精華",
+    "#台灣直播",
+    "#funnymoment",
+    "#livestream"
+   ]
+  }
+ ]
+}

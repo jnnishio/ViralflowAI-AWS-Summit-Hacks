@@ -11,6 +11,9 @@ dist/
 target/
 .turbo/
 
+# Local-first demo: uploaded bytes written by mock-server
+uploads/
+
 # Python Virtual Environment
 .venv/
 

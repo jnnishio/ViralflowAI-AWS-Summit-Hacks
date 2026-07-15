@@ -17,9 +17,11 @@ from __future__ import annotations
 import os
 
 from aws_cdk import (
+    BundlingOptions,
     Duration,
     RemovalPolicy,
     Stack,
+    IgnoreMode,
     aws_apigateway as apigateway,
     aws_apigatewayv2 as apigwv2,
     aws_apigatewayv2_authorizers as apigwv2_authorizers,
@@ -31,10 +33,13 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as sfn_tasks,
+    aws_ecs as ecs,
+    aws_ec2 as ec2,
 )
 from constructs import Construct
 
 BACKEND_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+REPO_ROOT = os.path.join(BACKEND_ROOT, "..")
 
 # Stage order matches architecture.md's fusion pipeline exactly (Req 6.1).
 NO_OP_STAGES = [
@@ -238,7 +243,39 @@ class ApiStack(Stack):
             f"{self.websocket_api.api_id}/{self.websocket_stage.stage_name}/POST/@connections/*"
         )
 
-        # ---- Task 11: Analysis_Stage_Stub Lambdas + state machine ---------
+        # ---- Task 11: ECS Fargate Setup for Pipeline Rendering -------------
+        vpc = ec2.Vpc(self, "PipelineVpc", max_azs=2, nat_gateways=1)
+        cluster = ecs.Cluster(self, "PipelineCluster", vpc=vpc)
+        
+        render_task_def = ecs.FargateTaskDefinition(
+            self, "RenderTaskDef",
+            memory_limit_mib=4096,
+            cpu=1024,
+        )
+        
+        render_task_def.add_container(
+            "RenderContainer",
+            image=ecs.ContainerImage.from_asset(
+                REPO_ROOT,
+                file="pipeline/Dockerfile",
+                exclude=[
+                    "backend/cdk.out",
+                    "backend/cdk.out.pytest",
+                    "backend/.venv",
+                    ".git",
+                ],
+                ignore_mode=IgnoreMode.GIT,
+            ),
+            logging=ecs.LogDrivers.aws_logs(stream_prefix="RenderContainer"),
+            environment=self._table_env,
+        )
+        raw_bucket.grant_read_write(render_task_def.task_role)
+
+        # ---- Task 12: Analysis_Stage_Stub Lambdas + state machine ---------
+        NO_OP_STAGES = [
+            "normalize/proxy",
+            "transcript",
+        ]
         no_op_fns = []
         for stage_name in NO_OP_STAGES:
             fn = self._py_fn(
@@ -251,15 +288,67 @@ class ApiStack(Stack):
             )
             no_op_fns.append((stage_name, fn))
 
-        fusion_scoring_fn = self._py_fn(
-            "StubFusionScoringFn",
-            "lambdas/stage_stubs/fusion_scoring_stub.py:handler",
+        chat_analysis_fn = self._pipeline_py_fn(
+            "ChatAnalysisFn",
+            "lambdas/pipeline_stages/chat.py:handler",
             extra_env=progress_management_env,
+            # pipeline/signals/chat.py: numpy + pandas + scipy.ndimage/signal.
+            pip_packages=("numpy>=1.26.0", "pandas>=2.2.0", "scipy>=1.12.0"),
         )
-        categorization_fn = self._py_fn(
-            "StubCategorizationFn",
-            "lambdas/stage_stubs/categorization_stub.py:handler",
+        audio_analysis_fn = self._pipeline_py_fn(
+            "AudioAnalysisFn",
+            "lambdas/pipeline_stages/audio.py:handler",
             extra_env=progress_management_env,
+            # pipeline/signals/audio.py: numpy + scipy.ndimage (no pandas).
+            pip_packages=("numpy>=1.26.0", "scipy>=1.12.0"),
+        )
+        visual_analysis_fn = self._pipeline_py_fn(
+            "VisualAnalysisFn",
+            "lambdas/pipeline_stages/visual.py:handler",
+            extra_env=progress_management_env,
+            # pipeline/signals/visual.py: numpy only.
+            pip_packages=("numpy>=1.26.0",),
+        )
+        
+        # Audio and visual analysis need the ffmpeg layer.
+        ffmpeg_layer = lambda_.LayerVersion(
+            self,
+            "FfmpegLayer",
+            code=lambda_.Code.from_asset(
+                os.path.join(BACKEND_ROOT, "lambdas/ffmpeg_layer")
+            ),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_12],
+            description="Static ffmpeg/ffprobe binaries in bin/",
+        )
+        audio_analysis_fn.add_layers(ffmpeg_layer)
+        visual_analysis_fn.add_layers(ffmpeg_layer)
+        
+        fusion_scoring_fn = self._pipeline_py_fn(
+            "FusionScoringFn",
+            "lambdas/pipeline_stages/fusion.py:handler",
+            extra_env=progress_management_env,
+            # pipeline/fusion.py: numpy + scipy.ndimage/signal (no pandas).
+            pip_packages=("numpy>=1.26.0", "scipy>=1.12.0"),
+        )
+        categorization_fn = self._pipeline_py_fn(
+            "DirectorCategorizationFn",
+            "lambdas/pipeline_stages/director.py:handler",
+            extra_env=progress_management_env,
+            timeout=Duration.minutes(10),
+            # pipeline/director.py only uses boto3 (already in the Lambda
+            # runtime) -- no extra pip deps needed.
+        )
+        # director.py extracts local keyframes via ffmpeg before calling
+        # Bedrock, and calls bedrock-runtime Converse directly -- neither
+        # of which had any IAM grant before, so this stage would fail with
+        # an ffmpeg-not-found error or an AccessDenied from Bedrock even
+        # after the ModuleNotFoundError above was fixed.
+        categorization_fn.add_layers(ffmpeg_layer)
+        categorization_fn.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["bedrock:InvokeModel", "bedrock:Converse"],
+                resources=["*"],
+            )
         )
         set_status_in_progress_fn = self._py_fn(
             "SetJobInProgressFn",
@@ -279,6 +368,9 @@ class ApiStack(Stack):
 
         for fn in (
             *[f for _, f in no_op_fns],
+            chat_analysis_fn,
+            audio_analysis_fn,
+            visual_analysis_fn,
             fusion_scoring_fn,
             categorization_fn,
             set_status_in_progress_fn,
@@ -292,6 +384,12 @@ class ApiStack(Stack):
                     resources=[management_connections_arn],
                 )
             )
+        raw_bucket.grant_read_write(chat_analysis_fn)
+        raw_bucket.grant_read_write(audio_analysis_fn)
+        raw_bucket.grant_read_write(visual_analysis_fn)
+        raw_bucket.grant_read_write(fusion_scoring_fn)
+        raw_bucket.grant_read_write(categorization_fn)
+        
         job_table.grant_read_write_data(set_status_in_progress_fn)
         job_table.grant_read_write_data(set_status_completed_fn)
         job_table.grant_read_write_data(set_status_failed_fn)
@@ -328,12 +426,63 @@ class ApiStack(Stack):
                 )
             )
             chain = chain.next(step)
+            
+        chain = chain.next(
+            _with_catch(
+                sfn_tasks.LambdaInvoke(
+                    self,
+                    "ChatAnalysis",
+                    lambda_function=chat_analysis_fn,
+                    payload_response_only=True,
+                )
+            )
+        ).next(
+            _with_catch(
+                sfn_tasks.LambdaInvoke(
+                    self,
+                    "AudioAnalysis",
+                    lambda_function=audio_analysis_fn,
+                    payload_response_only=True,
+                )
+            )
+        )
+
+        render_run_task = sfn_tasks.EcsRunTask(
+            self,
+            "RenderFargateTask",
+            integration_pattern=sfn.IntegrationPattern.RUN_JOB,
+            cluster=cluster,
+            task_definition=render_task_def,
+            launch_target=sfn_tasks.EcsFargateLaunchTarget(
+                platform_version=ecs.FargatePlatformVersion.LATEST,
+            ),
+            container_overrides=[
+                sfn_tasks.ContainerOverride(
+                    container_definition=render_task_def.default_container,
+                    environment=[
+                        sfn_tasks.TaskEnvironmentVariable(
+                            name="JOB_ID", value=sfn.JsonPath.string_at("$.jobId")
+                        )
+                    ],
+                )
+            ],
+            result_path="$.renderResult",
+        )
 
         chain = chain.next(
             _with_catch(
                 sfn_tasks.LambdaInvoke(
                     self,
-                    "FusionScoringStub",
+                    "VisualAnalysis",
+                    lambda_function=visual_analysis_fn,
+                    payload_response_only=True,
+                )
+            )
+        ).next(
+            _with_catch(
+                sfn_tasks.LambdaInvoke(
+                    self,
+                    "FusionScoring",
                     lambda_function=fusion_scoring_fn,
                     payload_response_only=True,
                 )
@@ -342,11 +491,13 @@ class ApiStack(Stack):
             _with_catch(
                 sfn_tasks.LambdaInvoke(
                     self,
-                    "CategorizationStub",
+                    "CategorizationAndDirector",
                     lambda_function=categorization_fn,
                     payload_response_only=True,
                 )
             )
+        ).next(
+            _with_catch(render_run_task)
         ).next(
             sfn_tasks.LambdaInvoke(
                 self,
@@ -420,15 +571,161 @@ class ApiStack(Stack):
             code=lambda_.Code.from_asset(
                 BACKEND_ROOT,
                 exclude=[
-                    ".venv",
                     "cdk.out",
+                    "cdk.out.pytest",
+                    ".venv",
                     "tests",
                     "__pycache__",
                     "*.pyc",
                     ".pytest_cache",
                 ],
+                ignore_mode=IgnoreMode.GIT,
             ),
             timeout=Duration.seconds(30),
+            environment=env,
+        )
+
+    def _pipeline_py_fn(
+        self,
+        construct_id: str,
+        handler: str,
+        extra_env: dict | None = None,
+        timeout: Duration = Duration.minutes(5),
+        memory_size: int = 1024,
+        pip_packages: tuple[str, ...] = (),
+    ) -> lambda_.Function:
+        """Like `_py_fn`, but for the pipeline_stages Lambdas (chat/audio/
+        visual/fusion/director analysis stages) that `import pipeline...` --
+        the top-level `pipeline/` package one directory above `backend/`.
+
+        `_py_fn` packages only `Code.from_asset(BACKEND_ROOT)`, so
+        `pipeline/` was never in the zip and every one of these five
+        Lambdas raised `ModuleNotFoundError: No module named 'pipeline'` at
+        invoke time -- the Step Functions state machine's Catch then routed
+        straight to SetJobFailed a couple seconds into a run. This packages
+        the repo root instead.
+
+        `pip_packages` lists the *runtime* pip deps this specific stage
+        needs (boto3 is already in the Lambda runtime, so it's never
+        listed here) -- callers pass only what their stage module actually
+        imports (see call sites), since numpy+scipy+pandas together
+        (~280MB unzipped) blow past Lambda's 250MB unzipped code-size
+        limit if installed into every stage regardless of need. Only
+        `lambdas/pipeline_stages` (not all of `backend/lambdas`, which
+        includes the 76MB ffmpeg_layer binary) is copied in, since no
+        pipeline stage imports sibling `lambdas.*` packages.
+
+        Cross-arch note: the build host is arm64 (Apple Silicon) but the
+        Lambda runtime is x86_64 (must match the ffmpeg_layer's x86_64
+        static binary). We do NOT rely on `BundlingOptions.platform` /
+        Docker `--platform` emulation to get x86_64 wheels: that path was
+        silently producing arm64 numpy/scipy/pandas `.so` files anyway
+        (CDK's docker-run bundling did not effectively apply the platform
+        pin), so every stage that imports numpy died at invoke time with
+        `Runtime.ImportModuleError` ("_multiarray_umath...aarch64...so ...
+        incompatible with ... platform 'linux'"). Instead we let the
+        bundling container run natively (fast, no QEMU) and make *pip*
+        fetch the target platform's prebuilt wheels directly via
+        `--platform manylinux2014_x86_64 --only-binary=:all:`. This is
+        deterministic regardless of the container/host architecture, and
+        `--only-binary=:all:` makes a missing x86_64 wheel fail loudly
+        rather than silently compile a wrong-arch binary.
+        """
+        env = dict(self._table_env)
+        if extra_env:
+            env.update(extra_env)
+        module_path, function_name = handler.split(":")
+        dotted_module = module_path.replace("/", ".").removesuffix(".py")
+        # Fetch x86_64 (Lambda's arch) wheels regardless of the build
+        # host/container architecture -- see the docstring's cross-arch
+        # note. --only-binary=:all: forbids source builds (which would
+        # otherwise compile for the container's native arch).
+        pip_install = (
+            "pip install --no-cache-dir"
+            " --platform manylinux2014_x86_64"
+            " --only-binary=:all:"
+            " --python-version 3.12"
+            " --implementation cp"
+            " --target /asset-output "
+            + " ".join(pip_packages)
+            if pip_packages
+            else "true"
+        )
+        return lambda_.Function(
+            self,
+            construct_id,
+            runtime=lambda_.Runtime.PYTHON_3_12,
+            architecture=lambda_.Architecture.X86_64,
+            handler=f"{dotted_module}.{function_name}",
+            code=lambda_.Code.from_asset(
+                REPO_ROOT,
+                exclude=[
+                    "backend/cdk.out",
+                    "backend/cdk.out.pytest",
+                    "backend/.venv",
+                    "backend/tests",
+                    "backend/.pytest_cache",
+                    "backend/lambdas/__pycache__",
+                    "frontend",
+                    "apps",
+                    "out",
+                    "ls",
+                    "docs",
+                    ".git",
+                    ".claude",
+                    ".agents",
+                    ".kiro",
+                    "__pycache__",
+                    "*.pyc",
+                ],
+                ignore_mode=IgnoreMode.GIT,
+                bundling=BundlingOptions(
+                    # No platform pin: correctness comes from pip's
+                    # --platform wheel targeting (see docstring), not from
+                    # emulating an x86_64 build container.
+                    image=lambda_.Runtime.PYTHON_3_12.bundling_image,
+                    command=[
+                        "bash",
+                        "-c",
+                        " && ".join(
+                            [
+                                "mkdir -p /asset-output/lambdas",
+                                "touch /asset-output/lambdas/__init__.py",
+                                "cp -r backend/lambdas/pipeline_stages"
+                                " /asset-output/lambdas/pipeline_stages",
+                                "cp -r pipeline /asset-output/pipeline",
+                                "cp -r config /asset-output/config",
+                                pip_install,
+                                # Trim test suites + bytecode caches pip
+                                # pulls in alongside scipy/pandas -- dead
+                                # weight against the 250MB unzipped limit,
+                                # never imported at runtime.
+                                #
+                                # numpy's tests dir is deliberately NOT
+                                # trimmed: scipy.ndimage/signal do
+                                # `from numpy import *`, which lazily
+                                # imports numpy.testing, which in turn does
+                                # `from numpy._core.tests._natype import
+                                # pd_NA`. Blanket-deleting every `tests`
+                                # dir removed numpy/_core/tests and broke
+                                # that chain at cold start
+                                # (ModuleNotFoundError: No module named
+                                # 'numpy._core.tests'). Scoping the delete
+                                # to scipy/ and pandas/ keeps numpy intact
+                                # while still trimming ~60MB.
+                                "find /asset-output/scipy -type d -name tests"
+                                " -exec rm -rf {} + 2>/dev/null || true",
+                                "find /asset-output/pandas -type d -name tests"
+                                " -exec rm -rf {} + 2>/dev/null || true",
+                                "find /asset-output -type d -name __pycache__"
+                                " -exec rm -rf {} + 2>/dev/null || true",
+                            ]
+                        ),
+                    ],
+                ),
+            ),
+            timeout=timeout,
+            memory_size=memory_size,
             environment=env,
         )
 

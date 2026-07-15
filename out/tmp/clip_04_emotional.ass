@@ -4,23 +4,13 @@ PlayResY: 1920
 WrapStyle: 0
 
 [V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
-Style: zh,PingFang TC,64,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
+Style: karaoke,Noto Sans CJK TC,64,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
 
 [Events]
 Format: Layer, Start, End, Style, Text
-Dialogue: 0,0:00:01.00,0:00:01.45,zh,的詩。
-Dialogue: 0,0:00:04.14,0:00:04.60,zh,嗯。
-Dialogue: 0,0:00:05.83,0:00:06.36,zh,去。
-Dialogue: 0,0:00:07.90,0:00:10.50,zh,我都是。
-Dialogue: 0,0:00:16.15,0:00:16.65,zh,我
-Dialogue: 0,0:00:18.04,0:00:19.65,zh,生的狗。
-Dialogue: 0,0:00:22.99,0:00:24.70,zh,重在醫學在
-Dialogue: 0,0:00:30.26,0:00:30.96,zh,這
-Dialogue: 0,0:00:34.50,0:00:35.37,zh,真情。
-Dialogue: 0,0:00:36.54,0:00:36.81,zh,是。
-Dialogue: 0,0:00:37.38,0:00:40.74,zh,不住忍不住哭泣。
-Dialogue: 0,0:00:44.54,0:00:45.24,zh,有。
-Dialogue: 0,0:00:51.38,0:00:51.96,zh,嗯
-Dialogue: 0,0:00:54.58,0:00:58.66,zh,管夢你不在我左右，
-Dialogue: 0,0:00:59.75,0:01:00.49,zh,是。
+Dialogue: 0,0:00:01.77,0:00:08.60,karaoke,{\kf1}嗯{\kf40}不曾{\kf1}聽{\kf36}嗯
+Dialogue: 0,0:00:10.67,0:00:18.96,karaoke,{\kf23}將來{\kf2}生疏{\kf61}主不責{\kf16}有
+Dialogue: 0,0:00:18.96,0:00:31.55,karaoke,{\kf47}多{\kf21}受過{\kf16}哦{\kf20}有
+Dialogue: 0,0:00:33.45,0:00:50.14,karaoke,{\kf12}嗯{\kf35}就是{\kf23}你{\kf16}嗯
+Dialogue: 0,0:00:55.28,0:00:55.49,karaoke,{\kf21}朋友
