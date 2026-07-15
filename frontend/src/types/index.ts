@@ -39,59 +39,35 @@ export interface Clip {
   cropConfirmed: boolean
 }
 
-export type RefinementTargetType = 'clip' | 'group'
-export type RefinementActionType = 'chip' | 'freeform'
-export type ChipType =
-  | 'reorder'
-  | 'faster_pacing'
-  | 'swap_intro'
-  | 'more_reactions'
-export type RefinementStatus = 'pending' | 'completed' | 'failed'
-
-export interface Refinement {
-  jobId: string
-  refinementId: string
-  targetType: RefinementTargetType
-  targetIds: string[]
-  actionType: RefinementActionType
-  chipType: ChipType | null
-  text: string | null
-  status: RefinementStatus
-  createdAt: string
-}
-
-export interface ConfirmedSelection {
-  jobId: string
-  handoffId: string
-  clipIds: string[]
-  createdAt: string
-}
-
-export interface HandoffClip {
-  clipId: string
-  titleNative: string
-  thumbUrl: string | null
-}
-
 export type SortOrder = 'desc' | 'asc'
-export type ViewMode = 'gallery' | 'grid'
 
 /**
- * Shared grid state (design.md's Components and Interfaces section):
- * single source of truth for HighlightsGridScreen, driving GalleryView and
- * GridView identically via deriveDisplayList (Req 18.7).
+ * Shared grid state: single source of truth for HighlightsGridScreen,
+ * driving the GalleryView via deriveDisplayList.
  */
-export interface GridState {
-  clips: Clip[]
-  sortOrder: SortOrder
-  viewMode: ViewMode
-  compilationMode: boolean
-  selectedClipIds: Set<string>
-  activeScoreDetailsClipId: string | null
-  cropViewClipId: string | null
+/** A cross-clip compilation reel proposed by the pipeline (compilations.py),
+ * referencing its member clips by id. Editable client-side (add/remove). */
+export interface Compilation {
+  id: string
+  titleNative: string
+  titleEnglish: string
+  reason: string
+  clipIds: string[]
 }
 
+export interface GridState {
+  clips: Clip[]
+  compilations: Compilation[]
+  sortOrder: SortOrder
+  compilationMode: boolean
+  activeScoreDetailsClipId: string | null
+}
+
+/** A Compilation resolved to its member Clip objects, for rendering. */
 export interface CompilationGroup {
-  mood: string
+  id: string
+  titleNative: string
+  titleEnglish: string
+  reason: string
   clips: Clip[]
 }

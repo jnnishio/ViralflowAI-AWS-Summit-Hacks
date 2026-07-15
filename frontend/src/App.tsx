@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import {
-  HandoffStubScreen,
   HighlightsGridScreen,
   PlatformSelectScreen,
   ProcessingScreen,
@@ -16,7 +15,6 @@ function App() {
       <Route path="/platforms" element={<PlatformSelectScreen />} />
       <Route path="/processing/:jobId" element={<ProcessingScreen />} />
       <Route path="/highlights/:jobId" element={<HighlightsGridScreen />} />
-      <Route path="/handoff/:handoffId" element={<HandoffStubScreen />} />
       <Route path="*" element={<Navigate to="/upload" replace />} />
     </Routes>
   )

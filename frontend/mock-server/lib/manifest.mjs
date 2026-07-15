@@ -71,3 +71,38 @@ export async function loadManifestClips(outRoot, streamId, baseUrl) {
   const raw = await readFile(manifestPath(outRoot, streamId), 'utf-8')
   return manifestToClips(JSON.parse(raw), streamId, baseUrl)
 }
+
+/** Path to a stream's compilations.json (sibling of manifest.json). */
+export function compilationsPath(outRoot, streamId) {
+  return join(clipsDir(outRoot, streamId), 'compilations.json')
+}
+
+/**
+ * Read the cross-clip compilation topics for a stream (pipeline/compilations.py
+ * output), mapped to the frontend wire shape. Returns [] when the file is
+ * absent — compilations are optional; the grid works without them.
+ */
+export async function loadCompilations(outRoot, streamId) {
+  let raw
+  try {
+    raw = await readFile(compilationsPath(outRoot, streamId), 'utf-8')
+  } catch {
+    return []
+  }
+  let data
+  try {
+    data = JSON.parse(raw)
+  } catch {
+    return []
+  }
+  const list = Array.isArray(data) ? data : (data.compilations ?? [])
+  return list
+    .map((c, i) => ({
+      id: c.id ?? `comp_${String(i + 1).padStart(2, '0')}`,
+      titleNative: c.title_zh ?? c.titleNative ?? '',
+      titleEnglish: c.title_en ?? c.titleEnglish ?? '',
+      reason: c.reason ?? '',
+      clipIds: Array.isArray(c.clipIds) ? c.clipIds : [],
+    }))
+    .filter((c) => c.clipIds.length > 0)
+}

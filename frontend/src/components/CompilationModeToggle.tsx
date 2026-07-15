@@ -3,21 +3,20 @@ export interface CompilationModeToggleProps {
   onChange: (next: boolean) => void
 }
 
-/** Task 25.1: menu control toggling Compilation Mode (Req 12.1). Selection
- * preservation across the toggle is handled by the reducer (Req 12.5), not
- * this component. */
+/** Toggles Compilation mode: groups the highlights into AI-suggested themed
+ * reels (pipeline/compilations.py) instead of one flat list. */
 export function CompilationModeToggle({
   compilationMode,
   onChange,
 }: CompilationModeToggleProps) {
   return (
-    <label>
+    <label className="comp-toggle">
       <input
         type="checkbox"
         checked={compilationMode}
         onChange={(event) => onChange(event.target.checked)}
       />
-      Compilation mode
+      Compilation reels
     </label>
   )
 }
