@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n server,vite -c yellow,cyan \"npm:local-server\" \"vite --mode demo\"",
+    "dev:all": "concurrently -k -n server,vite,editor -c yellow,cyan,magenta \"npm:local-server\" \"vite --mode demo\" \"npm:editor\"",
+    "editor": "cd ../apps/editor/apps/web && npx bun run dev:highlight",
     "dev:cloud": "vite",
     "dev:mock": "concurrently -k -n mock,vite -c yellow,cyan \"npm:local-server\" \"vite --mode mock\"",
     "local-server": "node mock-server/server.mjs",
