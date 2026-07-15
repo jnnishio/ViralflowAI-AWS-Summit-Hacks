@@ -31,10 +31,15 @@ export function ClipCard({
   onOpenScoreDetails,
 }: ClipCardProps) {
   // Deep link into the vendored OpenCut editor app (a separate server from the
-  // REST/pipeline API), opening this clip's scene. Clip ids (clip_01..) match
-  // the editor's fixtures, so the correct clip opens.
+  // REST/pipeline API), opening this clip's scene. The editor loads clips by
+  // stream, so the clip id is stream-scoped ("{stream}__clip_NN") — the stream
+  // is derived from videoId ("video_{stream}"). The pipeline server's
+  // editor-shaped API resolves both back to the run's real clips + auto-edit.
   const editorHref = videoId
-    ? `${EDITOR_BASE_URL}/editor/video/${videoId}/edit/${clip.clipId}`
+    ? `${EDITOR_BASE_URL}/editor/video/${videoId}/edit/${videoId.replace(
+        /^video_/,
+        '',
+      )}__${clip.clipId}`
     : undefined
 
   return (
