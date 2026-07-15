@@ -11,3 +11,27 @@ This project is an MVP (Minimum Viable Product), NOT a full production-ready pro
 # Style Rules
 
 - Do not use fluffy, over-affirmative language, unnecessary pleasantries, filler phrases, or conversational filler (e.g., "I'd be happy to help with that!", "Absolutely!", "Certainly!", "Here is the information you requested:"). Keep responses concise, direct, and factual.
+
+# Architecture Decision: Local-First Only (AWS Cloud Infra Is Dormant)
+
+This applies to ALL AI assistants/agents. Full detail:
+`.kiro/steering/local-first.md` (authoritative).
+
+- The "Processing" / highlight flow runs LOCAL-FIRST ONLY. The local Node dev
+  server (`frontend/mock-server/server.mjs`) is the active backend: it runs the
+  real pipeline (`python3 -m pipeline.run`) as a subprocess, or serves
+  pre-computed cached results from `out/<streamId>/clips/`.
+- The AWS cloud orchestration (CDK / Lambdas / Step Functions / API Gateway under
+  `backend/`) is DORMANT — kept as a "scales to cloud" talking point, NOT used.
+  Do NOT route Processing through it, and do NOT debug/fix/refactor/redeploy
+  `backend/` unless explicitly asked. Do NOT delete it either.
+- Cloud AI is still mandatory and used via the local pipeline: AWS Transcribe,
+  Rekognition, Bedrock (through boto3) + S3 (`hackathon-152315741309-us-east-1-an`)
+  as the required I/O store. NEVER add local/offline AI models (no Whisper, no
+  local LLMs, no local CV).
+- Frontend targets the local server via `VITE_REST_API_URL` / `VITE_WS_API_URL`:
+  `npm run dev` = local server + `vite --mode demo`; `npm run dev:cloud` = the old
+  cloud build (reference only). `auth.ts` skips Cognito on localhost.
+- Local prereqs: repo `.venv` (Python 3.12) with `pipeline/requirements.txt`;
+  `ffmpeg` WITH libass + freetype (use the `homebrew-ffmpeg/ffmpeg` tap, not slim
+  homebrew-core); working AWS credentials.
