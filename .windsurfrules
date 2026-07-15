@@ -8,6 +8,49 @@ This project is an MVP (Minimum Viable Product), NOT a full production-ready pro
 2. **Do Not Over-Engineer**: Avoid spending time on perfect architecture, extreme scalability, or comprehensive edge-case handling unless it directly impacts the demo's success.
 3. **Prioritize Speed**: Focus on making the primary happy-path flows work beautifully and quickly. If a shortcut saves time and works reliably for a demo, take it.
 
+# Feature Documentation Requirements
+
+When developing new features, you MUST document any new dependencies, environment variables, or setup steps so other developers (and AI assistants) can reproduce the setup.
+
+**After completing a feature that introduces any of the following, update the docs:**
+
+1. **New Dependencies**
+   - Python: Add to `requirements.txt` or `pyproject.toml` with pinned versions
+   - JavaScript/TypeScript: Ensure `package.json` is updated
+   - System dependencies (ffmpeg, etc.): Document in README.md
+
+2. **Environment Variables**
+   - Add to `.env.example` at project root
+   - Document purpose, example value, and whether required/optional
+
+3. **Setup Steps**
+   - Add to README.md or create `docs/SETUP.md` for complex setups
+   - Include platform-specific instructions if needed
+
+4. **AWS/Infrastructure Changes**
+   - Note any new services, IAM permissions, or S3 buckets
+   - Update architecture diagrams if significant
+
+**Before marking a feature complete, provide this summary:**
+
+```
+## Feature Documentation Summary
+
+### Dependencies Added
+- [package@version] - [purpose]
+
+### Environment Variables
+- [VAR_NAME] - [description] - [required/optional]
+
+### Setup Steps
+1. [step]
+
+### Notes
+- [any other info for other developers]
+```
+
+If nothing new was introduced, state: "No new dependencies or setup requirements."
+
 # Architecture Decision: Local-First Only (AWS Cloud Infra Is Dormant)
 
 This applies to ALL AI assistants/agents. Full detail:

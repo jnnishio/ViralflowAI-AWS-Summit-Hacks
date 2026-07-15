@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Session End Documentation Check",
+      "trigger": "Stop",
+      "description": "Reminds AI agents to document feature requirements when a session ends after making significant changes",
+      "action": {
+        "type": "agent",
+        "prompt": "Before this session ends, review if you made any changes that introduced:\n\n- New npm/pip/system dependencies\n- New environment variables\n- New configuration files or settings\n- New AWS services or infrastructure requirements\n- New setup steps or commands\n\nIf YES to any of these, ensure the documentation was updated:\n- Dependencies → README.md prerequisites or requirements.txt/package.json\n- Env vars → .env.example files and README.md\n- Setup steps → README.md or docs/SETUP.md\n\nProvide a brief summary of documentation updates made (or needed)."
+      }
+    }
+  ]
+}

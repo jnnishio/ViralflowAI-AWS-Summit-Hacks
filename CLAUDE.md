@@ -1,14 +1,15 @@
-# AI Assistant Instructions
+# Claude Code Instructions
 
 **CRITICAL PROJECT CONTEXT:**
 This project is an MVP (Minimum Viable Product), NOT a full production-ready product.
 
-**Guidelines:**
+## Guidelines
+
 1. **Demo-Driven Development**: We just want the core features to work in a way so it looks complete in a live demo.
 2. **Do Not Over-Engineer**: Avoid spending time on perfect architecture, extreme scalability, or comprehensive edge-case handling unless it directly impacts the demo's success.
 3. **Prioritize Speed**: Focus on making the primary happy-path flows work beautifully and quickly. If a shortcut saves time and works reliably for a demo, take it.
 
-# Feature Documentation Requirements
+## Feature Documentation Requirements
 
 When developing new features, you MUST document any new dependencies, environment variables, or setup steps so other developers (and AI assistants) can reproduce the setup.
 
@@ -51,10 +52,13 @@ When developing new features, you MUST document any new dependencies, environmen
 
 If nothing new was introduced, state: "No new dependencies or setup requirements."
 
-# Architecture Decision: Local-First Only (AWS Cloud Infra Is Dormant)
+## Style Rules
 
-This applies to ALL AI assistants/agents. Full detail:
-`.kiro/steering/local-first.md` (authoritative).
+- Do not use fluffy, over-affirmative language, unnecessary pleasantries, filler phrases, or conversational filler. Keep responses concise, direct, and factual.
+
+## Architecture Decision: Local-First Only (AWS Cloud Infra Is Dormant)
+
+Full detail: `.kiro/steering/local-first.md` (authoritative).
 
 - The "Processing" / highlight flow runs LOCAL-FIRST ONLY. The local Node dev
   server (`frontend/mock-server/server.mjs`) is the active backend: it runs the
@@ -71,6 +75,22 @@ This applies to ALL AI assistants/agents. Full detail:
 - Frontend targets the local server via `VITE_REST_API_URL` / `VITE_WS_API_URL`:
   `npm run dev` = local server + `vite --mode demo`; `npm run dev:cloud` = the old
   cloud build (reference only). `auth.ts` skips Cognito on localhost.
-- Local prereqs: repo `.venv` (Python 3.12) with `pipeline/requirements.txt`;
-  `ffmpeg` WITH libass + freetype (use the `homebrew-ffmpeg/ffmpeg` tap, not slim
-  homebrew-core); working AWS credentials.
+
+## Local Prerequisites
+
+- Python 3.12 with repo `.venv` and `pipeline/requirements.txt` installed
+- `ffmpeg` WITH libass + freetype (use the `homebrew-ffmpeg/ffmpeg` tap, not slim homebrew-core)
+- Working AWS credentials with access to required services
+
+## Common Commands
+
+```bash
+# Start local development
+cd frontend && npm run dev
+
+# Run pipeline directly
+python3 -m pipeline.run --stream-id <id>
+
+# Install Python deps
+pip install -r pipeline/requirements.txt
+```

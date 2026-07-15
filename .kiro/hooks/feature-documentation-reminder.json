@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Feature Documentation Reminder",
+      "trigger": "PostTaskExec",
+      "description": "Reminds AI agents to document dependencies, env vars, and setup steps after completing a feature task",
+      "action": {
+        "type": "agent",
+        "prompt": "IMPORTANT: Before marking this feature/task complete, ensure you have documented any new:\n\n1. **Dependencies** - Added to requirements.txt/package.json with pinned versions? Documented in README if system-level?\n2. **Environment Variables** - Added to .env.example? Documented their purpose?\n3. **Setup Steps** - Any new commands or configuration needed for other developers?\n4. **AWS/Infrastructure** - New services, IAM permissions, or cost implications?\n\nIf this task introduced ANY of the above, provide a summary in the format:\n\n```\n## Feature Documentation Summary\n\n### Dependencies Added\n- [package@version] - [purpose]\n\n### Environment Variables  \n- [VAR_NAME] - [description] - [required/optional]\n\n### Setup Steps\n1. [step]\n\n### Infrastructure Changes\n- [change]\n```\n\nIf nothing was added, explicitly state: \"No new dependencies or setup requirements introduced.\""
+      }
+    }
+  ]
+}
