@@ -9,6 +9,7 @@ import {
 import { AssetsPanel } from "@/components/editor/panels/assets";
 import { PropertiesPanel } from "@/components/editor/panels/properties";
 import { ClipMetadataPanel } from "@/components/editor/panels/clip-metadata";
+import { AiEditPanel } from "@/components/editor/panels/ai-edit";
 import { Timeline } from "@/timeline/components";
 import { PreviewPanel } from "@/preview/components";
 import { VideoEditorHeader } from "@/components/editor/video-editor-header";
@@ -19,9 +20,7 @@ import { usePanelStore } from "@/editor/panel-store";
 /**
  * The multi-clip editor: opens all of a video's clips as scenes (see
  * remote-clips-manager.ts), pre-selecting the clip the user clicked "Open in
- * Editor" on from the clips gallery (../../page.tsx). Scene tabs in
- * VideoEditorHeader still let you switch between the video's other clips
- * without leaving the editor.
+ * Editor" on from the clips gallery (../../page.tsx).
  */
 export default function VideoEditorPage() {
 	const params = useParams();
@@ -86,6 +85,12 @@ function VideoEditorLayout() {
 						className="min-h-0 min-w-0 flex-1"
 					>
 						<PreviewPanel overlayControls={[]} overlayInstances={[]} onOverlayVisibilityChange={() => {}} />
+					</ResizablePanel>
+
+					<ResizableHandle withHandle />
+
+					<ResizablePanel defaultSize={22} minSize={15} maxSize={40} className="min-w-0">
+						<AiEditPanel />
 					</ResizablePanel>
 
 					<ResizableHandle withHandle />

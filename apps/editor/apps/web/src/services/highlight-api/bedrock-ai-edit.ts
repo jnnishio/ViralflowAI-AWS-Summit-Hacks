@@ -13,7 +13,7 @@ import { aiEditResponseSchema, type AiEditRequest, type Clip, type Edl } from ".
  */
 
 const REGION = process.env.AWS_REGION ?? "us-east-1";
-const MODEL_ID = process.env.BEDROCK_MODEL_ID ?? "us.anthropic.claude-sonnet-4-6";
+export const MODEL_ID = process.env.BEDROCK_MODEL_ID ?? "us.anthropic.claude-sonnet-4-6";
 
 export class AiEditGenerationError extends Error {}
 
@@ -22,7 +22,8 @@ export function isBedrockConfigured(): boolean {
 }
 
 let cachedClient: BedrockRuntimeClient | null = null;
-function getClient(): BedrockRuntimeClient {
+/** Shared across every Bedrock-calling route (ai-edit, agent-turn) — one client per server process. */
+export function getBedrockClient(): BedrockRuntimeClient {
 	if (!cachedClient) {
 		cachedClient = new BedrockRuntimeClient({ region: REGION });
 	}
@@ -53,8 +54,18 @@ Segment semantics (must follow exactly — this is what the editor applies):
 - timelineStart/timelineEnd: where that segment lands in the OUTPUT timeline. Multiple segments with different sourceStart/sourceEnd reorder shots. Implicit speed change = timeline span shorter/longer than source span (e.g. 30% faster means timelineEnd-timelineStart = (sourceEnd-sourceStart)/1.3).
 - effects[] type "visual" with params {"scale": <float>} = a punch-in zoom, for reaction/emphasis requests. type "sound" = a stinger/sfx cue.
 - captions.overlays and hookOverlay carry ON-SCREEN TEXT, not narration.
+
+STRICT SCOPE RULE — this is the most important rule, follow it even if you think another change would improve the clip:
+Only change what the request explicitly asks for. Do NOT add transitions, effects, captions, zooms, crop changes, or any other embellishment that wasn't requested, even as a "nice bonus." If the user asks to speed up the clip, ONLY change segment timing — do not also add whip-pans or punch-in zooms unless they separately asked for emphasis/reactions. Copy every other field from the current draft edl byte-for-byte unchanged.
+
+Quick-action chip definitions (when the request is one of these, do EXACTLY this and nothing more):
+- "reorder": rearrange the existing segments/shots into a different sequence. Do not change speed, add effects, or add transitions beyond a plain "cut" between reordered segments.
+- "faster_pacing": increase playback speed ~30% via timeline compression only (timelineEnd-timelineStart shorter than sourceEnd-sourceStart). Do not add effects or transitions.
+- "swap_intro": only possible if the clip has genuinely distinct alternate footage; this demo clip does not, so say so honestly in "summary" and return the CURRENT draft edl unchanged — do not invent unrelated changes instead.
+- "more_reactions": add one or two punch-in zoom effects (effects[] type "visual") at the clip's most expressive moment(s). Do not change segment timing, transitions, or anything else.
+
 - Always return a FULL, valid edl — a complete replacement for the current draft, not a diff. Preserve everything the user didn't ask to change.
-- If the request is unclear or not achievable (e.g. no alternate footage exists for "swap intro"), say so honestly in "summary" and return the CURRENT draft edl unchanged.
+- If the request is unclear or not achievable, say so honestly in "summary" and return the CURRENT draft edl unchanged rather than guessing at an unrelated change.
 - musicIntent: set this ONLY in direct response to an explicit music/song/soundtrack request — you don't pick the actual track, just describe the mood/style wanted (e.g. "upbeat lo-fi", "tense cinematic"); the server resolves a real track separately. Otherwise null.`;
 
 function buildUserContent({
@@ -163,12 +174,12 @@ export async function generateBedrockAiEditResponse({
 		modelId: MODEL_ID,
 		system: [{ text: SYSTEM }],
 		messages: [{ role: "user", content: [{ text: content }] }],
-		inferenceConfig: { maxTokens: 1500, temperature: 0.4 },
+		inferenceConfig: { maxTokens: 1500, temperature: 0.2 },
 	});
 
 	let raw: string;
 	try {
-		const resp = await getClient().send(command);
+		const resp = await getBedrockClient().send(command);
 		const text = resp.output?.message?.content?.[0]?.text;
 		if (!text) {
 			throw new AiEditGenerationError("Bedrock returned no text content");

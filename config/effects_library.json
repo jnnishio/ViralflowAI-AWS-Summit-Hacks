@@ -1,0 +1,147 @@
+{
+  "description": "AI auto-edit effects manifest. Each entry describes an effect the auto-edit engine can place. Sound effects reference placeholder assets (synthesized via ffmpeg lavfi) - swap for real licensed audio later.",
+  "effects": [
+    {
+      "effectId": "punch-in-zoom",
+      "type": "visual",
+      "name": "Reaction Zoom",
+      "useWhen": "A strong audience/streamer reaction is detected (loud vocal burst corroborated by chat laugh or emotional face). Zooms toward the reacting person's face.",
+      "defaultDuration": 2.0,
+      "params": {
+        "scale": {
+          "type": "number",
+          "default": 1.3,
+          "min": 1.1,
+          "max": 2.0
+        },
+        "cx": {
+          "type": "number",
+          "default": 0.5,
+          "description": "Zoom target center-x (0..1)"
+        },
+        "cy": {
+          "type": "number",
+          "default": 0.4,
+          "description": "Zoom target center-y (0..1)"
+        }
+      }
+    },
+    {
+      "effectId": "onomatopoeia-caption",
+      "type": "visual",
+      "name": "Burst Caption",
+      "useWhen": "A sharp vocal emphasis or energy jump aligns with a transcript word - flash a short onomatopoeia/reaction word for comic effect.",
+      "defaultDuration": 0.5,
+      "params": {
+        "text": {
+          "type": "string",
+          "description": "The caption text (e.g. 'WHAT?!')"
+        },
+        "style": {
+          "type": "object",
+          "properties": {
+            "fontSize": {
+              "type": "number",
+              "default": 120
+            },
+            "burst": {
+              "type": "boolean",
+              "default": true,
+              "description": "If true, scale-in then fade-out animation"
+            }
+          }
+        }
+      }
+    },
+    {
+      "effectId": "sfx-comedic-stinger",
+      "type": "sound",
+      "name": "Comedic Stinger (ba-dum-tss)",
+      "useWhen": "After a funny moment's punchline lands, during a brief silence. Best for mood=funny clips.",
+      "defaultDuration": 0.5,
+      "assetKey": "sfx/comedic_stinger.wav",
+      "placeholder": true,
+      "params": {
+        "gainDb": {
+          "type": "number",
+          "default": -4
+        }
+      }
+    },
+    {
+      "effectId": "sfx-crickets",
+      "type": "sound",
+      "name": "Crickets (Awkward Silence)",
+      "useWhen": "During an awkward silence after dialogue. Default fallback SFX.",
+      "defaultDuration": 3.0,
+      "assetKey": "sfx/crickets_loop.wav",
+      "placeholder": true,
+      "params": {
+        "gainDb": {
+          "type": "number",
+          "default": -6
+        }
+      }
+    },
+    {
+      "effectId": "sfx-whoosh",
+      "type": "sound",
+      "name": "Whoosh (Transition)",
+      "useWhen": "Quick scene transition or fast movement. mood=impressive clips.",
+      "defaultDuration": 0.3,
+      "assetKey": "sfx/whoosh.wav",
+      "placeholder": true,
+      "params": {
+        "gainDb": {
+          "type": "number",
+          "default": -5
+        }
+      }
+    },
+    {
+      "effectId": "sfx-air-horn",
+      "type": "sound",
+      "name": "Air Horn (Hype)",
+      "useWhen": "Peak hype moment. mood=hype clips.",
+      "defaultDuration": 1.5,
+      "assetKey": "sfx/air_horn.wav",
+      "placeholder": true,
+      "params": {
+        "gainDb": {
+          "type": "number",
+          "default": -8
+        }
+      }
+    },
+    {
+      "effectId": "sfx-record-scratch",
+      "type": "sound",
+      "name": "Record Scratch (WTF moment)",
+      "useWhen": "Something unexpected or controversial. mood=controversial clips.",
+      "defaultDuration": 0.4,
+      "assetKey": "sfx/record_scratch.wav",
+      "placeholder": true,
+      "params": {
+        "gainDb": {
+          "type": "number",
+          "default": -5
+        }
+      }
+    },
+    {
+      "effectId": "sfx-tension-riser",
+      "type": "sound",
+      "name": "Tension Riser",
+      "useWhen": "Building anticipation before an emotional payoff. mood=emotional clips.",
+      "defaultDuration": 2.0,
+      "assetKey": "sfx/tension_riser.wav",
+      "placeholder": true,
+      "params": {
+        "gainDb": {
+          "type": "number",
+          "default": -6
+        }
+      }
+    }
+  ]
+}

@@ -25,7 +25,28 @@
    }
   }
  ],
- "effects": [],
+ "effects": [
+  {
+   "effectId": "sfx-comedic-stinger",
+   "type": "sound",
+   "at": 0.429,
+   "duration": 1.5,
+   "params": {
+    "assetKey": "sfx/comedic_stinger.wav",
+    "gainDb": -4
+   }
+  },
+  {
+   "effectId": "sfx-comedic-stinger",
+   "type": "sound",
+   "at": 2.759,
+   "duration": 1.2,
+   "params": {
+    "assetKey": "sfx/comedic_stinger.wav",
+    "gainDb": -4
+   }
+  }
+ ],
  "captions": {
   "source": "transcribe_word_timeline",
   "burnIn": true,

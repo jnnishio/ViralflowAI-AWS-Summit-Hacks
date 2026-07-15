@@ -105,6 +105,7 @@ export const aiEditChipActionSchema = z.enum([
 	"faster_pacing",
 	"swap_intro",
 	"more_reactions",
+	"auto",
 ]);
 export type AiEditChipAction = z.infer<typeof aiEditChipActionSchema>;
 

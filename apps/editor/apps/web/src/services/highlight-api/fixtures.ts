@@ -5,52 +5,53 @@ import type { Clip, RenderStatusValue, ShotBoundary, Video } from "./schema";
  * (not-yet-built) API Gateway + Lambda + DynamoDB stack described in
  * INTEGRATION_CONTRACT.md. Text content (hook/caption/hashtags/mood/
  * category/score) is copied verbatim from the real pipeline run's
- * out/clips/manifest.json, in the same order as out/clips/gallery.html's
+ * out/clips/clips.json, in the same order as out/clips/gallery.html's
  * cards, so gallery.html's "Open in Editor" buttons (clip_01..clip_05) open
  * an editor session whose clip metadata matches what the card shows.
  *
- * Each clip is given its OWN distinct sample video (public/sample-videos/)
- * rather than all clips sharing one file trimmed to different (overlapping)
- * windows — the real ~96-minute langlive VOD, and the real per-clip renders
- * cut from it, aren't available in this repo (only thumbnails are). Sharing
- * one short placeholder video with overlapping trims made every "clip" look
- * like the same clip; giving each its own file fixes that at the mock layer.
- * start/end are trim offsets into that clip's own footage, not shared-VOD
- * timestamps — see schema.ts's Clip type comment.
+ * Unlike the earlier (video_6910008) fixture set, these clips are the
+ * REAL per-clip renders cut by pipeline/render.py from the actual VOD
+ * (D:\...\s3-backup\3654414_video.mp4) — each clip's proxy.mp4 was copied
+ * into public/sample-videos/ verbatim, so start=0/end=<clip duration> are
+ * real trim offsets into that clip's own footage, not placeholder values.
+ * hookEn has no pipeline equivalent (the AI Director only emits hook_zh);
+ * it's a short hand-written English gloss of hook_zh for the mock UI.
  *
  * Server-process-lifetime only — resets on restart. That's fine for a mock;
  * swapping this module for real HTTP calls to AWS is the intended next step.
  */
 
-const VIDEO_ID = "video_6910008";
+const VIDEO_ID = "video_3654414";
 
 // Same-origin (public/sample-videos) so RemoteClipsManager.loadVideo's
-// fetch()-as-blob doesn't hit cross-origin CORS blocks. Five distinct real
-// clips (not five trims of one file) so each "Open in Editor" button shows
-// visibly different footage. All ~10s; exact duration gets re-probed
-// client-side via processMediaAssets anyway, so approximate end values here
-// are just a reasonable initial trim range, not authoritative.
+// fetch()-as-blob doesn't hit cross-origin CORS blocks. Real durations
+// (not round numbers) since these are the actual rendered clip lengths.
 const SAMPLE_CLIPS = [
-	{ id: "clip_01", file: "mov_bbb.mp4" },
-	{ id: "clip_02", file: "flower.mp4" },
-	{ id: "clip_03", file: "sintel.mp4" },
-	{ id: "clip_04", file: "jellyfish.mp4" },
-	{ id: "clip_05", file: "bigbuckbunny.mp4" },
+	{ id: "clip_01", file: "3654414_clip_01.mp4", durationSeconds: 35 },
+	{ id: "clip_02", file: "3654414_clip_02.mp4", durationSeconds: 60 },
+	{ id: "clip_03", file: "3654414_clip_03.mp4", durationSeconds: 58 },
+	{ id: "clip_04", file: "3654414_clip_04.mp4", durationSeconds: 60 },
+	{ id: "clip_05", file: "3654414_clip_05.mp4", durationSeconds: 58 },
 ] as const;
 
-const SAMPLE_SHOTS: ShotBoundary[] = [
-	{ start: 0, end: 2.5, confidence: 98.2 },
-	{ start: 2.5, end: 5, confidence: 96.7 },
-	{ start: 5, end: 7.5, confidence: 99.1 },
-	{ start: 7.5, end: 10, confidence: 94.3 },
-];
+// No shot-detection data for this run (visual-mode=fast only ran
+// face-detection on candidate windows, not full-VOD shot boundaries) — one
+// evenly-split placeholder shot per quarter of the clip's real duration.
+function evenShots(durationSeconds: number): ShotBoundary[] {
+	const step = durationSeconds / 4;
+	return [0, 1, 2, 3].map((i) => ({
+		start: i * step,
+		end: (i + 1) * step,
+		confidence: 95,
+	}));
+}
 
 const video: Video = {
 	id: VIDEO_ID,
-	title: "langlive idol-show VOD (6910008)",
+	title: "TPE48 zongzi-tasting & games livestream VOD (3654414)",
 	videoUrl: `/sample-videos/${SAMPLE_CLIPS[0].file}`,
-	mediaAssetId: "media_6910008_overview",
-	durationSeconds: 10,
+	mediaAssetId: "media_3654414_overview",
+	durationSeconds: SAMPLE_CLIPS[0].durationSeconds,
 	createdAt: new Date().toISOString(),
 };
 
@@ -59,68 +60,94 @@ const clips = new Map<string, Clip>(
 		{
 			id: "clip_01",
 			videoId: VIDEO_ID,
-			score: 72,
-			category: "song performance",
-			mood: "emotional",
-			hook: "閉眼深情彈唱🎸",
-			hookEn: "Eyes-closed acoustic performance",
-			caption: "韋綸閉上眼睛、深情投入地自彈自唱，歌聲讓直播間瞬間安靜下來💙 你有被這把聲音打動嗎？",
+			score: 78,
+			category: "funny moment",
+			mood: "funny",
+			hook: "排練無聊跳起來😂",
+			hookEn: "Bored at rehearsal, starts dancing",
+			caption:
+				"排練唱歌太無聊，直接自己跳舞找樂子😂 女團路過鏡子全員必停下來整理儀容，這個魔力太真實了吧！",
 			captionEn:
-				"Weilun closes his eyes and pours his heart into this acoustic performance — the live chat couldn't stop flooding with hearts 🎸❤️",
-			hashtags: ["#黃韋綸", "#自彈自唱", "#acoustic", "#直播精華", "#LivePerformance"],
+				"Too bored at concert rehearsals so she just… started dancing 😂 And apparently every girl group member is physically unable to walk past a mirror without stopping — too relatable!",
+			hashtags: [
+				"#女團日常",
+				"#排練花絮",
+				"#鏡子魔力",
+				"#直播精華",
+				"#girlgroup",
+				"#rehearsal",
+				"#funny",
+				"#台灣女團",
+			],
 		},
 		{
 			id: "clip_02",
 			videoId: VIDEO_ID,
 			score: 72,
-			category: "song performance",
-			mood: "hype",
-			hook: "自彈自唱🎹🎸",
-			hookEn: "Live guitar & keys duo",
-			caption: "兩位男神同台自彈自唱，吉他配鍵盤超有感覺✨直播現場氣氛超好！",
+			category: "food reaction",
+			mood: "funny",
+			hook: "減重粽是什麼👀",
+			hookEn: "What's a 'diet zongzi'?",
+			caption: "第一次挑戰減重粽，說好沒味道要沾糖，結果忘記沾😂表情管理完全失敗，觀眾全都看穿了哈哈哈！",
 			captionEn:
-				"An intimate live duo performance with guitar and keyboard – the vibe is immaculate 🎶",
-			hashtags: ["#自彈自唱", "#直播精華", "#吉他", "#鍵盤", "#黃韋綸"],
+				"First time trying a 'diet zongzi' — no filling, no seasoning, supposed to dip in sugar… but she forgot 😂 Facial expressions said it all!",
+			hashtags: [
+				"#減重粽",
+				"#端午節",
+				"#試吃反應",
+				"#表情管理失敗",
+				"#foodreaction",
+				"#台灣美食",
+				"#直播精華",
+			],
 		},
 		{
 			id: "clip_03",
 			videoId: VIDEO_ID,
 			score: 72,
-			category: "song performance",
-			mood: "emotional",
-			hook: "超浪漫現場彈唱😍",
-			hookEn: "Heartfelt acoustic performance",
-			caption: "閉上眼睛，用吉他訴說最深的情感🎸❤️ 直播現場粉絲全被融化了！",
+			category: "food reaction",
+			mood: "funny",
+			hook: "粽子裡有香菜？！",
+			hookEn: "Cilantro... in a rice dumpling?!",
+			caption: "香菜花生冰心粽登場💀 打開的瞬間全員崩潰，哥直接說「太好了，那就是你的！」😂 你敢吃嗎？",
 			captionEn:
-				"Eyes closed, pouring his heart out on guitar 🎸❤️ The live audience was completely swept away!",
-			hashtags: ["#黃韋綸", "#吉他彈唱", "#直播精華", "#情歌", "#acousticcover"],
+				"A cilantro & peanut ice-filled rice dumpling appears and the whole crew loses it 😂 Would YOU eat this?",
+			hashtags: ["#香菜", "#粽子", "#端午節", "#食物挑戰", "#FoodChallenge", "#搞笑", "#台灣美食"],
 		},
 		{
 			id: "clip_04",
 			videoId: VIDEO_ID,
-			score: 68,
-			category: "song performance",
-			mood: "emotional",
-			hook: "原創情歌太催淚😭",
-			hookEn: "Original song live performance",
-			caption: "韋綸閉眼深情演唱自創曲《愛情旅行》🎸「管你不在我左右，忍不住哭泣」每一句都戳心❤️",
+			score: 72,
+			category: "funny moment",
+			mood: "funny",
+			hook: "假哭獲勝術😱",
+			hookEn: "The fake-cry power move",
+			caption:
+				"「誰會在吵架時假哭來獲得優勢？」成員互相指認超好笑，還有人65歲被要求點兒童餐😂 這題太犀利了！",
 			captionEn:
-				"Singer pours his heart into his original love song on acoustic guitar — fans in chat couldn't stop flooding hearts ❤️",
-			hashtags: ["#韋綸", "#愛情旅行", "#原創歌曲", "#吉他彈唱", "#直播精華"],
+				"'Who fake-cries during arguments to gain the upper hand?' Members immediately start pointing fingers — and then someone gets roasted for looking young enough to order a kids' meal at 65 😂",
+			hashtags: [
+				"#假哭",
+				"#吵架技巧",
+				"#成員互揭",
+				"#直播精華",
+				"#funnymoment",
+				"#台灣直播",
+				"#兒童餐",
+			],
 		},
 		{
 			id: "clip_05",
 			videoId: VIDEO_ID,
-			score: 62,
-			category: "guest story & song reveal",
-			mood: "wholesome",
-			hook: "18歲站主場😲",
-			hookEn: "On stage at 18",
-			caption:
-				"從籃球校隊到站上主場，韋綸分享青春往事，聊著聊著竟然臨時決定唱自己寫的歌《愛情旅行》🎵 這段對話太有畫面了！",
+			score: 72,
+			category: "funny moment",
+			mood: "funny",
+			hook: "浣熊當貓養🦝",
+			hookEn: "Raised a raccoon... as a cat?",
+			caption: "這題太荒唐了吧！貓過敏還要帶浣熊回家？笑死😂 #猜猜我是誰",
 			captionEn:
-				"From school basketball team to performing on stage at 18 — and now surprising everyone with an original song 'Love Journey' inspired by the chat 🎵",
-			hashtags: ["#黃韋綸", "#愛情旅行", "#原創歌曲", "#青春回憶", "#籃球"],
+				"The most chaotic 'who would' question ever — raccoon as a pet cat?? 😂 The laughter says it all.",
+			hashtags: ["#浣熊", "#好笑瞬間", "#直播精華", "#猜猜我是誰", "#funnymoment", "#livestream", "#台灣直播"],
 		},
 	].map((entry, index) => {
 		const sample = SAMPLE_CLIPS[index];
@@ -128,8 +155,8 @@ const clips = new Map<string, Clip>(
 			...entry,
 			sourceVideoUrl: `/sample-videos/${sample.file}`,
 			start: 0,
-			end: 10,
-			shots: SAMPLE_SHOTS,
+			end: sample.durationSeconds,
+			shots: evenShots(sample.durationSeconds),
 			thumbKey: null,
 			renderStatus: "idle" as RenderStatusValue,
 			previewUrl: null,

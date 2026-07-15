@@ -63,7 +63,7 @@ def word_overlays(transcript, start_s, end_s, words_per_group=4):
     return overlays
 
 
-def build_edl(hl, clip_id, job_id, transcript=None, visual=None, fps=30):
+def build_edl(hl, clip_id, job_id, transcript=None, visual=None, fps=30, effects=None):
     start_s, end_s = hl["start_s"], hl["end_s"]
     duration = round(end_s - start_s, 3)
 
@@ -88,7 +88,7 @@ def build_edl(hl, clip_id, job_id, transcript=None, visual=None, fps=30):
             "vodStart": start_s,
             "vodEnd": end_s,
         }],
-        "effects": [],
+        "effects": effects or [],
         "captions": {
             "source": "transcribe_word_karaoke" if transcript and transcript.get("words") else "transcribe_word_timeline",
             "burnIn": True,
@@ -111,12 +111,14 @@ def build_edl(hl, clip_id, job_id, transcript=None, visual=None, fps=30):
     return edl
 
 
-def emit(highlights_path, stream_id, outdir, transcript_path=None, visual_path=None, top=None):
-    highlights = json.loads(Path(highlights_path).read_text())["highlights"]
+def emit(highlights_path, stream_id, outdir, transcript_path=None, visual_path=None,
+         top=None, effects_per_clip=None):
+    highlights = json.loads(Path(highlights_path).read_text(encoding="utf-8"))["highlights"]
     if top:
         highlights = highlights[:top]
-    transcript = json.loads(Path(transcript_path).read_text()) if transcript_path else None
-    visual = (json.loads(Path(visual_path).read_text())
+    transcript = (json.loads(Path(transcript_path).read_text(encoding="utf-8"))
+                  if transcript_path else None)
+    visual = (json.loads(Path(visual_path).read_text(encoding="utf-8"))
               if visual_path and Path(visual_path).exists() else None)
     job_id = f"job_{stream_id}"
 
@@ -125,9 +127,12 @@ def emit(highlights_path, stream_id, outdir, transcript_path=None, visual_path=N
     written = []
     for i, hl in enumerate(highlights, 1):
         clip_id = f"clip_{i:02d}"
-        edl = build_edl(hl, clip_id, job_id, transcript, visual)
+        clip_effects = (effects_per_clip.get(clip_id, [])
+                        if effects_per_clip else [])
+        edl = build_edl(hl, clip_id, job_id, transcript, visual,
+                        effects=clip_effects)
         path = outdir / f"{clip_id}.edl.json"
-        path.write_text(json.dumps(edl, ensure_ascii=False, indent=1))
+        path.write_text(json.dumps(edl, ensure_ascii=False, indent=1), encoding="utf-8")
         written.append(path)
     return written
 

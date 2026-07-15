@@ -219,12 +219,40 @@ def run(argv=None):
                      visual_path=str(visual_json) if visual_json.exists() else None,
                      top=args.top_clips)
 
+        # ---- 10b. AI auto-edit: detect reaction zooms, onomatopoeia, SFX
+        from pipeline import autoedit as autoedit_mod
+
+        log("autoedit: detecting reaction zooms, onomatopoeia, SFX")
+        autoedit_updated = autoedit_mod.emit(
+            hl_json, str(args.video), out / "edl",
+            transcript_path=str(transcript_json) if transcript_json.exists() else None,
+            visual_path=str(visual_json) if visual_json.exists() else None,
+            chat_path=str(chat_json) if chat_json.exists() else None,
+            top=args.top_clips)
+        for clip_id, n_effects in autoedit_updated:
+            log(f"  {clip_id}: {n_effects} auto-edit effects")
+
+        # ---- 10c. render burned-in "director's cut" (autoedit effects baked into MP4)
+        from pipeline import render_autoedit as render_ae_mod
+
+        log("render_autoedit: burning effects into director's-cut clips")
+        ae_rendered = render_ae_mod.emit(out / "edl", out / "clips", out / "clips")
+        for clip_id, path in ae_rendered:
+            log(f"  {clip_id} -> {path.name}")
+
     # ---- 11. publish to S3 (presigned GET URLs) — opt-in, needs live creds
     if args.upload_s3:
         from pipeline import publish as publish_mod
 
         log("publish: uploading artifacts to S3 + presigning")
         publish_mod.publish(sid, out, args.s3_bucket)
+
+    # ---- 12. generate demo gallery HTML
+    from pipeline import gallery as gallery_mod
+
+    log("gallery: generating HTML preview")
+    gallery_mod.main([str(out / "clips"), "--stream-id", sid,
+                      "--out", str(out / "clips" / "gallery.html")])
 
     log("DONE")
 

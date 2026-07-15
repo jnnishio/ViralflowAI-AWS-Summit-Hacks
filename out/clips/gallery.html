@@ -9,6 +9,7 @@
  .en{color:#9aa;font-size:12px;margin:0} .cap{font-size:13px;color:#ccd}
  .tags{color:#6cf;font-size:12px} .score{font-size:18px;font-weight:700}
  .mood{margin-left:8px;font-size:11px;background:#2a2f3a;padding:2px 8px;border-radius:99px;vertical-align:middle}
+ .ai-badge{margin-left:8px;font-size:10px;background:#2d6b3f;color:#7fef9a;padding:2px 8px;border-radius:99px;vertical-align:middle}
  .factor{display:flex;align-items:center;gap:8px;font-size:11px;margin:3px 0}
  .factor span{width:44px;color:#9aa} .factor em{color:#9aa;font-style:normal}
  .bar{flex:1;height:6px;background:#2a2f3a;border-radius:3px} .bar div{height:100%;background:#6cf;border-radius:3px}
@@ -17,76 +18,97 @@
  .btn{display:block;margin-top:10px;padding:8px 12px;background:#6cf;color:#0e0f13;
    text-align:center;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px}
  .btn:hover{background:#8fd6ff}
+ .version-toggle{display:flex;gap:0;padding:6px 10px;background:#11131a}
+ .vtog{flex:1;padding:5px 0;border:none;background:#1e2130;color:#8899aa;font-size:11px;
+   font-weight:500;cursor:pointer;border-radius:6px;transition:all .15s}
+ .vtog.active{background:#6cf;color:#0e0f13;font-weight:700}
+ .vtog:first-child{border-radius:6px 0 0 6px} .vtog:last-child{border-radius:0 6px 6px 0}
 </style>
 <h1>StreamSmith — auto-generated highlights</h1>
 <div class="grid">
 <article class="card">
-  <video controls preload="none" poster="clip_01_emotional.jpg" src="clip_01_emotional.mp4"></video>
+  <video id="vid_clip_01" controls preload="none" poster="clip_01_funny.jpg" src="clip_01_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_01','clip_01_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_01','clip_01_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 72<span class="mood">emotional</span></div>
-    <h2>韋綸自彈自唱太好聽了😍</h2>
-    <p class="en">Weilun&#x27;s Soulful Acoustic Live Performance</p>
-    <p class="cap">韋綸閉上眼睛、深情投入地自彈自唱，歌聲讓直播間瞬間安靜下來💙 你有被這把聲音打動嗎？</p>
-    <p class="tags">#黃韋綸 #自彈自唱 #acoustic #直播精華 #LivePerformance #吉他彈唱 #短影音</p>
-    <a class="btn" href="http://localhost:3000/editor/video/video_6910008/edit/clip_01">Open in Editor →</a>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:83%'></div></div><em>2.50</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:44%'></div></div><em>1.34</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:0%'></div></div><em>-0.20</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.48</em></div>
-      <p class="range">1779s – 1839s · song performance</p>
+    <div class="score">🔥 78<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>女團排練無聊就跳舞？路過鏡子必照！</h2>
+    <p class="en">Girl group member admits she dances out of boredom at rehearsals 😂</p>
+    <p class="cap">排練唱歌太無聊，直接自己跳舞找樂子😂 女團路過鏡子全員必停下來整理儀容，這個魔力太真實了吧！</p>
+    <p class="tags">#女團日常 #排練花絮 #鏡子魔力 #直播精華 #girlgroup #rehearsal #funny #台灣女團</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_01">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:44%'></div></div><em>1.32</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:24%'></div></div><em>0.72</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:58%'></div></div><em>1.76</em></div>
+      <p class="range">3320s – 3355s · funny moment</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_02_hype.jpg" src="clip_02_hype.mp4"></video>
+  <video id="vid_clip_02" controls preload="none" poster="clip_02_funny.jpg" src="clip_02_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_02','clip_02_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_02','clip_02_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 72<span class="mood">hype</span></div>
-    <h2>吉他鍵盤雙人現場自彈自唱！</h2>
-    <p class="en">Live Acoustic Duo Performance – Guitar &amp; Keys</p>
-    <p class="cap">兩位男神同台自彈自唱，吉他配鍵盤超有感覺✨直播現場氣氛超好！</p>
-    <p class="tags">#自彈自唱 #直播精華 #吉他 #鍵盤 #黃韋綸 #liveperformance #acousticcover</p>
-    <a class="btn" href="http://localhost:3000/editor/video/video_6910008/edit/clip_02">Open in Editor →</a>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:72%'></div></div><em>2.19</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:45%'></div></div><em>1.35</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:0%'></div></div><em>-0.29</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.16</em></div>
-      <p class="range">3982s – 4040s · song performance</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>第一次吃減重粽！表情根本藏不住😂</h2>
+    <p class="en">Trying a &#x27;Diet Zongzi&#x27; for the First Time — Can&#x27;t Hide the Reaction 😂</p>
+    <p class="cap">第一次挑戰減重粽，說好沒味道要沾糖，結果忘記沾😂表情管理完全失敗，觀眾全都看穿了哈哈哈！</p>
+    <p class="tags">#減重粽 #端午節 #試吃反應 #表情管理失敗 #foodreaction #台灣美食 #直播精華</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_02">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:100%'></div></div><em>3.50</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:42%'></div></div><em>1.27</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.14</em></div>
+      <p class="range">2074s – 2134s · food reaction</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_03_emotional.jpg" src="clip_03_emotional.mp4"></video>
+  <video id="vid_clip_03" controls preload="none" poster="clip_03_funny.jpg" src="clip_03_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_03','clip_03_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_03','clip_03_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 72<span class="mood">emotional</span></div>
-    <h2>韋綸深情吉他彈唱❤️</h2>
-    <p class="en">Heartfelt Acoustic Performance by 韋綸</p>
-    <p class="cap">閉上眼睛，用吉他訴說最深的情感🎸❤️ 直播現場粉絲全被融化了！</p>
-    <p class="tags">#黃韋綸 #吉他彈唱 #直播精華 #情歌 #acousticcover #liveperformance #台灣歌手</p>
-    <a class="btn" href="http://localhost:3000/editor/video/video_6910008/edit/clip_03">Open in Editor →</a>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:55%'></div></div><em>1.67</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:52%'></div></div><em>1.56</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:0%'></div></div><em>-0.29</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.16</em></div>
-      <p class="range">2943s – 3003s · song performance</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>香菜冰心粽挑戰！裡面真的有香菜😱</h2>
+    <p class="en">Cilantro Ice Dumpling Challenge – They Can&#x27;t Believe It&#x27;s Real</p>
+    <p class="cap">香菜花生冰心粽登場💀 打開的瞬間全員崩潰，哥直接說「太好了，那就是你的！」😂 你敢吃嗎？</p>
+    <p class="tags">#香菜 #粽子 #端午節 #食物挑戰 #FoodChallenge #搞笑 #台灣美食</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_03">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:59%'></div></div><em>1.78</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:50%'></div></div><em>1.52</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:65%'></div></div><em>1.97</em></div>
+      <p class="range">2698s – 2756s · food reaction</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_04_emotional.jpg" src="clip_04_emotional.mp4"></video>
+  <video id="vid_clip_04" controls preload="none" poster="clip_04_funny.jpg" src="clip_04_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_04','clip_04_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_04','clip_04_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 68<span class="mood">emotional</span></div>
-    <h2>韋綸深情原創曲《愛情旅行》現場演唱</h2>
-    <p class="en">Heartfelt Original Song Live Performance</p>
-    <p class="cap">韋綸閉眼深情演唱自創曲《愛情旅行》🎸「管你不在我左右，忍不住哭泣」每一句都戳心❤️</p>
-    <p class="tags">#韋綸 #愛情旅行 #原創歌曲 #吉他彈唱 #直播精華 #liveperformance #acousticguitar</p>
-    <a class="btn" href="http://localhost:3000/editor/video/video_6910008/edit/clip_04">Open in Editor →</a>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:92%'></div></div><em>2.79</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:58%'></div></div><em>1.77</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:0%'></div></div><em>-0.10</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.16</em></div>
-      <p class="range">3119s – 3179s · song performance</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>吵架會假哭的人是誰？！</h2>
+    <p class="en">Who Fake-Cries to Win Arguments? 😂</p>
+    <p class="cap">「誰會在吵架時假哭來獲得優勢？」成員互相指認超好笑，還有人65歲被要求點兒童餐😂 這題太犀利了！</p>
+    <p class="tags">#假哭 #吵架技巧 #成員互揭 #直播精華 #funnymoment #台灣直播 #兒童餐</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_04">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:63%'></div></div><em>1.91</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:66%'></div></div><em>1.99</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:30%'></div></div><em>0.92</em></div>
+      <p class="range">4064s – 4124s · funny moment</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_05_wholesome.jpg" src="clip_05_wholesome.mp4"></video>
+  <video id="vid_clip_05" controls preload="none" poster="clip_05_funny.jpg" src="clip_05_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_05','clip_05_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_05','clip_05_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 62<span class="mood">wholesome</span></div>
-    <h2>18歲就站上主場！還有一首原創歌曲？</h2>
-    <p class="en">On Stage at 18 &amp; Surprise Original Song Reveal</p>
-    <p class="cap">從籃球校隊到站上主場，韋綸分享青春往事，聊著聊著竟然臨時決定唱自己寫的歌《愛情旅行》🎵 這段對話太有畫面了！</p>
-    <p class="tags">#黃韋綸 #愛情旅行 #原創歌曲 #青春回憶 #籃球 #直播精華 #livestream</p>
-    <a class="btn" href="http://localhost:3000/editor/video/video_6910008/edit/clip_05">Open in Editor →</a>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:91%'></div></div><em>2.74</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:0%'></div></div><em>-0.17</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:73%'></div></div><em>2.22</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:79%'></div></div><em>2.40</em></div>
-      <p class="range">2085s – 2145s · guest story &amp; song reveal</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>誰會把浣熊當貓帶回家？😂</h2>
+    <p class="en">Who Would Bring a Raccoon Home Thinking It&#x27;s a Cat?</p>
+    <p class="cap">這題太荒唐了吧！貓過敏還要帶浣熊回家？笑死😂 #猜猜我是誰</p>
+    <p class="tags">#浣熊 #好笑瞬間 #直播精華 #猜猜我是誰 #funnymoment #livestream #台灣直播</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_05">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:48%'></div></div><em>1.45</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:60%'></div></div><em>1.82</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:100%'></div></div><em>3.03</em></div>
+      <p class="range">3417s – 3475s · funny moment</p>
     </details>
   </div>
 </article></div>
+<script>
+function switchVid(vidId, src, btn) {
+  var v = document.getElementById(vidId);
+  if (v.src.endsWith(src)) return;
+  var wasPlaying = !v.paused;
+  v.src = src; v.load();
+  if (wasPlaying) v.play();
+  btn.parentElement.querySelectorAll('.vtog').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
