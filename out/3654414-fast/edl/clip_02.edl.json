@@ -1,0 +1,113 @@
+{
+ "edlId": "edl_clip_02_v1",
+ "jobId": "job_3654414",
+ "clipIds": [
+  "clip_02"
+ ],
+ "status": "draft",
+ "canvas": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30
+ },
+ "segments": [
+  {
+   "segmentId": "seg_01",
+   "clipId": "clip_02",
+   "sourceStart": 0,
+   "sourceEnd": 59.0,
+   "timelineStart": 0,
+   "timelineEnd": 59.0,
+   "transitionIn": null,
+   "crop": {
+    "mode": "face_track",
+    "cx": 0.563
+   }
+  }
+ ],
+ "effects": [],
+ "captions": {
+  "source": "transcribe_word_timeline",
+  "burnIn": true,
+  "style": {
+   "fontName": "PingFang TC",
+   "fontSize": 64,
+   "alignment": 2,
+   "marginV": 220
+  },
+  "overlays": [
+   {
+    "start": 0.0,
+    "end": 8.239,
+    "text": "是什麼東西？感覺他們要說很荒唐，誰比較可能會把浣熊當成貓帶回家，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 10.37,
+    "end": 18.29,
+    "text": "321，這什麼東西啦，我想跟你說，當成",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 18.29,
+    "end": 30.77,
+    "text": "貓是怎樣，但因為我，我不會，我就算把它當成貓，我也不會帶它回家，因為我超嚴重的貓過敏，所以我肯定是投你啊。對啊，對啊，你家貓也蠻像浣熊的。",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 32.84,
+    "end": 34.739,
+    "text": "好。",
+    "speaker": "spk_0"
+   },
+   {
+    "start": 35.61,
+    "end": 39.219,
+    "text": "哦，我們那個也稱倒數1分鐘，時間比較清。",
+    "speaker": "spk_0"
+   },
+   {
+    "start": 39.909,
+    "end": 44.27,
+    "text": "好，等一下，我們現在目前的那個榜前3的話，倒數最後1分鐘，",
+    "speaker": "spk_0"
+   },
+   {
+    "start": 44.709,
+    "end": 46.149,
+    "text": "最後咯，加油",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 46.149,
+    "end": 53.239,
+    "text": "加油，好，題目是，誰會自信滿滿地唱錯歌詞，3、2、1。",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 55.8,
+    "end": 57.449,
+    "text": "承認，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 58.719,
+    "end": 65.76,
+    "text": "沒有沒有這回事，但其實我們兩個都蠻不常唱錯的，對，意外的，",
+    "speaker": "spk_2"
+   }
+  ]
+ },
+ "hookOverlay": {
+  "text": "浣熊當貓養😂",
+  "start": 0,
+  "duration": 2.5,
+  "style": {
+   "fontSize": 88,
+   "fontColor": "white",
+   "borderWidth": 6,
+   "borderColor": "black"
+  }
+ },
+ "musicBed": null
+}

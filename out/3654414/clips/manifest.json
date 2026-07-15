@@ -1,0 +1,147 @@
+[
+ {
+  "start_s": 2074.0,
+  "end_s": 2134.0,
+  "virality_score": 72,
+  "mood": "funny",
+  "category": "food reaction",
+  "factors": {
+   "chat": 3.498,
+   "audio": 1.267,
+   "visual": 0.622,
+   "speech": -0.142
+  },
+  "title_zh": "減重粽竟然沒有味道😂",
+  "title_en": "Trying a 'Diet Zongzi' and Forgetting the Sugar 😂",
+  "hook_zh": "減重粽是什麼👀",
+  "caption_zh": "第一次吃減重粽，結果忘記沾糖，吃到完全沒味道的皮😂大家有吃過嗎？",
+  "caption_en": "First time trying a low-cal 'diet zongzi' — forgot to dip it in sugar and ended up eating a completely flavorless skin 😂 Have you ever tried one?",
+  "hashtags": [
+   "#減重粽",
+   "#端午節",
+   "#吃播",
+   "#foodreaction",
+   "#台灣美食",
+   "#直播精華",
+   "#zongzi"
+  ],
+  "file": "out/3654414/clips/clip_01_funny.mp4",
+  "thumb": "out/3654414/clips/clip_01_funny.jpg"
+ },
+ {
+  "start_s": 2698.0,
+  "end_s": 2758.0,
+  "virality_score": 72,
+  "mood": "funny",
+  "category": "funny moment",
+  "factors": {
+   "chat": 1.782,
+   "audio": 1.523,
+   "visual": 0.437,
+   "speech": 1.972
+  },
+  "title_zh": "香菜粽子裂開的瞬間😱",
+  "title_en": "Cilantro Rice Dumpling Jumpscare 😱",
+  "hook_zh": "香菜粽？！😱",
+  "caption_zh": "香菜花生冰心粽裂開的瞬間⋯裡面真的有香菜😭大家吃香菜嗎？哥說「太好了，那就是你的！」笑死🤣 #端午節 #奇葩粽子",
+  "caption_en": "They cracked open a cilantro peanut ice-cream dumpling and the filling was VERY green 😭 Host immediately volunteered the cilantro-hater to eat it all 🤣",
+  "hashtags": [
+   "#香菜粽",
+   "#端午節",
+   "#奇葩美食",
+   "#試吃挑戰",
+   "#FoodChallenge",
+   "#台灣美食",
+   "#直播精華"
+  ],
+  "file": "out/3654414/clips/clip_02_funny.mp4",
+  "thumb": "out/3654414/clips/clip_02_funny.jpg"
+ },
+ {
+  "start_s": 3320.0,
+  "end_s": 3366.0,
+  "virality_score": 72,
+  "mood": "funny",
+  "category": "funny moment",
+  "factors": {
+   "chat": 1.322,
+   "audio": 0.725,
+   "visual": 0.839,
+   "speech": 1.76
+  },
+  "title_zh": "女團看到鏡子就停不下來😂",
+  "title_en": "Girl Group Can't Walk Past a Mirror Without Stopping 😂",
+  "hook_zh": "女團鏡子魔力🪞",
+  "caption_zh": "女團的神奇魔力：路過任何鏡子都必須停下來整理儀容😂 這根本是職業病吧！",
+  "caption_en": "Girl group secret: they literally CANNOT walk past a mirror without stopping to fix themselves 😂 It's a talent at this point.",
+  "hashtags": [
+   "#女團日常",
+   "#鏡子魔力",
+   "#台灣女團",
+   "#直播精華",
+   "#girlgroup",
+   "#relatable",
+   "#funny"
+  ],
+  "file": "out/3654414/clips/clip_03_funny.mp4",
+  "thumb": "out/3654414/clips/clip_03_funny.jpg"
+ },
+ {
+  "start_s": 1954.0,
+  "end_s": 2000.0,
+  "virality_score": 62,
+  "mood": "funny",
+  "category": "food review / funny moment",
+  "factors": {
+   "chat": 1.94,
+   "audio": 0.959,
+   "visual": 0.994,
+   "speech": 1.338
+  },
+  "title_zh": "金華火腿粽大評分！只拿超小一口？",
+  "title_en": "Jin Hua Ham Zongzi Review — Someone Only Took a Tiny Bite 😂",
+  "hook_zh": "你只拿這樣？！",
+  "caption_zh": "吃粽子還被抓包只拿超小一口🤏 米飯超黏好吃但火腿味道不搭？嚴格評審倒數給分，結果出乎意料😂 #端午節 #粽子測評",
+  "caption_en": "Got caught taking the tiniest bite of Jin Hua ham zongzi 🤏 The rice is amazing but the flavors clash? Strict judges count down their scores and the results are hilarious 😂",
+  "hashtags": [
+   "#粽子",
+   "#端午節",
+   "#美食測評",
+   "#金華火腿",
+   "#直播精華",
+   "#foodreview",
+   "#zongzi"
+  ],
+  "file": "out/3654414/clips/clip_04_funny.mp4",
+  "thumb": "out/3654414/clips/clip_04_funny.jpg"
+ },
+ {
+  "start_s": 4060.0,
+  "end_s": 4120.0,
+  "virality_score": 62,
+  "mood": "funny",
+  "category": "funny moment",
+  "factors": {
+   "chat": 1.909,
+   "audio": 1.989,
+   "visual": 0.406,
+   "speech": 0.915
+  },
+  "title_zh": "吵架假哭獲勝？成員互相爆料！",
+  "title_en": "Who Fake-Cries to Win Arguments? Members Call Each Other Out!",
+  "hook_zh": "假哭獲勝術😂",
+  "caption_zh": "吵架的時候誰會假哭來獲得優勢？成員們互相指認，笑到不行🤣 #互揭底細",
+  "caption_en": "Which member fake-cries to win fights? The girls call each other out and chaos ensues 😂",
+  "hashtags": [
+   "#假哭",
+   "#成員互揭",
+   "#直播精華",
+   "#funnymoment",
+   "#idol",
+   "#台灣女團",
+   "#reels"
+  ],
+  "file": "out/3654414/clips/clip_05_funny.mp4",
+  "thumb": "out/3654414/clips/clip_05_funny.jpg"
+ }
+]

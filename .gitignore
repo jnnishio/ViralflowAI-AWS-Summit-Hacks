@@ -10,3 +10,12 @@ node_modules/
 dist/
 target/
 .turbo/
+
+# Python Virtual Environment
+.venv/
+
+# AWS CDK Build Output
+cdk.out/
+
+# Pytest cache
+.pytest_cache/

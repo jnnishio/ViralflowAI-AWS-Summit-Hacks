@@ -1,0 +1,113 @@
+{
+ "edlId": "edl_clip_04_v1",
+ "jobId": "job_3654414",
+ "clipIds": [
+  "clip_04"
+ ],
+ "status": "draft",
+ "canvas": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30
+ },
+ "segments": [
+  {
+   "segmentId": "seg_01",
+   "clipId": "clip_04",
+   "sourceStart": 0,
+   "sourceEnd": 36.0,
+   "timelineStart": 0,
+   "timelineEnd": 36.0,
+   "transitionIn": null,
+   "crop": {
+    "mode": "face_track",
+    "cx": 0.5678
+   }
+  }
+ ],
+ "effects": [],
+ "captions": {
+  "source": "transcribe_word_timeline",
+  "burnIn": true,
+  "style": {
+   "fontName": "PingFang TC",
+   "fontSize": 64,
+   "alignment": 2,
+   "marginV": 220
+  },
+  "overlays": [
+   {
+    "start": 0.08,
+    "end": 0.129,
+    "text": "哈，",
+    "speaker": "spk_0"
+   },
+   {
+    "start": 1.949,
+    "end": 2.459,
+    "text": "我不，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 3.909,
+    "end": 6.189,
+    "text": "我有影片哦，大家想看嗎？",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 7.33,
+    "end": 18.37,
+    "text": "沒有，就是，因為就是那個就練習嘛，練習的時候，就在那邊唱歌，就有點無聊，所以我會想要自己找事情做這樣子，就跳個舞之類的，我跟你講，",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 18.449,
+    "end": 26.1,
+    "text": "真的，對，女團的很神奇的魔力，就是我們路過一個地方，只要有鏡子，所有人都會穿，就是",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 26.729,
+    "end": 27.58,
+    "text": "最開始",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 27.649,
+    "end": 28.78,
+    "text": "整理服裝儀容，",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 29.87,
+    "end": 30.409,
+    "text": "好特別，",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 32.84,
+    "end": 34.05,
+    "text": "得1分呢，好厲害哦。",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 34.85,
+    "end": 35.34,
+    "text": "來。",
+    "speaker": "spk_1"
+   }
+  ]
+ },
+ "hookOverlay": {
+  "text": "女團看到鏡子必停！",
+  "start": 0,
+  "duration": 2.5,
+  "style": {
+   "fontSize": 88,
+   "fontColor": "white",
+   "borderWidth": 6,
+   "borderColor": "black"
+  }
+ },
+ "musicBed": null
+}

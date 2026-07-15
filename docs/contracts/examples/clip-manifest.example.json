@@ -1,0 +1,58 @@
+[
+  {
+    "jobId": "job_3654414",
+    "clipId": "clip_01",
+    "start": 2698.0,
+    "end": 2758.0,
+    "peak": 2715,
+    "score": 78,
+    "factors": { "chat": 1.782, "audio": 1.523, "speech": 1.972 },
+    "modalities": ["chat", "audio", "speech"],
+    "keep": true,
+    "reason": "The group's shocked and funny reaction to discovering a cilantro-filled rice dumpling (香菜粽) makes for a highly relatable and entertaining food-reaction clip.",
+    "mood": "funny",
+    "category": "funny moment",
+    "title": {
+      "zh": "香菜粽裡面真的有香菜😱",
+      "en": "There's Actually Cilantro INSIDE the Dumpling 😱"
+    },
+    "hook": { "zh": "香菜粽驚魂！" },
+    "caption": {
+      "zh": "「我以為只是外面這個…」打開粽子發現裡面真的有香菜，表情全崩了😂 你敢吃嗎？",
+      "en": "\"I thought it was just the outside…\" They opened the dumpling and found REAL cilantro inside — the reactions are priceless 😂 Would you eat it?"
+    },
+    "hashtags": ["#香菜粽", "#端午節", "#奇怪口味", "#食物挑戰", "#cilantro", "#funnyreaction", "#台灣美食"],
+    "clipKey": "clips/3654414/clip_01_funny.mp4",
+    "thumbKey": "clips/3654414/clip_01_funny.jpg",
+    "proxyKey": "clips/3654414/clip_01_funny.proxy.mp4",
+    "createdAt": "2026-07-14T09:12:03Z"
+  },
+  {
+    "jobId": "job_3654414",
+    "clipId": "clip_02",
+    "start": 3417.0,
+    "end": 3476.0,
+    "peak": 3440,
+    "score": 78,
+    "factors": { "chat": 1.45, "audio": 1.819, "speech": 3.029 },
+    "modalities": ["chat", "audio", "speech"],
+    "keep": true,
+    "reason": "The raccoon-mistaken-for-cat question triggers genuine laughter and a funny cat-allergy confession, with both hosts cracking up visibly in the keyframes and chat reacting with 🤣 emojis.",
+    "mood": "funny",
+    "category": "funny moment",
+    "title": {
+      "zh": "把浣熊當貓帶回家？！",
+      "en": "Who Would Mistake a Raccoon for a Cat?!"
+    },
+    "hook": { "zh": "浣熊當貓養😂" },
+    "caption": {
+      "zh": "誰比較可能把浣熊當貓帶回家？結果貓過敏的人直接投降😂 這題太荒唐了啦！",
+      "en": "Which one of them would bring home a raccoon thinking it's a cat? The one with severe cat allergies immediately noped out 😂"
+    },
+    "hashtags": ["#浣熊", "#好笑瞬間", "#直播精華", "#funnymoment", "#livestream", "#台灣直播", "#raccoon"],
+    "clipKey": "clips/3654414/clip_02_funny.mp4",
+    "thumbKey": "clips/3654414/clip_02_funny.jpg",
+    "proxyKey": "clips/3654414/clip_02_funny.proxy.mp4",
+    "createdAt": "2026-07-14T09:12:07Z"
+  }
+]

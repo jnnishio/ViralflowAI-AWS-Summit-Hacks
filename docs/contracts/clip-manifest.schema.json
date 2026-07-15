@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clip-manifest.schema.json",
+  "title": "Clip",
+  "description": "One scored, Director-approved highlight clip. Canonical shape of the DynamoDB `Clip` item described in .kiro/steering/architecture.md, extended with the fields the AI Director (pipeline/director.py) already produces. See README.md for how this maps to the pipeline's current raw output (out/*/highlights.json, out/*/clips/manifest.json).",
+  "type": "object",
+  "required": [
+    "jobId", "clipId", "start", "end", "score", "factors", "modalities",
+    "mood", "category", "title", "caption", "hashtags", "clipKey", "thumbKey", "createdAt"
+  ],
+  "properties": {
+    "jobId": { "type": "string", "description": "Parent Job this clip was produced by." },
+    "clipId": { "type": "string", "description": "Stable id, e.g. `clip_01`." },
+    "start": { "type": "number", "description": "Clip start, seconds from VOD start. Pipeline: `start_s`." },
+    "end": { "type": "number", "description": "Clip end, seconds from VOD start. Pipeline: `end_s`." },
+    "peak": { "type": "number", "description": "Timestamp of the statistical peak inside [start,end]; used for thumbnail extraction. Pipeline: `peak_s`." },
+    "score": {
+      "type": "number", "minimum": 0, "maximum": 100,
+      "description": "AI Director's 0-100 virality score (post cross-modal validation). Pipeline: `virality_score`. Note: candidates.json/highlights.json also has an unrelated fusion-stage `score` (the raw peak-curve height, not 0-100) — do not confuse the two; this field is always the Director's 0-100 number."
+    },
+    "factors": {
+      "type": "object",
+      "description": "Per-modality z-scores from the fusion stage that produced this candidate. Keys come from config/weights.json (chat, audio, speech, visual); `visual` is commonly absent since analysis runs in --visual-mode fast by default.",
+      "properties": {
+        "chat": { "type": "number" },
+        "audio": { "type": "number" },
+        "speech": { "type": "number" },
+        "visual": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "modalities": {
+      "type": "array", "items": { "type": "string", "enum": ["chat", "audio", "speech", "visual"] },
+      "description": "Which modalities spiked together near the peak (cross-modal validation — a candidate needs >=2 to survive fusion)."
+    },
+    "keep": { "type": "boolean", "description": "Director's keep/drop verdict. Always true for a persisted Clip row; kept for audit trail parity with highlights.json." },
+    "reason": { "type": "string", "description": "Director's one-line rationale for keeping the clip. Optional, useful for QA/debugging the scoring, not shown to end users." },
+    "mood": { "type": "string", "enum": ["funny", "hype", "emotional", "impressive", "wholesome", "controversial"] },
+    "category": { "type": "string", "description": "Free-text grouping label the Director assigns (e.g. \"funny moment\", \"food reaction\"). Drives compilation-mode grouping in the UI." },
+    "title": {
+      "type": "object", "required": ["zh", "en"],
+      "properties": { "zh": { "type": "string" }, "en": { "type": "string" } },
+      "description": "Pipeline: `title_zh` / `title_en`."
+    },
+    "hook": {
+      "type": "object", "required": ["zh"],
+      "properties": { "zh": { "type": "string" }, "en": { "type": "string" } },
+      "description": "<=12-char on-screen hook text burned into the first 2.5s of the clip (pipeline/render.py). Pipeline only emits `hook_zh` today; `hook.en` is a fast-follow for the English-market export path."
+    },
+    "caption": {
+      "type": "object", "required": ["zh", "en"],
+      "properties": { "zh": { "type": "string" }, "en": { "type": "string" } },
+      "description": "Pipeline: `caption_zh` / `caption_en`."
+    },
+    "hashtags": { "type": "array", "items": { "type": "string" } },
+    "clipKey": { "type": "string", "description": "S3 key of the rendered 9:16 mp4 (presigned-GET by the API). Pipeline's local CLI emits a local path in `file` instead — swap at the Lambda/render layer, not in this schema." },
+    "thumbKey": { "type": "string", "description": "S3 key of the peak-frame thumbnail jpg. Pipeline's local CLI emits a local path in `thumb`." },
+    "proxyKey": { "type": ["string", "null"], "description": "S3 key of the low-res proxy mp4 (~540x960) the browser editor loads and the UI can hover-preview. Null when no proxy was produced. Pipeline's local CLI emits a local path in `proxy`." },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

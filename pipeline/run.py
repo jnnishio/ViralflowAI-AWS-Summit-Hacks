@@ -38,6 +38,14 @@ def run(argv=None):
     ap.add_argument("--vertical", default="talk")
     ap.add_argument("--outdir", default="out")
     ap.add_argument("--top-clips", type=int, default=5)
+    ap.add_argument("--visual-mode", choices=["fast", "full", "off"], default="fast",
+                    help="fast: face-detect only candidate windows (default); "
+                         "full: whole-VOD Rekognition (4-modal fusion); off: skip visual")
+    ap.add_argument("--emit-contracts", dest="emit_contracts", action="store_true", default=True,
+                    help="emit canonical clips.json + per-clip EDLs (default on)")
+    ap.add_argument("--no-emit-contracts", dest="emit_contracts", action="store_false")
+    ap.add_argument("--upload-s3", action="store_true", default=False,
+                    help="upload clips/thumbs/proxies/manifest/EDLs to S3 + presign (needs live creds)")
     args = ap.parse_args(argv)
 
     out = Path(args.outdir)
@@ -88,11 +96,11 @@ def run(argv=None):
 
     visual_json = out / "visual_signals.json"
     rek_jobs_file = out / f"rek_jobs_{sid}.json"
-    if not visual_json.exists():
+    if args.visual_mode == "full" and not visual_json.exists():
         if rek_jobs_file.exists():
             rek_jobs = json.loads(rek_jobs_file.read_text())
         else:
-            log("rekognition: starting shot+face jobs")
+            log("rekognition: starting shot+face jobs (full VOD)")
             rek_jobs = vis_mod.start_jobs(f"s3://{args.s3_bucket}/{sid}_video.mp4")
             rek_jobs_file.write_text(json.dumps(rek_jobs))
 
@@ -114,8 +122,8 @@ def run(argv=None):
             transcript_json.write_text(json.dumps(parsed, ensure_ascii=False))
     log(f"transcript: {transcript_json if transcript_json.exists() else 'unavailable'}")
 
-    # ---- 6. collect Rekognition
-    if not visual_json.exists():
+    # ---- 6. collect Rekognition (full mode only; fast mode runs post-fusion)
+    if args.visual_mode == "full" and not visual_json.exists():
         log("rekognition: waiting for completion")
         while True:
             s_status, shot_pages = vis_mod.get_shots(rek_jobs["shots"])
@@ -127,7 +135,7 @@ def run(argv=None):
                 log("rekognition FAILED (continuing without visual)")
                 break
             time.sleep(30)
-    log(f"visual: {visual_json if visual_json.exists() else 'unavailable'}")
+    log(f"visual: {visual_json if visual_json.exists() else args.visual_mode + ' mode'}")
 
     # ---- 6.5 auto-align event log with the recording (see pipeline.align)
     from pipeline import align as align_mod
@@ -146,11 +154,24 @@ def run(argv=None):
                    "--chat-offset", str(chat_offset),
                    "--vertical", args.vertical, "--out", str(cands_json)]
     if visual_json.exists():
-        fusion_args += ["--visual", str(visual_json)]
+        # faces-only files from fast mode have no binned series; skip those
+        if json.loads(visual_json.read_text())["series"]["t_s"]:
+            fusion_args += ["--visual", str(visual_json)]
     if transcript_json.exists():
         fusion_args += ["--transcript", str(transcript_json)]
     log("fusion: building excitement curve + candidates")
     fusion.main(fusion_args)
+
+    # ---- 7.5 fast visual: face-detect ONLY the candidate windows, in parallel,
+    # while the Director judges. ~10 min of footage instead of the whole VOD.
+    face_jobs = None
+    if args.visual_mode == "fast" and not visual_json.exists():
+        windows = [(c["start_s"], c["end_s"])
+                   for c in json.loads(cands_json.read_text())["candidates"]]
+        if windows:
+            log(f"rekognition(fast): face jobs on {len(windows)} candidate segments")
+            face_jobs = vis_mod.start_face_jobs_for_windows(
+                video, args.s3_bucket, windows, out / "segments")
 
     # ---- 8. AI Director
     hl_json = out / "highlights.json"
@@ -164,6 +185,15 @@ def run(argv=None):
     log("director: judging candidates with Bedrock")
     director.main(dir_args)
 
+    if face_jobs:
+        log("rekognition(fast): collecting segment face jobs")
+        faces = vis_mod.collect_face_jobs(face_jobs)
+        visual_json.write_text(json.dumps(
+            {"signal": "visual", "bin_seconds": 5,
+             "series": {"t_s": [], "scene_change": [], "emotion_hot": []},
+             "shots": [], "faces": faces}))
+        log(f"visual: {len(faces)} face samples for smart-crop -> {visual_json}")
+
     # ---- 9. render clips
     from pipeline import render as render_mod
 
@@ -175,6 +205,27 @@ def run(argv=None):
         render_args += ["--visual", str(visual_json)]
     log("render: cutting vertical clips")
     render_mod.main(render_args)
+
+    # ---- 10. emit contract-shaped artifacts (canonical manifest + per-clip EDLs)
+    clips_dir = out / "clips"
+    if args.emit_contracts:
+        from pipeline import contracts, edl as edl_mod
+
+        log("contracts: emitting canonical clips.json")
+        contracts.emit(hl_json, clips_dir / "manifest.json", sid, clips_dir / "clips.json")
+        log("edl: emitting per-clip EDLs")
+        edl_mod.emit(hl_json, sid, out / "edl",
+                     transcript_path=str(transcript_json) if transcript_json.exists() else None,
+                     visual_path=str(visual_json) if visual_json.exists() else None,
+                     top=args.top_clips)
+
+    # ---- 11. publish to S3 (presigned GET URLs) — opt-in, needs live creds
+    if args.upload_s3:
+        from pipeline import publish as publish_mod
+
+        log("publish: uploading artifacts to S3 + presigning")
+        publish_mod.publish(sid, out, args.s3_bucket)
+
     log("DONE")
 
 

@@ -71,6 +71,78 @@ def get_faces(job_id):
     return _drain(lambda tok: rek.get_face_detection(JobId=job_id, **({"NextToken": tok} if tok else {})))
 
 
+def _face_entry(f, offset_s=0.0):
+    det = f["Face"]
+    emotions = {e["Type"]: e["Confidence"] for e in det.get("Emotions", [])}
+    top = max(emotions, key=emotions.get) if emotions else ""
+    return {
+        "t_s": f["Timestamp"] / 1000 + offset_s,
+        "box": {k: round(v, 4) for k, v in det["BoundingBox"].items()},
+        "emotion": top,
+        "emotion_conf": round(emotions.get(top, 0.0), 1),
+        "smile": round(det.get("Smile", {}).get("Confidence", 0.0), 1)
+        if det.get("Smile", {}).get("Value")
+        else 0.0,
+    }
+
+
+def start_face_jobs_for_windows(video_path, bucket, windows, workdir, pad_s=10.0):
+    """Fast path: cut candidate windows out of the local VOD (stream copy, no
+    re-encode), upload each, and start one face-detection job per segment.
+    Analyzing ~10 min of candidate footage instead of the whole VOD cuts
+    Rekognition wall-clock and cost by roughly the same factor."""
+    import subprocess
+    from concurrent.futures import ThreadPoolExecutor
+    from pathlib import Path
+
+    workdir = Path(workdir)
+    workdir.mkdir(parents=True, exist_ok=True)
+    s3 = boto3.client("s3", region_name=REGION)
+    rek = _rek()
+
+    def cut_upload_start(i_window):
+        i, (start_s, end_s) = i_window
+        lo = max(0.0, start_s - pad_s)
+        dur = end_s + pad_s - lo
+        seg = workdir / f"seg_{i:02d}.mp4"
+        subprocess.run(
+            ["ffmpeg", "-y", "-v", "error", "-ss", str(lo), "-t", str(dur),
+             "-i", str(video_path), "-c", "copy", str(seg)],
+            check=True,
+        )
+        key = f"segments/{Path(video_path).stem}/seg_{i:02d}.mp4"
+        s3.upload_file(str(seg), bucket, key)
+        job_id = rek.start_face_detection(
+            Video={"S3Object": {"Bucket": bucket, "Name": key}}, FaceAttributes="ALL"
+        )["JobId"]
+        return {"job_id": job_id, "offset_s": lo}
+
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        return list(pool.map(cut_upload_start, enumerate(windows)))
+
+
+def collect_face_jobs(jobs, poll_s=15, timeout_s=1200):
+    """Wait for all per-segment face jobs; merge into VOD-global timestamps."""
+    faces, pending, waited = [], list(jobs), 0
+    while pending and waited < timeout_s:
+        still = []
+        for j in pending:
+            status, pages = get_faces(j["job_id"])
+            if status == "SUCCEEDED":
+                for page in pages:
+                    for f in page.get("Faces", []):
+                        faces.append(_face_entry(f, j["offset_s"]))
+            elif status == "IN_PROGRESS":
+                still.append(j)
+            # FAILED: drop silently; crop falls back to center for that window
+        pending = still
+        if pending:
+            time.sleep(poll_s)
+            waited += poll_s
+    faces.sort(key=lambda f: f["t_s"])
+    return faces
+
+
 def parse_results(shot_pages, face_pages, bin_seconds=BIN_SECONDS):
     shots = []
     for page in shot_pages:
@@ -86,20 +158,7 @@ def parse_results(shot_pages, face_pages, bin_seconds=BIN_SECONDS):
     faces = []  # sparse samples: timestamp, box, strongest emotion
     for page in face_pages:
         for f in page.get("Faces", []):
-            det = f["Face"]
-            emotions = {e["Type"]: e["Confidence"] for e in det.get("Emotions", [])}
-            top = max(emotions, key=emotions.get) if emotions else ""
-            faces.append(
-                {
-                    "t_s": f["Timestamp"] / 1000,
-                    "box": {k: round(v, 4) for k, v in det["BoundingBox"].items()},
-                    "emotion": top,
-                    "emotion_conf": round(emotions.get(top, 0.0), 1),
-                    "smile": round(det.get("Smile", {}).get("Confidence", 0.0), 1)
-                    if det.get("Smile", {}).get("Value")
-                    else 0.0,
-                }
-            )
+            faces.append(_face_entry(f))
 
     duration = max(
         [s["end_s"] for s in shots] + [f["t_s"] for f in faces] + [0]

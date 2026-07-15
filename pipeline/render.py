@@ -24,6 +24,17 @@ from pathlib import Path
 
 ZH_FONT = "PingFang TC"  # macOS built-in; Linux: swap for Noto Sans CJK TC
 
+# Caption style, shared with pipeline/edl.py so the burned-in captions and the
+# EDL's caption.style stay in lockstep (edit here, both follow).
+CAPTION_STYLE = {
+    "fontName": ZH_FONT,
+    "fontSize": 64,
+    "alignment": 2,   # ASS: 2 = bottom-center
+    "marginV": 220,   # bottom margin in the 1080x1920 PlayRes
+}
+CAPTION_CHUNK = 16    # max chars per burned caption line
+HOOK_DURATION_S = 2.5  # hook overlay shows for the opening seconds
+
 
 def face_crop_x(visual, start_s, end_s):
     """Median face-center x (0..1) inside the window, for crop positioning."""
@@ -59,7 +70,9 @@ def build_ass(transcript, start_s, end_s, path, play_res=(1080, 1920)):
         "[V4+ Styles]",
         "Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour,"
         " Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV",
-        f"Style: zh,{ZH_FONT},64,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220",
+        f"Style: zh,{CAPTION_STYLE['fontName']},{CAPTION_STYLE['fontSize']},"
+        f"&H00FFFFFF,&H00000000,&H80000000,1,3,1,"
+        f"{CAPTION_STYLE['alignment']},60,60,{CAPTION_STYLE['marginV']}",
         "",
         "[Events]",
         "Format: Layer, Start, End, Style, Text",
@@ -69,10 +82,10 @@ def build_ass(transcript, start_s, end_s, path, play_res=(1080, 1920)):
             continue
         text = seg["text"].replace("\n", " ")
         # chunk long segments so lines stay readable
-        for i in range(0, len(text), 16):
-            chunk = text[i: i + 16]
+        for i in range(0, len(text), CAPTION_CHUNK):
+            chunk = text[i: i + CAPTION_CHUNK]
             frac_lo = i / max(len(text), 1)
-            frac_hi = min((i + 16) / max(len(text), 1), 1.0)
+            frac_hi = min((i + CAPTION_CHUNK) / max(len(text), 1), 1.0)
             dur = seg["end_s"] - seg["start_s"]
             t0 = seg["start_s"] + frac_lo * dur - start_s
             t1 = seg["start_s"] + frac_hi * dur - start_s
@@ -100,7 +113,7 @@ def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path(
         vf.append(
             f"drawtext=font='{ZH_FONT}':text='{hook}':fontsize=88:fontcolor=white:"
             "borderw=6:bordercolor=black:x=(w-text_w)/2:y=h*0.18:"
-            "enable='lt(t,2.5)'"
+            f"enable='lt(t,{HOOK_DURATION_S})'"
         )
 
     cmd = [
@@ -114,6 +127,19 @@ def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path(
     ]
     subprocess.run(cmd, check=True)
     return out_path
+
+
+def make_proxy(clip_path, proxy_path, height=960):
+    """Low-res 9:16 proxy of a rendered clip — the media the browser editor loads.
+    Small + fast to stream; the final render still comes from the full-res clip."""
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-i", str(clip_path),
+         "-vf", f"scale=-2:{height}", "-c:v", "libx264", "-preset", "veryfast",
+         "-crf", "30", "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart",
+         str(proxy_path)],
+        check=True,
+    )
+    return proxy_path
 
 
 def main(argv=None):
@@ -132,8 +158,9 @@ def main(argv=None):
 
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    manifest = []
-    for i, hl in enumerate(hls, 1):
+
+    def render_one(i_hl):
+        i, hl = i_hl
         name = f"clip_{i:02d}_{hl.get('mood','clip')}.mp4"
         out_path = outdir / name
         print(f"rendering {name}  {hl['start_s']:.0f}-{hl['end_s']:.0f}s  v={hl.get('virality_score')}")
@@ -145,12 +172,20 @@ def main(argv=None):
              "-i", str(args.video), "-frames:v", "1", "-vf", "scale=480:-2", str(thumb)],
             check=True,
         )
+        # low-res proxy for the browser editor (see pipeline/edl.py + architecture.md)
+        proxy = out_path.with_suffix(".proxy.mp4")
+        make_proxy(out_path, proxy)
         # field names follow the UI's Clip data model (see .kiro/steering/architecture.md)
-        manifest.append({**{k: hl.get(k) for k in
-                            ("start_s", "end_s", "virality_score", "mood", "category",
-                             "factors", "title_zh", "title_en", "hook_zh", "caption_zh",
-                             "caption_en", "hashtags")},
-                         "file": str(out_path), "thumb": str(thumb)})
+        return {**{k: hl.get(k) for k in
+                   ("start_s", "end_s", "virality_score", "mood", "category",
+                    "factors", "title_zh", "title_en", "hook_zh", "caption_zh",
+                    "caption_en", "hashtags")},
+                "file": str(out_path), "thumb": str(thumb), "proxy": str(proxy)}
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=3) as pool:  # ffmpeg is multi-threaded; 3 keeps cores busy
+        manifest = list(pool.map(render_one, enumerate(hls, 1)))
     (outdir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
     print(f"{len(manifest)} clips -> {outdir}/")
 

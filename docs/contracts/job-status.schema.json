@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "job-status.schema.json",
+  "title": "Job",
+  "description": "DRAFT — no real Job record exists yet (the pipeline is currently a local CLI, pipeline/run.py). This is the canonical shape for the DynamoDB `Job` item from .kiro/steering/architecture.md, filled in with a `stage` enum taken 1:1 from run.py's real, comment-documented stage order (chat -> audio extract/upload -> Transcribe -> Rekognition -> fusion -> Director -> render) so it can double as the state-name basis for the eventual Step Functions machine.",
+  "type": "object",
+  "required": ["jobId", "userId", "status", "stage", "targets", "sourceKey", "createdAt", "updatedAt"],
+  "properties": {
+    "jobId": { "type": "string" },
+    "userId": { "type": "string" },
+    "status": {
+      "type": "string", "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED"],
+      "description": "Coarse job outcome. Poll `GET /jobs/{id}` (WebSocket push is primary; this is the fallback per architecture.md)."
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["UPLOAD", "CHAT_ANALYSIS", "AUDIO_EXTRACT", "TRANSCRIBE", "VISUAL_ANALYSIS", "FUSION", "DIRECTOR", "RENDER", "DONE"],
+      "description": "Current pipeline stage. Order mirrors pipeline/run.py exactly: 1 chat signals, 2 audio extract/upload, 3 Transcribe, 4 Rekognition (visual), 5 fusion, 6 AI Director (Bedrock), 7 render. Chat/audio/Transcribe/Rekognition fan out in parallel in the cloud version (architecture.md); this enum still lists them in run.py's sequential-fallback order for readability."
+    },
+    "targets": {
+      "type": "array", "items": { "type": "string", "enum": ["tiktok", "reels", "shorts"] },
+      "description": "Platform selections, consumed at export time for aspect ratio/duration/bitrate."
+    },
+    "vertical": {
+      "type": "string",
+      "description": "Selects the fusion weight preset from config/weights.json (e.g. \"talk\", \"gaming\"). Config-over-redeploy per architecture.md non-negotiables."
+    },
+    "sourceKey": { "type": "string", "description": "S3 key of the uploaded raw VOD." },
+    "proxyKey": { "type": "string", "description": "S3 key of the MediaConvert-produced low-res proxy (analysis + browser editor run against this, not the source)." },
+    "progress": {
+      "type": "object",
+      "description": "Pushed over the API Gateway WebSocket on each Step Functions state transition.",
+      "properties": {
+        "stage": { "type": "string", "description": "Duplicates top-level `stage`; included so a progress event is self-contained." },
+        "pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "message": { "type": "string", "description": "Human-readable status line, e.g. \"Transcribing audio (zh-TW)\"." },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "description": "Populated once fusion/Director have run. Drives \"N highlights found\" in the UI. Pipeline: len(candidates), len([h for h in highlights if h.keep]).",
+      "properties": {
+        "candidates": { "type": "integer", "description": "Candidate windows fusion produced, pre-Director filtering." },
+        "kept": { "type": "integer", "description": "Highlights the Director kept (== number of Clip rows written)." }
+      }
+    },
+    "error": {
+      "type": ["object", "null"],
+      "properties": {
+        "stage": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "description": "Set when status is FAILED; null otherwise."
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
