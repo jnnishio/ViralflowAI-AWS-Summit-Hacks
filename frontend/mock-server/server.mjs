@@ -29,7 +29,7 @@ import { saveUpload, uploadPathForKey } from './lib/uploads.mjs'
 import { buildPipelineArgs, DEFAULT_S3_BUCKET } from './lib/pipeline-args.mjs'
 import { spawnPipeline } from './lib/runner.mjs'
 import { parseLogLine, toProgressEvent } from './lib/progress.mjs'
-import { loadManifestClips, clipsDir } from './lib/manifest.mjs'
+import { loadManifestClips, loadCompilations, clipsDir } from './lib/manifest.mjs'
 import { scanCachedStreams, matchCachedStream } from './lib/cache.mjs'
 import {
   listEditorVideos,
@@ -323,23 +323,31 @@ export function startServer(opts = {}) {
       return sendJson(res, 404, { error: 'job not found' })
     }
 
-    // GET /jobs/:jobId/clips
+    // GET /jobs/:jobId/clips  — clips + (optional) cross-clip compilation reels
     const clipsMatch = path.match(/^\/jobs\/([^/]+)\/clips$/)
     if (req.method === 'GET' && clipsMatch) {
       const jobId = clipsMatch[1]
+      // Resolve which on-disk stream this job's compilations live under: a
+      // live/cache job carries its streamId; an on-disk run is addressed by
+      // its dir name (jobId === streamId).
+      const job = jobs.get(jobId)
+      const onDisk = existsSync(join(outRoot, jobId, 'clips', 'manifest.json'))
+      const streamId = job?.streamId ?? (onDisk ? jobId : null)
+      const compilations = streamId ? await loadCompilations(outRoot, streamId) : []
+
       if (clipsByJob.has(jobId)) {
-        return sendJson(res, 200, { clips: clipsByJob.get(jobId) })
+        return sendJson(res, 200, { clips: clipsByJob.get(jobId), compilations })
       }
       // Fallback: load straight from an on-disk run's manifest.
-      if (existsSync(join(outRoot, jobId, 'clips', 'manifest.json'))) {
+      if (onDisk) {
         try {
           const clips = await loadManifestClips(outRoot, jobId, baseUrl())
-          return sendJson(res, 200, { clips })
+          return sendJson(res, 200, { clips, compilations })
         } catch {
-          return sendJson(res, 200, { clips: [] })
+          return sendJson(res, 200, { clips: [], compilations })
         }
       }
-      return sendJson(res, 200, { clips: [] })
+      return sendJson(res, 200, { clips: [], compilations: [] })
     }
 
     // PATCH /jobs/:jobId/clips/:clipId  (crop-confirm)
