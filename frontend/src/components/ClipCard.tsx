@@ -7,12 +7,11 @@ const FACTOR_ORDER: (keyof ClipFactors)[] = ['chat', 'audio', 'visual', 'speech'
 
 export interface ClipCardProps {
   clip: Clip
-  selected: boolean
   /** `video_{streamId}` — drives the "Open in Editor" deep link. */
   videoId?: string
-  onToggleSelect: () => void
-  onOpenCrop: () => void
   onOpenScoreDetails: () => void
+  /** When provided (compilation view), shows a "remove from this reel" control. */
+  onRemove?: () => void
 }
 
 /**
@@ -24,11 +23,9 @@ export interface ClipCardProps {
  */
 export function ClipCard({
   clip,
-  selected,
   videoId,
-  onToggleSelect,
-  onOpenCrop,
   onOpenScoreDetails,
+  onRemove,
 }: ClipCardProps) {
   // Deep link into the vendored OpenCut editor app (a separate server from the
   // REST/pipeline API), opening this clip's scene. The editor loads clips by
@@ -43,20 +40,18 @@ export function ClipCard({
     : undefined
 
   return (
-    <article
-      className="clip-card"
-      data-selected={selected}
-      aria-label={clip.titleNative || clip.clipId}
-    >
-      <label className="clip-select">
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={onToggleSelect}
-          aria-label={`Select ${clip.titleNative || clip.clipId}`}
-        />
-        {selected && <span aria-hidden="true">✓</span>}
-      </label>
+    <article className="clip-card" aria-label={clip.titleNative || clip.clipId}>
+      {onRemove && (
+        <button
+          type="button"
+          className="clip-remove"
+          onClick={onRemove}
+          aria-label="Remove from compilation"
+          title="Remove from this reel"
+        >
+          ×
+        </button>
+      )}
 
       {clip.videoUrl ? (
         <video
@@ -73,7 +68,6 @@ export function ClipCard({
         <div className="clip-score">
           🔥 {clip.score}
           {clip.mood && <span className="clip-mood">{clip.mood}</span>}
-          {clip.cropConfirmed && <span className="clip-badge">cropped</span>}
         </div>
 
         {clip.titleNative && <h2>{clip.titleNative}</h2>}
@@ -111,16 +105,8 @@ export function ClipCard({
           </p>
         </details>
 
-        <div className="clip-actions">
-          <button
-            type="button"
-            className="btn btn--ghost"
-            data-done={clip.cropConfirmed}
-            onClick={onOpenCrop}
-          >
-            {clip.cropConfirmed ? '✓ Cropped' : 'Crop & confirm'}
-          </button>
-          {editorHref && (
+        {editorHref && (
+          <div className="clip-actions">
             <a
               className="btn"
               href={editorHref}
@@ -129,8 +115,8 @@ export function ClipCard({
             >
               Open in Editor →
             </a>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </article>
   )

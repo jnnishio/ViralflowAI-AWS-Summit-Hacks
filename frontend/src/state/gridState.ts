@@ -1,69 +1,65 @@
-import type { Clip, CompilationGroup, GridState, SortOrder, ViewMode } from '../types'
+import type {
+  Clip,
+  Compilation,
+  CompilationGroup,
+  GridState,
+  SortOrder,
+} from '../types'
 
-/** Task 20.1: GridState initial value + reducer actions. */
+/** GridState initial value + reducer actions. */
 export function initialGridState(clips: Clip[] = []): GridState {
   return {
     clips,
+    compilations: [],
     sortOrder: 'desc', // Req 8.3
-    // Default to the responsive card grid so the clip display matches
-    // out/clips/gallery.html; the gallery (horizontal) view is still one
-    // toggle away via ViewModeSwitch (Req 18.2).
-    viewMode: 'grid',
     compilationMode: false,
-    selectedClipIds: new Set(),
     activeScoreDetailsClipId: null,
-    cropViewClipId: null,
   }
 }
 
 export type GridAction =
   | { type: 'setClips'; clips: Clip[] }
+  | { type: 'setCompilations'; compilations: Compilation[] }
   | { type: 'setSortOrder'; sortOrder: SortOrder }
-  | { type: 'setViewMode'; viewMode: ViewMode }
   | { type: 'setCompilationMode'; compilationMode: boolean }
-  | { type: 'toggleSelection'; clipId: string }
-  | { type: 'clearSelection' }
+  | { type: 'addClipToCompilation'; compilationId: string; clipId: string }
+  | { type: 'removeClipFromCompilation'; compilationId: string; clipId: string }
   | { type: 'setActiveScoreDetails'; clipId: string | null }
-  | { type: 'setCropViewClip'; clipId: string | null }
-  | { type: 'updateClip'; clipId: string; patch: Partial<Clip> }
 
 export function gridReducer(state: GridState, action: GridAction): GridState {
   switch (action.type) {
     case 'setClips':
       return { ...state, clips: action.clips }
+    case 'setCompilations':
+      return { ...state, compilations: action.compilations }
     case 'setSortOrder':
-      // Req 10.4, 12.5, 18.6 (Property 22): changing sort order must not
-      // touch selection or compilation mode.
       return { ...state, sortOrder: action.sortOrder }
-    case 'setViewMode':
-      // Req 18.6 (Property 22): view mode switch preserves selection, sort
-      // order, and compilation mode.
-      return { ...state, viewMode: action.viewMode }
     case 'setCompilationMode':
-      // Req 12.5 (Property 22): toggling compilation mode preserves selection.
       return { ...state, compilationMode: action.compilationMode }
-    case 'toggleSelection': {
-      const next = new Set(state.selectedClipIds)
-      if (next.has(action.clipId)) {
-        next.delete(action.clipId)
-      } else {
-        next.add(action.clipId)
-      }
-      return { ...state, selectedClipIds: next }
-    }
-    case 'clearSelection':
-      return { ...state, selectedClipIds: new Set() }
-    case 'setActiveScoreDetails':
-      return { ...state, activeScoreDetailsClipId: action.clipId }
-    case 'setCropViewClip':
-      return { ...state, cropViewClipId: action.clipId }
-    case 'updateClip':
+    case 'addClipToCompilation':
       return {
         ...state,
-        clips: state.clips.map((clip) =>
-          clip.clipId === action.clipId ? { ...clip, ...action.patch } : clip,
+        compilations: state.compilations.map((comp) =>
+          comp.id === action.compilationId &&
+          !comp.clipIds.includes(action.clipId)
+            ? { ...comp, clipIds: [...comp.clipIds, action.clipId] }
+            : comp,
         ),
       }
+    case 'removeClipFromCompilation':
+      return {
+        ...state,
+        compilations: state.compilations.map((comp) =>
+          comp.id === action.compilationId
+            ? {
+                ...comp,
+                clipIds: comp.clipIds.filter((id) => id !== action.clipId),
+              }
+            : comp,
+        ),
+      }
+    case 'setActiveScoreDetails':
+      return { ...state, activeScoreDetailsClipId: action.clipId }
     default:
       return state
   }
@@ -78,27 +74,28 @@ function compareClips(a: Clip, b: Clip, sortOrder: SortOrder): number {
   return a.clipId < b.clipId ? -1 : a.clipId > b.clipId ? 1 : 0
 }
 
-/**
- * Task 20.2: pure derivation of what to render from GridState. When
- * compilationMode is off, returns a flat sorted list. When on, returns
- * Compilation_Group sections ordered alphabetically by mood (Req 12.2),
- * each internally sorted the same way (Req 8.4).
- */
+/** Flat sorted list of all clips (default, non-compilation view). */
 export function deriveDisplayList(state: GridState): Clip[] {
   return [...state.clips].sort((a, b) => compareClips(a, b, state.sortOrder))
 }
 
+/**
+ * Resolve each Compilation to its member Clip objects for rendering, in the
+ * compilations' given order, each group internally sorted like the flat list.
+ * Compilations whose members are all missing are dropped.
+ */
 export function deriveCompilationGroups(state: GridState): CompilationGroup[] {
-  const byMood = new Map<string, Clip[]>()
-  for (const clip of state.clips) {
-    const list = byMood.get(clip.mood) ?? []
-    list.push(clip)
-    byMood.set(clip.mood, list)
-  }
-  return [...byMood.entries()]
-    .sort(([moodA], [moodB]) => (moodA < moodB ? -1 : moodA > moodB ? 1 : 0))
-    .map(([mood, clips]) => ({
-      mood,
-      clips: [...clips].sort((a, b) => compareClips(a, b, state.sortOrder)),
+  const byId = new Map(state.clips.map((clip) => [clip.clipId, clip]))
+  return state.compilations
+    .map((comp) => ({
+      id: comp.id,
+      titleNative: comp.titleNative,
+      titleEnglish: comp.titleEnglish,
+      reason: comp.reason,
+      clips: comp.clipIds
+        .map((clipId) => byId.get(clipId))
+        .filter((clip): clip is Clip => clip !== undefined)
+        .sort((a, b) => compareClips(a, b, state.sortOrder)),
     }))
+    .filter((group) => group.clips.length > 0)
 }
