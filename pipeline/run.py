@@ -68,7 +68,10 @@ def run(argv=None):
     ap.add_argument("--stream-id", required=True)
     ap.add_argument("--vertical", default="talk")
     ap.add_argument("--outdir", default="out")
-    ap.add_argument("--top-clips", type=int, default=5)
+    ap.add_argument("--top-clips", type=int, default=12,
+                    help="max highlights to keep/render (more clips = richer "
+                         "compilation clustering). Actual count is capped by how "
+                         "many candidates the Director marks keep=true.")
     ap.add_argument("--visual-mode", choices=["fast", "full", "off"], default="fast",
                     help="fast: face-detect only candidate windows (default); "
                          "full: whole-VOD Rekognition (4-modal fusion); off: skip visual")
@@ -254,6 +257,17 @@ def run(argv=None):
 
         log("contracts: emitting canonical clips.json")
         contracts.emit(hl_json, clips_dir / "manifest.json", sid, clips_dir / "clips.json")
+
+        # ---- 10a. cross-clip compilation topics (Bedrock) -> compilations.json
+        from pipeline import compilations as comp_mod
+
+        log("compilations: proposing compilation reels with Bedrock")
+        try:
+            comps = comp_mod.emit(clips_dir / "manifest.json", clips_dir / "compilations.json")
+            log(f"  {len(comps)} compilations")
+        except Exception as e:  # a compilation failure shouldn't kill the run
+            log(f"  compilations skipped: {e}")
+
         log("edl: emitting per-clip EDLs")
         edl_mod.emit(hl_json, sid, out / "edl",
                      transcript_path=str(transcript_json) if transcript_json.exists() else None,
