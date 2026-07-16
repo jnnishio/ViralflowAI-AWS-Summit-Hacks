@@ -72,7 +72,7 @@ export function HighlightsGridScreen() {
 
   if (fetchError && state.clips.length === 0 && jobStatus === null) {
     return (
-      <section>
+      <section className="highlights">
         <h1>Highlights</h1>
         <p role="alert">{fetchError}</p>
       </section>
@@ -81,7 +81,7 @@ export function HighlightsGridScreen() {
 
   if (jobStatus === 'failed') {
     return (
-      <section>
+      <section className="highlights">
         <h1>Highlights</h1>
         <p role="alert">Processing failed.</p>
       </section>
@@ -90,18 +90,20 @@ export function HighlightsGridScreen() {
 
   if (jobStatus === 'pending' || jobStatus === 'in_progress') {
     return (
-      <section>
+      <section className="highlights">
         <h1>Highlights</h1>
-        <p>Processing is still in progress...</p>
+        <p className="highlights__subtitle">Processing is still in progress…</p>
       </section>
     )
   }
 
   if (jobStatus === 'completed' && state.clips.length === 0) {
     return (
-      <section>
+      <section className="highlights">
         <h1>Highlights</h1>
-        <p>No highlights were found for this job.</p>
+        <p className="highlights__subtitle">
+          No highlights were found for this job.
+        </p>
       </section>
     )
   }
@@ -109,6 +111,9 @@ export function HighlightsGridScreen() {
   return (
     <section className="highlights">
       <h1>Highlights</h1>
+      <p className="highlights__subtitle">
+        Your top viral moments, ranked and ready to share.
+      </p>
       {fetchError && <p role="alert">{fetchError}</p>}
 
       <div className="highlights-controls">

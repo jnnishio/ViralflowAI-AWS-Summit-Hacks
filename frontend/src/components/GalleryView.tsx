@@ -1,5 +1,7 @@
 import type { Clip, CompilationGroup } from '../types'
 import { ClipCard } from './ClipCard'
+import { ScoreRing } from './ScoreRing'
+import { StoriesCarousel } from './StoriesCarousel'
 
 export interface GalleryViewProps {
   clips: Clip[]
@@ -12,9 +14,10 @@ export interface GalleryViewProps {
   onRemoveFromCompilation?: (compilationId: string, clipId: string) => void
 }
 
-/** Horizontally scrollable row of rich clip cards. When `groups` is provided
- * (Compilation mode), renders one titled reel section per compilation with
- * light add/remove curation; otherwise a single flat row of all clips. */
+/** Stories-style focused gallery of rich clip cards. When `groups` is provided
+ * (Compilation mode), renders one titled reel section per compilation — each
+ * its own carousel — with light add/remove curation; otherwise a single
+ * carousel over all clips. */
 export function GalleryView({
   clips,
   groups,
@@ -23,14 +26,24 @@ export function GalleryView({
   onAddToCompilation,
   onRemoveFromCompilation,
 }: GalleryViewProps) {
-  function renderCard(clip: Clip, onRemove?: () => void) {
+  function renderCarousel(
+    list: Clip[],
+    ariaLabel: string,
+    onRemove?: (clipId: string) => void,
+  ) {
     return (
-      <ClipCard
-        key={clip.clipId}
-        clip={clip}
-        videoId={videoId}
-        onOpenScoreDetails={() => onOpenScoreDetails(clip.clipId)}
-        onRemove={onRemove}
+      <StoriesCarousel
+        clips={list}
+        ariaLabel={ariaLabel}
+        renderCard={(clip, active) => (
+          <ClipCard
+            clip={clip}
+            active={active}
+            videoId={videoId}
+            onOpenScoreDetails={() => onOpenScoreDetails(clip.clipId)}
+            onRemove={onRemove ? () => onRemove(clip.clipId) : undefined}
+          />
+        )}
       />
     )
   }
@@ -44,7 +57,7 @@ export function GalleryView({
       )
     }
     return (
-      <div>
+      <div className="comp-list">
         {groups.map((group) => {
           const memberIds = new Set(group.clips.map((clip) => clip.clipId))
           const candidates = clips.filter(
@@ -54,7 +67,7 @@ export function GalleryView({
           return (
             <section
               key={group.id}
-              className="clip-section comp-section"
+              className="comp-section"
               aria-label={`Compilation reel: ${heading}`}
             >
               <header className="comp-header">
@@ -70,37 +83,42 @@ export function GalleryView({
                 </span>
               </header>
               {group.reason && <p className="comp-reason">{group.reason}</p>}
-              <div className="clip-row">
-                {group.clips.map((clip) =>
-                  renderCard(
-                    clip,
-                    onRemoveFromCompilation
-                      ? () => onRemoveFromCompilation(group.id, clip.clipId)
-                      : undefined,
-                  ),
-                )}
-                {onAddToCompilation && candidates.length > 0 && (
-                  <details className="comp-add">
-                    <summary>＋ Add clip</summary>
-                    <div className="comp-add-list">
-                      {candidates.map((clip) => (
-                        <button
-                          type="button"
-                          key={clip.clipId}
-                          onClick={() =>
-                            onAddToCompilation(group.id, clip.clipId)
-                          }
-                        >
-                          <span className="comp-add-score">🔥 {clip.score}</span>
-                          <span className="comp-add-title">
-                            {clip.titleNative || clip.titleEnglish || clip.clipId}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </details>
-                )}
-              </div>
+
+              {renderCarousel(
+                group.clips,
+                `Compilation reel: ${heading}`,
+                onRemoveFromCompilation
+                  ? (clipId) => onRemoveFromCompilation(group.id, clipId)
+                  : undefined,
+              )}
+
+              {onAddToCompilation && candidates.length > 0 && (
+                <details className="comp-add">
+                  <summary>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                      aria-hidden="true">
+                      <path d="M12 5v14" />
+                      <path d="M5 12h14" />
+                    </svg>
+                    Add clip to this reel
+                  </summary>
+                  <div className="comp-add-list">
+                    {candidates.map((clip) => (
+                      <button
+                        type="button"
+                        key={clip.clipId}
+                        onClick={() => onAddToCompilation(group.id, clip.clipId)}
+                      >
+                        <ScoreRing score={clip.score} size={30} stroke={4} />
+                        <span className="comp-add-title">
+                          {clip.titleNative || clip.titleEnglish || clip.clipId}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </details>
+              )}
             </section>
           )
         })}
@@ -108,7 +126,7 @@ export function GalleryView({
     )
   }
 
-  return <div className="clip-row">{clips.map((clip) => renderCard(clip))}</div>
+  return renderCarousel(clips, 'Suggested highlights')
 }
 
 export default GalleryView
