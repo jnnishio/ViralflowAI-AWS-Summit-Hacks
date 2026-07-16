@@ -8,7 +8,7 @@ this document wins.
 ## The decision
 
 **Processing runs local-first ONLY.** The local Node dev server
-(`frontend/mock-server/server.mjs`) is the active backend. It either:
+(`frontend/local-server/server.mjs`) is the active backend. It either:
 
 1. runs the real pipeline (`python3 -m pipeline.run`) as a subprocess, or
 2. serves pre-computed cached results from `out/<streamId>/clips/`.

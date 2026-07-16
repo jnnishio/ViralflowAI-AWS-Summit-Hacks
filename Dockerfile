@@ -3,7 +3,7 @@
 # Serves the built SPA + REST + WebSocket + pre-rendered media on ONE port,
 # replaying the baked `out/3654414` run. No Python, ffmpeg, or AWS at runtime.
 # Build/run env (CACHED_ONLY, DEMO_STREAM_ID, ...) is documented in
-# frontend/mock-server/server.mjs and .kiro/steering/local-first.md.
+# frontend/local-server/server.mjs and .kiro/steering/local-first.md.
 
 # --- Stage 1: build the Vite SPA (uses frontend/.env.production) ------------
 FROM node:20-slim AS build
@@ -25,9 +25,9 @@ ENV NODE_ENV=production \
     PORT=8080
 
 # Server code + the only external runtime dependency it imports (`ws`, which
-# has no transitive deps). Node resolves `ws` up from mock-server/ to
+# has no transitive deps). Node resolves `ws` up from local-server/ to
 # frontend/node_modules, so the repo layout is preserved.
-COPY frontend/mock-server /app/frontend/mock-server
+COPY frontend/local-server /app/frontend/local-server
 COPY --from=build /app/frontend/node_modules/ws /app/frontend/node_modules/ws
 COPY --from=build /app/frontend/dist /app/frontend/dist
 
@@ -35,4 +35,4 @@ COPY --from=build /app/frontend/dist /app/frontend/dist
 COPY out/3654414 /app/out/3654414
 
 EXPOSE 8080
-CMD ["node", "frontend/mock-server/server.mjs"]
+CMD ["node", "frontend/local-server/server.mjs"]

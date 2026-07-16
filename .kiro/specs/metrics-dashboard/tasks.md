@@ -90,7 +90,7 @@ contract, but are NOT built:
   route), the pure-function shared-module extraction for Lambda reuse, IAM grants,
   and CDK synth assertions (Reqs 12, 13). Abandoned with the rest of the CDK/Lambda
   backend. (If metrics need to appear in the mock UI later, the natural home is a
-  `GET /jobs/:id/metrics` handler in `frontend/mock-server/server.mjs` serving
+  `GET /jobs/:id/metrics` handler in `frontend/local-server/server.mjs` serving
   `metrics.json` — a small JS addition, coordinated with the frontend owner.)
 - **Metrics panel** (Req 14) — `[QUEUED — frontend]`, teammate owns the frontend.
 - **Property-based test suite** — the 13 properties in `design.md` are covered at a

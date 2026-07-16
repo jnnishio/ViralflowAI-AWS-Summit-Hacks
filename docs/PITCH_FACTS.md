@@ -212,7 +212,7 @@ expose it.** — [CODE]
   `docs/batch-processing.md:34`, `docs/contracts/clip-manifest.schema.json:23`, and a
   frontend fixture comment (`apps/editor/apps/web/src/services/highlight-api/fixtures.ts:37`).
 - **The running demo app never sets it** → always the default (`fast`). The local server
-  builds the pipeline argv in `frontend/mock-server/lib/pipeline-args.mjs`
+  builds the pipeline argv in `frontend/local-server/lib/pipeline-args.mjs`
   (`buildPipelineArgs()`), which passes `--video/--chat-log/--s3-bucket/--stream-id/
   --outdir/--vertical` and **omits `--visual-mode` entirely**. So a streamer/end-user
   has **no way to choose** Full in the app; Full is reachable only by running the CLI
@@ -242,5 +242,5 @@ expose it.** — [CODE]
 | Flat, mode-independent cost model | `config/metrics.json` (`costModel.perVod`) |
 | Only metrics file / qualityScore 0.79 / no precision | `out/3654414-fast/metrics.json` |
 | Ground truth covers 6910008 only | `pipeline/fixtures/ground_truth.json` |
-| Demo app omits `--visual-mode` | `frontend/mock-server/lib/pipeline-args.mjs` (`buildPipelineArgs`) |
+| Demo app omits `--visual-mode` | `frontend/local-server/lib/pipeline-args.mjs` (`buildPipelineArgs`) |
 | Batch passthrough of mode | `pipeline/batch.py:201`, `:214-217` |

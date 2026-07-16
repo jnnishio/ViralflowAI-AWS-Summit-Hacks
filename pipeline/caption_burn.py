@@ -2,7 +2,7 @@
 
 The highlights grid ships RAW clips (see pipeline/render.py). When a creator
 opens a clip in the editor and presses "Auto Caption", the local server
-(frontend/mock-server) invokes THIS module to burn karaoke-style TikTok
+(frontend/local-server) invokes THIS module to burn karaoke-style TikTok
 captions onto that one already-cut clip, using the clip-relative word timings
 the pipeline already computed into the clip's EDL (pipeline/edl.py
 word_overlays). The result is an MP4 with captions burned in at the exact same

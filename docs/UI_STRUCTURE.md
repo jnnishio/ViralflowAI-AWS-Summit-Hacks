@@ -14,7 +14,7 @@ The post-processing UI spans **two separate apps**:
 
 They are **not** embedded — the SPA hands off to the editor with a plain
 `<a target="_blank">` deep link. Both are backed by the same local Node server
-(`frontend/mock-server/server.mjs`), which serves the real pipeline output.
+(`frontend/local-server/server.mjs`), which serves the real pipeline output.
 
 ```
 Upload → Platforms → Processing → HIGHLIGHTS PAGE ──(Open in Editor deep link)──▶ EDITOR
@@ -67,7 +67,7 @@ shows a top-right **×** to remove the clip from that reel.
    `{ clips, compilations }`.
 3. Compilation reels come from `pipeline/compilations.py` output
    (`out/<stream>/clips/compilations.json`); the server maps it in
-   `mock-server/lib/manifest.mjs` → `loadCompilations()`.
+   `local-server/lib/manifest.mjs` → `loadCompilations()`.
 
 ---
 
@@ -146,7 +146,7 @@ decision is a normal element the creator can tweak or delete.
 
 ---
 
-## 4. Server endpoints (mock server, `frontend/mock-server/server.mjs`)
+## 4. Server endpoints (mock server, `frontend/local-server/server.mjs`)
 
 **SPA-shaped** (SPA calls these):
 `POST /uploads/presign`, `PUT /mock-upload/:key`, `POST /uploads/confirm`,
