@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { RenderStatusValue } from "@/services/highlight-api/schema";
+import {
+	PLATFORMS,
+	PLATFORM_PROFILES,
+	adaptMetadata,
+	adaptedToText,
+	type TargetPlatform,
+} from "@/lib/platform-profiles";
 
 const HOOK_MAX_LENGTH = 12;
 
@@ -35,6 +42,8 @@ export function ClipMetadataPanel() {
 	const [captionEn, setCaptionEn] = useState("");
 	const [hashtagsText, setHashtagsText] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
+	const [platform, setPlatform] = useState<TargetPlatform>("tiktok");
+	const [copied, setCopied] = useState(false);
 
 	useEffect(() => {
 		if (!clip) return;
@@ -57,6 +66,17 @@ export function ClipMetadataPanel() {
 		.split(",")
 		.map((tag) => tag.trim())
 		.filter(Boolean);
+
+	// Per-platform preview off the live-edited fields.
+	const adapted = adaptMetadata(
+		{ titleNative: hook, titleEnglish: hookEn, caption: captionEn || caption, hashtags },
+		platform,
+	);
+	const copyForPlatform = () => {
+		void navigator.clipboard?.writeText(adaptedToText(adapted));
+		setCopied(true);
+		setTimeout(() => setCopied(false), 1500);
+	};
 
 	const handleFieldBlur = () => {
 		editor.remoteClips.updateClipMetadataDraft({
@@ -143,6 +163,43 @@ export function ClipMetadataPanel() {
 								{tag}
 							</Badge>
 						))}
+					</div>
+				</div>
+
+				<div className="flex flex-col gap-2 border-t pt-3">
+					<div className="flex items-center justify-between">
+						<label className="text-xs text-muted-foreground">Platform preview</label>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-6 px-2 text-xs"
+							onClick={copyForPlatform}
+						>
+							{copied ? "Copied ✓" : "Copy"}
+						</Button>
+					</div>
+					<div className="flex flex-wrap gap-1">
+						{PLATFORMS.map((pf) => (
+							<button
+								key={pf}
+								type="button"
+								onClick={() => setPlatform(pf)}
+								className={
+									pf === platform
+										? "rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+										: "rounded-full border px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
+								}
+							>
+								{PLATFORM_PROFILES[pf].label}
+							</button>
+						))}
+					</div>
+					<div className="rounded-md border p-2 text-sm">
+						{adapted.title && <p className="font-medium">{adapted.title}</p>}
+						<p className="whitespace-pre-line text-muted-foreground">
+							{adapted.description}
+						</p>
+						<p className="pt-1 text-xs text-primary">{adapted.hashtags.join(" ")}</p>
 					</div>
 				</div>
 

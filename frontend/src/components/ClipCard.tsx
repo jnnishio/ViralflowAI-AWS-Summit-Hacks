@@ -1,6 +1,13 @@
-import type { Clip, ClipFactors } from '../types'
+import { useState } from 'react'
+import type { Clip, ClipFactors, TargetPlatform } from '../types'
 import { EDITOR_BASE_URL } from '../api/config'
 import { ThumbnailImage } from './ThumbnailImage'
+import {
+  PLATFORMS,
+  PLATFORM_PROFILES,
+  adaptMetadata,
+  adaptedToText,
+} from '../lib/platformProfiles'
 
 /** Fixed factor order, matching ScoreDetailsPanel / gallery.html. */
 const FACTOR_ORDER: (keyof ClipFactors)[] = ['chat', 'audio', 'visual', 'speech']
@@ -39,6 +46,18 @@ export function ClipCard({
       )}__${clip.clipId}`
     : undefined
 
+  // Per-platform metadata: pick a platform, see the title/description/hashtags
+  // rewritten to match that platform's algorithm, and copy it for posting.
+  const [platform, setPlatform] = useState<TargetPlatform>('tiktok')
+  const [copied, setCopied] = useState(false)
+  const adapted = adaptMetadata(clip, platform)
+
+  const copyForPlatform = () => {
+    void navigator.clipboard?.writeText(adaptedToText(adapted))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
   return (
     <article className="clip-card" aria-label={clip.titleNative || clip.clipId}>
       {onRemove && (
@@ -70,11 +89,33 @@ export function ClipCard({
           {clip.mood && <span className="clip-mood">{clip.mood}</span>}
         </div>
 
-        {clip.titleNative && <h2>{clip.titleNative}</h2>}
-        {clip.titleEnglish && <p className="clip-en">{clip.titleEnglish}</p>}
-        {clip.caption && <p className="clip-cap">{clip.caption}</p>}
-        {clip.hashtags.length > 0 && (
-          <p className="clip-tags">{clip.hashtags.join(' ')}</p>
+        <div className="clip-platforms" role="tablist">
+          {PLATFORMS.map((pf) => (
+            <button
+              key={pf}
+              type="button"
+              role="tab"
+              aria-selected={pf === platform}
+              className={pf === platform ? 'clip-platform is-active' : 'clip-platform'}
+              onClick={() => setPlatform(pf)}
+            >
+              {PLATFORM_PROFILES[pf].label}
+            </button>
+          ))}
+          <button
+            type="button"
+            className="clip-copy"
+            onClick={copyForPlatform}
+            title="Copy title + description + hashtags"
+          >
+            {copied ? 'Copied ✓' : 'Copy'}
+          </button>
+        </div>
+
+        {adapted.title && <h2>{adapted.title}</h2>}
+        {adapted.description && <p className="clip-cap">{adapted.description}</p>}
+        {adapted.hashtags.length > 0 && (
+          <p className="clip-tags">{adapted.hashtags.join(' ')}</p>
         )}
 
         <details
