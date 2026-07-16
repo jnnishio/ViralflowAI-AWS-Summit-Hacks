@@ -8,6 +8,9 @@
 
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
+<!-- 🖼️ VISUAL PLACEHOLDER — hero banner / logo lockup. Add as docs/media/hero-banner.png -->
+<sub>🖼️ <em>Hero banner placeholder — add <code>docs/media/hero-banner.png</code></em></sub>
+
 </div>
 
 ---
@@ -20,6 +23,18 @@ Streamers produce hours of live content, but audiences grow on short-form platfo
 
 The core idea: a highlight is a **cross-modal agreement event** — the chat erupts, the audio peaks, and the scene reacts *at the same moment*. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
+**The journey, end to end:**
+
+```mermaid
+flowchart LR
+    U[Upload VOD + chat log] --> P[AI processing<br/>signals · fusion · Director]
+    P --> H[Highlights gallery<br/>ranked 9:16 clips]
+    H --> E[Refine in editor<br/>AI auto-edit + agent]
+    H --> C[Compile a reel]
+    E --> X[Copy metadata · export]
+    C --> X
+```
+
 ---
 
 ## 🎥 Demo
@@ -30,15 +45,17 @@ The core idea: a highlight is a **cross-modal agreement event** — the chat eru
 
 **Walkthrough video:** `<add YouTube/Loom link here>`
 
-<!-- Example once media is added:
-[![Watch the demo](docs/media/demo-thumbnail.png)](https://youtu.be/your-video-id)
--->
+<!-- 🎞️ VISUAL PLACEHOLDER — hero demo GIF (30–60s loop of the full flow). Add as docs/media/demo.gif,
+     then swap the line below for:  ![Demo](docs/media/demo.gif)
+     Optionally link a thumbnail to the video:  [![Watch the demo](docs/media/demo-thumbnail.png)](https://youtu.be/your-video-id) -->
+> 🎞️ **Demo GIF placeholder** — add `docs/media/demo.gif` (full upload → highlights → edit loop).
 
-| Upload & processing | Highlights gallery | Per-platform metadata |
+<!-- 📸 VISUAL PLACEHOLDER — screenshot gallery. Replace each cell with ![alt](docs/media/<file>.png) once captured. -->
+| Upload | Processing | Highlights gallery |
 |---|---|---|
-| `docs/media/screenshot-upload.png` | `docs/media/screenshot-gallery.png` | `docs/media/screenshot-metadata.png` |
-
-<!-- Replace the table cells above with real images, e.g. ![Gallery](docs/media/screenshot-gallery.png) -->
+| 📸 `docs/media/screenshot-upload.png` | 📸 `docs/media/screenshot-processing.png` | 📸 `docs/media/screenshot-gallery.png` |
+| **Per-platform metadata** | **Agentic editor** | **Compilation reels** |
+| 📸 `docs/media/screenshot-metadata.png` | 📸 `docs/media/screenshot-editor.png` | 📸 `docs/media/screenshot-compilation.png` |
 
 ---
 
@@ -49,8 +66,9 @@ The core idea: a highlight is a **cross-modal agreement event** — the chat eru
 - **Face-guided 9:16 smart crop** — 16:9 → vertical, crop window panned to the median face position from Rekognition face tracking.
 - **Burned-in captions** — zh/en karaoke captions from Transcribe word timestamps (ASS subtitle pipeline), plus a ≤12-char hook overlay on the opening seconds.
 - **Per-platform metadata** — title, hook, caption, and hashtags rewritten per platform (TikTok / Reels / Shorts), one-click copy.
-- **Compilation reels** — auto-edit multiple clips into a single multi-clip reel EDL.
-- **In-browser editor** — open any clip's timeline in a vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) editor for manual refinement.
+- **AI auto-edit engine** — a per-clip editing pass that auto-zooms on the reacting speaker during laughter/loud moments, flashes split-second onomatopoeia captions ("WHAT?!", "NO WAY") on vocal accents, and drops mood-matched SFX. A Bedrock (Claude) brain plans the edit; a deterministic scipy detector is the offline fallback. Every edit lands as an *editable* timeline element, not a baked-in overlay. ([details](#-ai-editing-auto-edit-reels--agentic-editor))
+- **Compilation reels** — auto-edit a themed group of clips into one multi-clip reel with transitions and per-clip emphasis matched to the reel's *vibe* (punchy whip-pans for "hype", gentle crossfades for "emotional").
+- **Agentic in-browser editor** — a vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) fork (Next.js + Rust/WASM GPU renderer) with an **autonomous editing agent**: describe a change in natural language and a Bedrock tool-calling loop trims, retimes, splits, adds captions/effects, and more across the timeline — plus one-click AI auto-edit and auto-caption.
 - **Bilingual UI** — Traditional Chinese / English toggle across the app.
 - **Ranked output** — clips sorted by virality score so creators publish the best first.
 
@@ -66,18 +84,130 @@ Three modules turn a raw VOD + chat log into publish-ready clips:
 - **Visual:** Rekognition Video shot-segment detection (clean cut points) + face detection with emotions (SURPRISED/HAPPY spikes; boxes reused for smart cropping).
 - **Fusion:** all signals z-normalized on a 5s grid, combined with per-vertical weights (talk-show vs gaming presets); cross-modal validation + the Bedrock AI Director confirm clip-worthiness.
 
+**Multimodal fusion — how four signals become one excitement curve:**
+
+```mermaid
+flowchart LR
+    S1[Chat engagement] --> Z
+    S2[Speech · Transcribe] --> Z
+    S3[Visual · Rekognition<br/>shots + faces] --> Z
+    S4[Audio RMS · onsets] --> Z
+    Z[z-normalize on 5s grid<br/>per-vertical weights] --> Curve[Excitement curve]
+    Curve --> V{Cross-modal validation<br/>≥2 modalities spike?}
+    V -- yes --> Cand[Candidates] --> Dir[Bedrock AI Director<br/>score · boundaries · mood]
+    V -- no --> Drop[Discard]
+```
+
+<!-- 📸 VISUAL PLACEHOLDER — the signature excitement-curve chart with detected highlight windows shaded. Add as docs/media/excitement-curve.png -->
+> 📸 **Screenshot placeholder** — excitement curve with detected highlight windows · add `docs/media/excitement-curve.png`.
+
 **2 · AI automatic editing engine**
 - Boundaries chosen for setup → payoff, snapped near Rekognition shot cuts.
 - Face-guided 16:9 → 9:16 crop; burned-in zh captions from Transcribe timestamps; hook overlay on the first ~2.5s.
+- A further **AI auto-edit pass** layers reaction zooms, onomatopoeia captions, and mood-matched SFX — see [AI editing](#-ai-editing-auto-edit-reels--agentic-editor) below.
 
 **3 · Multi-style production (platform adaptation)**
 - Per-clip Bedrock metadata pack (title, hook, caption, hashtags) in Traditional Chinese + English; platform presets for length, caption style, and hook placement.
+
+> 📖 **Algorithm deep dive:** [`docs/algorithm-decisions.md`](docs/algorithm-decisions.md) — fast vs. full visual mode, fusion-weight choices, cross-modal validation, and every algorithmic tradeoff (with the ideas deliberately set aside and why).
+
+---
+
+## 🎬 AI editing (auto-edit, reels & agentic editor)
+
+Detection and cropping produce a clean clip — then a second AI layer makes it *feel* edited. All three subsystems below emit the **same EDL contract** ([`docs/contracts/edl.schema.json`](docs/contracts/)) that the in-browser editor renders, so nothing is ever baked in irreversibly.
+
+### 1 · AI auto-edit engine (`pipeline/autoedit.py`, `pipeline/autoedit_llm.py`)
+After a highlight is cut, an editing pass adds "make it more viral" beats:
+- **Reaction zoom** — punches in on the reacting speaker (Rekognition face box) during laughter or a loud-audio spike.
+- **Onomatopoeia flash captions** — split-second "WHAT?!" / "NO WAY" overlays on vocal accents/emphasis.
+- **Mood-matched SFX** — e.g. crickets after an awkward silence — chosen from the clip's vibe.
+
+**Two-tier brain (mirrors the AI Director):** a Bedrock (Claude) call reasons over the clip's multimodal context (audio-energy peaks, chat laughter, face boxes) and emits a **sequenced, timestamped EDL**; a deterministic scipy detector (`find_peaks`) is the offline fallback, so the loop stays runnable without AWS. Every emitted edit is materialized as an **ordinary, editable timeline element** — adjustable, deletable, or extendable by the user afterward.
+
+**Auto-edit engine — two-tier brain with an offline fallback:**
+
+```mermaid
+flowchart LR
+    Clip[Highlight clip + signals] --> Ctx[Build clip context<br/>energy peaks · chat laughs · face boxes]
+    Ctx --> Q{AWS configured?}
+    Q -- yes --> Bed[Bedrock EDL planner]
+    Q -- no --> Sci[Deterministic scipy detectors]
+    Bed --> Val[Validate vs EDL schema]
+    Sci --> Val
+    Val --> TL[Editable timeline elements]
+    TL --> R[Render 9:16 clip]
+```
+
+<!-- 🎞️ VISUAL PLACEHOLDER — before/after GIF: raw clip vs. auto-edited (reaction zoom + onomatopoeia caption). Add as docs/media/autoedit-before-after.gif -->
+> 🎞️ **GIF placeholder** — before/after: raw clip vs. auto-edited · add `docs/media/autoedit-before-after.gif`.
+
+### 2 · Compilation reels (`pipeline/compile_edl.py`, `pipeline/compilations.py`)
+Turn a themed group of highlights into **one multi-clip reel** on a single timeline: a segment per clip laid end to end, transitions between them, and light per-clip emphasis (opening hook + reaction zooms) chosen to match the reel's dominant **vibe** — a "hype" reel gets punchy whip-pan cuts and reaction zooms; an "emotional" one gets gentle crossfades and fades. Same two-tier planner (Bedrock brain + deterministic vibe planner fallback) and same EDL contract as the single-clip engine.
+
+**Compilation reel — one timeline, vibe-matched:**
+
+```mermaid
+flowchart LR
+    G[Themed clip group] --> Vibe[Detect reel vibe<br/>dominant mood]
+    Vibe --> Q{AWS configured?}
+    Q -- yes --> Bed[Bedrock reel planner]
+    Q -- no --> Det[Deterministic vibe planner]
+    Bed --> EDL[Multi-clip EDL<br/>segments · transitions · emphasis]
+    Det --> EDL
+    EDL --> Ed[Open in editor]
+```
+
+<!-- 📸 VISUAL PLACEHOLDER — compilation mode in the highlights gallery (reel sections + curation). Add as docs/media/screenshot-compilation.png -->
+> 📸 **Screenshot placeholder** — compilation mode (reel sections + add/remove curation) · add `docs/media/screenshot-compilation.png`.
+
+### 3 · Agentic in-browser editor (`apps/editor/`)
+A vendored fork of [OpenCut](https://github.com/OpenCut-app/OpenCut) (Next.js + a Rust/WASM GPU effects renderer), wired to this project's clips + auto-edit EDLs via a thin "highlight-api" backend. Beyond one-click **AI auto-edit** and **auto-caption**, it runs an **autonomous editing agent**: you describe a change in natural language and a Bedrock **tool-calling loop** executes it against the real timeline, with 15 editing tools —
+`trim_element`, `retime_element`, `split_element`, `move_element`, `delete_elements`, `duplicate_elements`, `add_track`, `insert_text_element`, `add_blur_effect`, `remove_clip_effect`, `toggle_clip_effect`, `toggle_track_mute`, `toggle_track_visibility`, `toggle_elements_muted`, `toggle_elements_visibility`.
+
+**Agentic editor — the tool-calling loop:**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Runner as agent-runner (browser)
+    participant API as agent-turn route
+    participant Bedrock
+    participant TL as Editor timeline
+    User->>Runner: natural-language edit request
+    loop until the agent signals done
+        Runner->>API: message history + prior tool results
+        API->>Bedrock: Converse with 15-tool catalog
+        Bedrock-->>API: toolUse, e.g. trim_element
+        API-->>Runner: tool call
+        Runner->>TL: apply tool
+        TL-->>Runner: toolResult
+    end
+    Runner-->>User: edited timeline
+```
+
+<!-- 🎞️ VISUAL PLACEHOLDER — GIF of the agent editing the timeline from a natural-language prompt. Add as docs/media/agent-edit.gif -->
+> 🎞️ **GIF placeholder** — agent editing the timeline from a prompt · add `docs/media/agent-edit.gif`.
 
 ---
 
 ## 🏗 Architecture
 
 **The demo runs local-first:** a Node server (`frontend/local-server/`) orchestrates the real Python pipeline (`python -m pipeline.run`) against AWS AI services, or serves pre-rendered results for a zero-latency demo. A **dormant AWS CDK stack** (`backend/`) is included as the cloud-scale design — the "scales to cloud" story — and is not required to run the project.
+
+**Runtime topology (local-first):**
+
+```mermaid
+flowchart LR
+    B[Browser SPA<br/>React + Vite] -->|REST + WebSocket| LS[local-server · Node]
+    LS -->|spawn| PY[pipeline.run<br/>Transcribe · Rekognition · Bedrock · S3]
+    LS -->|or serve| Cache[(cached out/ runs)]
+    PY --> Cache
+    LS -. dormant .-> AWS[AWS CDK<br/>Step Functions · Lambda · MediaConvert]
+```
+
+*The data-flow / signal pipeline itself:*
+
 
 ```mermaid
 flowchart LR
@@ -132,7 +262,8 @@ Measured on a real 74-minute idol-show VOD:
 | **Local backend** | Node.js server (`frontend/local-server/`) — runs the pipeline as a subprocess, streams progress over WebSocket, serves media |
 | **Pipeline** | Python 3.12 · boto3 · numpy · scipy · pandas · ffmpeg (with libass) |
 | **Cloud AI** | AWS Transcribe · Rekognition · Bedrock · S3 |
-| **Editor** | Vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) (Next.js) |
+| **Editor** | Vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) fork (Next.js + Rust/WASM GPU renderer) with an AI editing agent (Bedrock tool-calling) |
+| **AI auto-edit** | Bedrock (Claude) EDL planner + deterministic scipy fallback (`pipeline/autoedit*.py`, `pipeline/compile_edl.py`) |
 | **Deploy** | Docker · Fly.io (single-container cached demo) |
 | **Cloud design** | AWS CDK (Step Functions / Lambda / MediaConvert — dormant) |
 
