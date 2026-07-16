@@ -1,3 +1,5 @@
+import { useI18n } from '../i18n'
+
 export interface CompilationModeToggleProps {
   compilationMode: boolean
   onChange: (next: boolean) => void
@@ -9,6 +11,7 @@ export function CompilationModeToggle({
   compilationMode,
   onChange,
 }: CompilationModeToggleProps) {
+  const { t } = useI18n()
   return (
     <label className="comp-toggle">
       <input
@@ -16,7 +19,7 @@ export function CompilationModeToggle({
         checked={compilationMode}
         onChange={(event) => onChange(event.target.checked)}
       />
-      Compilation reels
+      {t('compToggle.label')}
     </label>
   )
 }

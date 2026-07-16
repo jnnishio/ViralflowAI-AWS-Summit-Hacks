@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { createJob } from '../api/jobApi'
+import { useI18n } from '../i18n'
 import type { TargetPlatform } from '../types'
 import './PlatformSelectScreen.css'
 
@@ -84,6 +85,7 @@ const PLATFORM_OPTIONS: {
 
 export function PlatformSelectScreen() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const location = useLocation()
   const sourceKeys: string[] = (location.state as { sourceKeys?: string[] })
     ?.sourceKeys ?? []
@@ -109,7 +111,7 @@ export function PlatformSelectScreen() {
   function handleStartJob() {
     if (selected.size === 0) {
       // Req 2.4: block starting a job with zero platforms selected.
-      setValidationMessage('Select at least one target platform to continue.')
+      setValidationMessage(t('platforms.selectAtLeastOne'))
       return
     }
     setValidationMessage(null)
@@ -119,20 +121,18 @@ export function PlatformSelectScreen() {
         navigate(`/processing/${jobId}`)
       })
       .catch(() => {
-        setValidationMessage('Could not start the job. Please try again.')
+        setValidationMessage(t('platforms.startError'))
         setSubmitting(false)
       })
   }
 
   return (
     <section className="platform-screen">
-      <h1 className="platform-screen__title">Select Platforms</h1>
-      <p className="platform-screen__subtitle">
-        Choose which platforms your highlights are intended for.
-      </p>
+      <h1 className="platform-screen__title">{t('platforms.title')}</h1>
+      <p className="platform-screen__subtitle">{t('platforms.subtitle')}</p>
 
       <fieldset className="platform-grid">
-        <legend>Target platforms</legend>
+        <legend>{t('platforms.legend')}</legend>
         {PLATFORM_OPTIONS.map((option) => (
           <label key={option.value} className="platform-card">
             <input
@@ -166,7 +166,7 @@ export function PlatformSelectScreen() {
         onClick={handleStartJob}
         disabled={submitting}
       >
-        Start processing
+        {t('platforms.start')}
       </button>
     </section>
   )

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { LaunchScreen } from './components/LaunchScreen'
+import { LanguageToggle } from './components/LanguageToggle'
 import {
   HighlightsGridScreen,
   PlatformSelectScreen,
@@ -16,6 +17,7 @@ function App() {
   return (
     <>
       {showLaunch && <LaunchScreen onFinish={handleLaunchFinish} />}
+      <LanguageToggle />
       <Routes>
         <Route path="/" element={<Navigate to="/upload" replace />} />
         <Route path="/upload" element={<UploadScreen />} />

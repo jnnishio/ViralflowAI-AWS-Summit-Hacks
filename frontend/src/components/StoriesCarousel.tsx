@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useI18n } from '../i18n'
 import type { Clip } from '../types'
 
 export interface StoriesCarouselProps {
@@ -46,8 +47,10 @@ const VISIBLE_NEIGHBOURS = 2
 export function StoriesCarousel({
   clips,
   renderCard,
-  ariaLabel = 'Highlights',
+  ariaLabel,
 }: StoriesCarouselProps) {
+  const { t } = useI18n()
+  const label = ariaLabel ?? t('carousel.default')
   const [active, setActive] = useState(0)
   const stageRef = useRef<HTMLDivElement>(null)
 
@@ -86,13 +89,13 @@ export function StoriesCarousel({
   const atEnd = active === clips.length - 1
 
   return (
-    <div className="stories" aria-roledescription="carousel" aria-label={ariaLabel}>
+    <div className="stories" aria-roledescription="carousel" aria-label={label}>
       <button
         type="button"
         className="stories__nav stories__nav--prev"
         onClick={() => go(-1)}
         disabled={atStart}
-        aria-label="Previous highlight"
+        aria-label={t('carousel.prev')}
       >
         <ChevronLeft />
       </button>
@@ -102,7 +105,10 @@ export function StoriesCarousel({
         ref={stageRef}
         tabIndex={0}
         role="group"
-        aria-label={`Highlight ${active + 1} of ${clips.length}`}
+        aria-label={t('carousel.countAria', {
+          current: active + 1,
+          total: clips.length,
+        })}
         onKeyDown={onKeyDown}
       >
         {clips.map((clip, index) => {
@@ -130,7 +136,7 @@ export function StoriesCarousel({
                   type="button"
                   className="stories__focus-btn"
                   onClick={() => setActive(index)}
-                  aria-label={`View highlight ${index + 1}`}
+                  aria-label={t('carousel.viewAria', { index: index + 1 })}
                   tabIndex={-1}
                 />
               )}
@@ -145,19 +151,23 @@ export function StoriesCarousel({
         className="stories__nav stories__nav--next"
         onClick={() => go(1)}
         disabled={atEnd}
-        aria-label="Next highlight"
+        aria-label={t('carousel.next')}
       >
         <ChevronRight />
       </button>
 
-      <div className="stories__dots" role="tablist" aria-label="Highlight position">
+      <div
+        className="stories__dots"
+        role="tablist"
+        aria-label={t('carousel.positionAria')}
+      >
         {clips.map((clip, index) => (
           <button
             key={clip.clipId}
             type="button"
             role="tab"
             aria-selected={index === active}
-            aria-label={`Go to highlight ${index + 1}`}
+            aria-label={t('carousel.goToAria', { index: index + 1 })}
             className={`stories__dot${index === active ? ' is-active' : ''}`}
             onClick={() => setActive(index)}
           />

@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n'
 import type { SortOrder } from '../types'
 
 export interface SortControlProps {
@@ -31,16 +32,17 @@ function ArrowDown() {
  * high→low, up = low→high). Req 8.1/8.3.
  */
 export function SortControl({ sortOrder, onChange }: SortControlProps) {
+  const { t } = useI18n()
   return (
-    <div className="sort-control" role="group" aria-label="Sort by score">
-      <span className="sort-control__label">Sort by Score</span>
+    <div className="sort-control" role="group" aria-label={t('sort.groupAria')}>
+      <span className="sort-control__label">{t('sort.label')}</span>
       <div className="sort-control__arrows">
         <button
           type="button"
           className="sort-control__arrow"
           aria-pressed={sortOrder === 'desc'}
-          aria-label="Sort by score, high to low"
-          title="High to low"
+          aria-label={t('sort.highToLowAria')}
+          title={t('sort.highToLow')}
           onClick={() => onChange('desc')}
         >
           <ArrowDown />
@@ -49,8 +51,8 @@ export function SortControl({ sortOrder, onChange }: SortControlProps) {
           type="button"
           className="sort-control__arrow"
           aria-pressed={sortOrder === 'asc'}
-          aria-label="Sort by score, low to high"
-          title="Low to high"
+          aria-label={t('sort.lowToHighAria')}
+          title={t('sort.lowToHigh')}
           onClick={() => onChange('asc')}
         >
           <ArrowUp />

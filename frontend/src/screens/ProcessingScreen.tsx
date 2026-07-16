@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getJob } from '../api/jobApi'
 import { connectProgress, type ProgressClient } from '../api/progressApi'
+import { useI18n } from '../i18n'
+import type { TranslationKey } from '../i18n'
 import type { JobStatus } from '../types'
 import './ProcessingScreen.css'
 
@@ -15,14 +17,14 @@ const POLL_INTERVAL_MS = 5000
  * of these phases rather than assuming a fixed vocabulary.
  */
 const PIPELINE_PHASES = [
-  { key: 'prepare', label: 'Preparing video' },
-  { key: 'transcribe', label: 'Transcribing speech' },
-  { key: 'visual', label: 'Analyzing video' },
-  { key: 'audio', label: 'Analyzing audio' },
-  { key: 'chat', label: 'Analyzing chat' },
-  { key: 'score', label: 'Scoring & selecting highlights' },
-  { key: 'render', label: 'Rendering & finalizing' },
-] as const
+  { key: 'prepare', labelKey: 'processing.phase.prepare' },
+  { key: 'transcribe', labelKey: 'processing.phase.transcribe' },
+  { key: 'visual', labelKey: 'processing.phase.visual' },
+  { key: 'audio', labelKey: 'processing.phase.audio' },
+  { key: 'chat', labelKey: 'processing.phase.chat' },
+  { key: 'score', labelKey: 'processing.phase.score' },
+  { key: 'render', labelKey: 'processing.phase.render' },
+] as const satisfies readonly { key: string; labelKey: TranslationKey }[]
 
 /** First-match-wins rules mapping any stage string to a phase key. More
  * specific patterns are listed before generic ones (e.g. "align" beats the
@@ -72,6 +74,7 @@ function AlertIcon() {
 export function ProcessingScreen() {
   const { jobId } = useParams<{ jobId: string }>()
   const navigate = useNavigate()
+  const { t } = useI18n()
 
   const [stage, setStage] = useState<string | null>(null)
   const [status, setStatus] = useState<JobStatus>('pending')
@@ -157,13 +160,13 @@ export function ProcessingScreen() {
   if (status === 'failed') {
     return (
       <section className="processing-screen">
-        <h1 className="processing-screen__title">Processing</h1>
+        <h1 className="processing-screen__title">{t('processing.title')}</h1>
         <div className="proc-error">
           <span className="proc-error__icon" aria-hidden="true">
             <AlertIcon />
           </span>
           <p className="proc-error__text" role="alert">
-            Processing failed. Please try again.
+            {t('processing.failed')}
           </p>
         </div>
       </section>
@@ -174,8 +177,8 @@ export function ProcessingScreen() {
 
   return (
     <section className="processing-screen">
-      <h1 className="processing-screen__title">Processing</h1>
-      <p className="processing-screen__subtitle">Your VOD is being analyzed.</p>
+      <h1 className="processing-screen__title">{t('processing.title')}</h1>
+      <p className="processing-screen__subtitle">{t('processing.subtitle')}</p>
 
       <div className="proc-orb" aria-hidden="true">
         <span className="proc-orb__ring" />
@@ -193,7 +196,7 @@ export function ProcessingScreen() {
       </div>
 
       <p className="proc-stage" key={stage ?? 'start'} aria-live="polite">
-        {stage ?? 'Starting pipeline\u2026'}
+        {stage ?? t('processing.starting')}
       </p>
 
       <ol className="proc-steps">
@@ -212,7 +215,7 @@ export function ProcessingScreen() {
               <span className="proc-step__marker">
                 {state === 'done' && <CheckIcon />}
               </span>
-              <span className="proc-step__label">{phase.label}</span>
+              <span className="proc-step__label">{t(phase.labelKey)}</span>
             </li>
           )
         })}
@@ -221,7 +224,7 @@ export function ProcessingScreen() {
       {isPolling && (
         <div className="proc-reconnect" role="status">
           <span className="proc-reconnect__dot" aria-hidden="true" />
-          Reconnecting… checking status every 5 seconds.
+          {t('processing.reconnecting')}
         </div>
       )}
     </section>

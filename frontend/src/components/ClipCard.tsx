@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Clip, ClipFactors, TargetPlatform } from '../types'
 import { EDITOR_BASE_URL } from '../api/config'
+import { useI18n } from '../i18n'
 import { ScoreRing } from './ScoreRing'
 import { ThumbnailImage } from './ThumbnailImage'
 import {
@@ -38,6 +39,7 @@ export function ClipCard({
   onOpenScoreDetails,
   onRemove,
 }: ClipCardProps) {
+  const { t } = useI18n()
   // Deep link into the vendored OpenCut editor app (a separate server from the
   // REST/pipeline API), opening this clip's scene. The editor loads clips by
   // stream, so the clip id is stream-scoped ("{stream}__clip_NN") — the stream
@@ -90,8 +92,8 @@ export function ClipCard({
             type="button"
             className="clip-remove"
             onClick={onRemove}
-            aria-label="Remove from compilation"
-            title="Remove from this reel"
+            aria-label={t('clip.removeAria')}
+            title={t('clip.removeTitle')}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -122,9 +124,9 @@ export function ClipCard({
               type="button"
               className="clip-copy"
               onClick={copyForPlatform}
-              title="Copy title + description + hashtags"
+              title={t('clip.copyTitle')}
             >
-              {copied ? 'Copied ✓' : 'Copy'}
+              {copied ? t('clip.copied') : t('clip.copy')}
             </button>
           </div>
 
@@ -142,13 +144,13 @@ export function ClipCard({
               if ((e.target as HTMLDetailsElement).open) onOpenScoreDetails()
             }}
           >
-            <summary>Score details</summary>
+            <summary>{t('clip.scoreDetails')}</summary>
             {FACTOR_ORDER.map((factor) => {
               const value = clip.factors[factor]
               const width = Math.min(Math.max(value, 0) * 33, 100)
               return (
                 <div className="factor" key={factor}>
-                  <span>{factor}</span>
+                  <span>{t(`factor.${factor}`)}</span>
                   <div className="bar">
                     <div style={{ width: `${width.toFixed(0)}%` }} />
                   </div>
@@ -170,7 +172,7 @@ export function ClipCard({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open in Editor →
+                {t('clip.openEditor')}
               </a>
             </div>
           )}

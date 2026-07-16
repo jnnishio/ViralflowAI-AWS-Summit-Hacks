@@ -1,0 +1,43 @@
+.lang-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.lang-toggle__opt {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: 500 13px/1 var(--sans);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+  white-space: nowrap;
+}
+
+.lang-toggle__opt:hover {
+  color: var(--text-h);
+}
+
+.lang-toggle__opt.is-active {
+  background: var(--text-h);
+  color: var(--bg);
+}
+
+.lang-toggle__opt:focus-visible {
+  outline: 2px solid var(--text-h);
+  outline-offset: 2px;
+}

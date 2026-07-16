@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useI18n } from '../i18n'
 
 export interface ScoreRingProps {
   /** Virality score on a 0–100 scale. */
@@ -23,6 +24,7 @@ export function ScoreRing({
   stroke = 7,
   label,
 }: ScoreRingProps) {
+  const { t } = useI18n()
   const gradientId = useId()
   const clamped = Math.min(Math.max(score, 0), 100)
   const radius = (size - stroke) / 2
@@ -34,7 +36,7 @@ export function ScoreRing({
       className="score-ring"
       style={{ width: size, height: size }}
       role="img"
-      aria-label={`Virality score ${Math.round(clamped)} out of 100`}
+      aria-label={t('score.viralityAria', { score: Math.round(clamped) })}
     >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <defs>

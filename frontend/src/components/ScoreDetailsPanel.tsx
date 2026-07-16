@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n'
 import type { Clip, ClipFactors } from '../types'
 
 const FACTOR_ORDER: (keyof ClipFactors)[] = ['chat', 'audio', 'visual', 'speech']
@@ -20,19 +21,20 @@ export interface ScoreDetailsPanelProps {
  * passed in -- this component itself is a pure function of its `clip` prop.
  */
 export function ScoreDetailsPanel({ clip, onClose }: ScoreDetailsPanelProps) {
+  const { t } = useI18n()
   return (
-    <div role="dialog" aria-label={`Score details for ${clip.titleNative}`}>
-      <h2>Score details</h2>
+    <div role="dialog" aria-label={t('score.dialogAria', { title: clip.titleNative })}>
+      <h2>{t('score.title')}</h2>
       <dl>
         {FACTOR_ORDER.map((factor) => (
           <div key={factor}>
-            <dt>{factor}</dt>
+            <dt>{t(`factor.${factor}`)}</dt>
             <dd>{formatSigned(clip.factors[factor])}</dd>
           </div>
         ))}
       </dl>
       <button type="button" onClick={onClose}>
-        Close
+        {t('score.close')}
       </button>
     </div>
   )

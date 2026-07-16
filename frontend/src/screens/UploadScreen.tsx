@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useI18n } from '../i18n'
 import {
   confirmUpload,
   requestPresignedUpload,
@@ -142,6 +143,7 @@ function CloseIcon() {
 
 export function UploadScreen() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const items = useUploadItems()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [validationMessage, setValidationMessage] = useState<string | null>(
@@ -161,12 +163,12 @@ export function UploadScreen() {
 
     if (rejectedExtension.length > 0) {
       setValidationMessage(
-        `Some files were rejected. Accepted file extensions: ${ACCEPTED_EXTENSIONS.join(', ')}.`,
+        t('upload.rejectedExtensions', {
+          extensions: ACCEPTED_EXTENSIONS.join(', '),
+        }),
       )
     } else if (rejectedBatchLimit.length > 0) {
-      setValidationMessage(
-        `You can upload at most ${MAX_FILES} files per batch. Extra files were not added.`,
-      )
+      setValidationMessage(t('upload.batchLimit', { max: MAX_FILES }))
     } else {
       setValidationMessage(null)
     }
@@ -181,7 +183,7 @@ export function UploadScreen() {
     }))
     addUploadItems(newItems)
     newItems.forEach(startUpload)
-  }, [])
+  }, [t])
 
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
@@ -231,10 +233,8 @@ export function UploadScreen() {
 
   return (
     <section className="upload-screen">
-      <h1 className="upload-screen__title">Upload</h1>
-      <p className="upload-screen__subtitle">
-        Upload one or more VOD files to generate highlights.
-      </p>
+      <h1 className="upload-screen__title">{t('upload.title')}</h1>
+      <p className="upload-screen__subtitle">{t('upload.subtitle')}</p>
 
       <input
         ref={fileInputRef}
@@ -245,7 +245,7 @@ export function UploadScreen() {
           handleFilesSelected(event.target.files)
           event.target.value = ''
         }}
-        aria-label="Select VOD and Chat Log files"
+        aria-label={t('upload.selectFilesAria')}
         hidden
       />
 
@@ -253,7 +253,7 @@ export function UploadScreen() {
         className={dropzoneClass}
         role="button"
         tabIndex={0}
-        aria-label="Drag and drop files here, or browse to select files"
+        aria-label={t('upload.dropzoneAria')}
         onClick={handleAddFilesClick}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -278,7 +278,8 @@ export function UploadScreen() {
         </div>
 
         <p className="dropzone__prompt">
-          <strong>Drag &amp; drop</strong> your files here
+          <strong>{t('upload.dropPromptStrong')}</strong>
+          {t('upload.dropPromptRest')}
         </p>
 
         <button
@@ -289,11 +290,14 @@ export function UploadScreen() {
             handleAddFilesClick()
           }}
         >
-          Browse files
+          {t('upload.browse')}
         </button>
 
         <p className="dropzone__hint">
-          Accepted: {ACCEPTED_EXTENSIONS.join(', ')} · up to {MAX_FILES} files
+          {t('upload.hint', {
+            extensions: ACCEPTED_EXTENSIONS.join(', '),
+            max: MAX_FILES,
+          })}
         </p>
       </div>
 
@@ -321,9 +325,9 @@ export function UploadScreen() {
                     }${isError ? ' is-error' : ''}`}
                   >
                     {isError
-                      ? 'Failed'
+                      ? t('upload.statusFailed')
                       : isDone
-                        ? 'Done'
+                        ? t('upload.statusDone')
                         : `${item.progress}%`}
                   </span>
 
@@ -332,8 +336,8 @@ export function UploadScreen() {
                       type="button"
                       className="icon-btn"
                       onClick={() => retry(item.id)}
-                      aria-label={`Retry upload of ${item.file.name}`}
-                      title="Retry"
+                      aria-label={t('upload.retryAria', { name: item.file.name })}
+                      title={t('upload.retry')}
                     >
                       <RetryIcon />
                     </button>
@@ -343,10 +347,18 @@ export function UploadScreen() {
                     type="button"
                     className="icon-btn"
                     onClick={() => remove(item.id)}
-                    aria-label={`${
-                      item.status === 'uploading' ? 'Cancel' : 'Remove'
-                    } ${item.file.name}`}
-                    title={item.status === 'uploading' ? 'Cancel' : 'Remove'}
+                    aria-label={t('upload.itemActionAria', {
+                      action:
+                        item.status === 'uploading'
+                          ? t('upload.cancel')
+                          : t('upload.remove'),
+                      name: item.file.name,
+                    })}
+                    title={
+                      item.status === 'uploading'
+                        ? t('upload.cancel')
+                        : t('upload.remove')
+                    }
                   >
                     <CloseIcon />
                   </button>
@@ -359,7 +371,9 @@ export function UploadScreen() {
                     aria-valuenow={item.progress}
                     aria-valuemin={0}
                     aria-valuemax={100}
-                    aria-label={`Upload progress for ${item.file.name}`}
+                    aria-label={t('upload.progressAria', {
+                      name: item.file.name,
+                    })}
                   >
                     <div
                       className={`progress-fill${isError ? ' is-error' : ''}`}
@@ -386,7 +400,7 @@ export function UploadScreen() {
           })
         }
       >
-        Continue
+        {t('upload.continue')}
       </button>
     </section>
   )
