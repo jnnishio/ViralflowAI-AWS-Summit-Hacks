@@ -430,3 +430,65 @@
     opacity: 0;
   }
 }
+
+/* --- Sample CTA (hosted demo: one-click, no upload) ---------------------- */
+
+.sample-cta {
+  width: 100%;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sample-cta__btn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--accent-ring);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.sample-cta__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px var(--accent-ring);
+  filter: brightness(1.05);
+}
+
+.sample-cta__btn:active {
+  transform: translateY(0);
+}
+
+.sample-cta__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #8a8a99);
+}
+
+/* --- "or upload your own" divider ---------------------------------------- */
+
+.upload-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+  color: var(--text-muted, #8a8a99);
+  font-size: 0.85rem;
+}
+
+.upload-divider::before,
+.upload-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}

@@ -45,7 +45,9 @@ export function ClipCard({
   // stream, so the clip id is stream-scoped ("{stream}__clip_NN") — the stream
   // is derived from videoId ("video_{stream}"). The pipeline server's
   // editor-shaped API resolves both back to the run's real clips + auto-edit.
-  const editorHref = videoId
+  // Hidden when EDITOR_BASE_URL is empty (e.g. the cached-only hosted demo,
+  // where the separate OpenCut editor app isn't deployed).
+  const editorHref = videoId && EDITOR_BASE_URL
     ? `${EDITOR_BASE_URL}/editor/video/${videoId}/edit/${videoId.replace(
         /^video_/,
         '',

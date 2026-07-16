@@ -10,8 +10,19 @@
 export const REST_API_BASE_URL: string =
   import.meta.env.VITE_REST_API_URL ?? 'http://localhost:3000'
 
-export const WS_API_BASE_URL: string =
-  import.meta.env.VITE_WS_API_URL ?? 'ws://localhost:3001'
+function resolveWsBase(): string {
+  const configured = import.meta.env.VITE_WS_API_URL
+  if (configured) return configured
+  // When unset (the single-container deploy), derive a same-origin URL from the
+  // page location so it works on any host — the WS shares the HTTP port there.
+  if (typeof window !== 'undefined' && window.location?.host) {
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    return `${proto}//${window.location.host}`
+  }
+  return 'ws://localhost:3001'
+}
+
+export const WS_API_BASE_URL: string = resolveWsBase()
 
 /**
  * Base URL of the vendored OpenCut editor app (apps/editor). This is a
