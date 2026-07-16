@@ -49,8 +49,9 @@ The core idea: a highlight is a **cross-modal agreement event** — the chat eru
 - **Face-guided 9:16 smart crop** — 16:9 → vertical, crop window panned to the median face position from Rekognition face tracking.
 - **Burned-in captions** — zh/en karaoke captions from Transcribe word timestamps (ASS subtitle pipeline), plus a ≤12-char hook overlay on the opening seconds.
 - **Per-platform metadata** — title, hook, caption, and hashtags rewritten per platform (TikTok / Reels / Shorts), one-click copy.
-- **Compilation reels** — auto-edit multiple clips into a single multi-clip reel EDL.
-- **In-browser editor** — open any clip's timeline in a vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) editor for manual refinement.
+- **AI auto-edit engine** — a per-clip editing pass that auto-zooms on the reacting speaker during laughter/loud moments, flashes split-second onomatopoeia captions ("WHAT?!", "NO WAY") on vocal accents, and drops mood-matched SFX. A Bedrock (Claude) brain plans the edit; a deterministic scipy detector is the offline fallback. Every edit lands as an *editable* timeline element, not a baked-in overlay. ([details](#-ai-editing-auto-edit-reels--agentic-editor))
+- **Compilation reels** — auto-edit a themed group of clips into one multi-clip reel with transitions and per-clip emphasis matched to the reel's *vibe* (punchy whip-pans for "hype", gentle crossfades for "emotional").
+- **Agentic in-browser editor** — a vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) fork (Next.js + Rust/WASM GPU renderer) with an **autonomous editing agent**: describe a change in natural language and a Bedrock tool-calling loop trims, retimes, splits, adds captions/effects, and more across the timeline — plus one-click AI auto-edit and auto-caption.
 - **Bilingual UI** — Traditional Chinese / English toggle across the app.
 - **Ranked output** — clips sorted by virality score so creators publish the best first.
 
@@ -69,9 +70,33 @@ Three modules turn a raw VOD + chat log into publish-ready clips:
 **2 · AI automatic editing engine**
 - Boundaries chosen for setup → payoff, snapped near Rekognition shot cuts.
 - Face-guided 16:9 → 9:16 crop; burned-in zh captions from Transcribe timestamps; hook overlay on the first ~2.5s.
+- A further **AI auto-edit pass** layers reaction zooms, onomatopoeia captions, and mood-matched SFX — see [AI editing](#-ai-editing-auto-edit-reels--agentic-editor) below.
 
 **3 · Multi-style production (platform adaptation)**
 - Per-clip Bedrock metadata pack (title, hook, caption, hashtags) in Traditional Chinese + English; platform presets for length, caption style, and hook placement.
+
+> 📖 **Algorithm deep dive:** [`docs/algorithm-decisions.md`](docs/algorithm-decisions.md) — fast vs. full visual mode, fusion-weight choices, cross-modal validation, and every algorithmic tradeoff (with the ideas deliberately set aside and why).
+
+---
+
+## 🎬 AI editing (auto-edit, reels & agentic editor)
+
+Detection and cropping produce a clean clip — then a second AI layer makes it *feel* edited. All three subsystems below emit the **same EDL contract** ([`docs/contracts/edl.schema.json`](docs/contracts/)) that the in-browser editor renders, so nothing is ever baked in irreversibly.
+
+### 1 · AI auto-edit engine (`pipeline/autoedit.py`, `pipeline/autoedit_llm.py`)
+After a highlight is cut, an editing pass adds "make it more viral" beats:
+- **Reaction zoom** — punches in on the reacting speaker (Rekognition face box) during laughter or a loud-audio spike.
+- **Onomatopoeia flash captions** — split-second "WHAT?!" / "NO WAY" overlays on vocal accents/emphasis.
+- **Mood-matched SFX** — e.g. crickets after an awkward silence — chosen from the clip's vibe.
+
+**Two-tier brain (mirrors the AI Director):** a Bedrock (Claude) call reasons over the clip's multimodal context (audio-energy peaks, chat laughter, face boxes) and emits a **sequenced, timestamped EDL**; a deterministic scipy detector (`find_peaks`) is the offline fallback, so the loop stays runnable without AWS. Every emitted edit is materialized as an **ordinary, editable timeline element** — adjustable, deletable, or extendable by the user afterward.
+
+### 2 · Compilation reels (`pipeline/compile_edl.py`, `pipeline/compilations.py`)
+Turn a themed group of highlights into **one multi-clip reel** on a single timeline: a segment per clip laid end to end, transitions between them, and light per-clip emphasis (opening hook + reaction zooms) chosen to match the reel's dominant **vibe** — a "hype" reel gets punchy whip-pan cuts and reaction zooms; an "emotional" one gets gentle crossfades and fades. Same two-tier planner (Bedrock brain + deterministic vibe planner fallback) and same EDL contract as the single-clip engine.
+
+### 3 · Agentic in-browser editor (`apps/editor/`)
+A vendored fork of [OpenCut](https://github.com/OpenCut-app/OpenCut) (Next.js + a Rust/WASM GPU effects renderer), wired to this project's clips + auto-edit EDLs via a thin "highlight-api" backend. Beyond one-click **AI auto-edit** and **auto-caption**, it runs an **autonomous editing agent**: you describe a change in natural language and a Bedrock **tool-calling loop** executes it against the real timeline, with 15 editing tools —
+`trim_element`, `retime_element`, `split_element`, `move_element`, `delete_elements`, `duplicate_elements`, `add_track`, `insert_text_element`, `add_blur_effect`, `remove_clip_effect`, `toggle_clip_effect`, `toggle_track_mute`, `toggle_track_visibility`, `toggle_elements_muted`, `toggle_elements_visibility`.
 
 ---
 
@@ -132,7 +157,8 @@ Measured on a real 74-minute idol-show VOD:
 | **Local backend** | Node.js server (`frontend/local-server/`) — runs the pipeline as a subprocess, streams progress over WebSocket, serves media |
 | **Pipeline** | Python 3.12 · boto3 · numpy · scipy · pandas · ffmpeg (with libass) |
 | **Cloud AI** | AWS Transcribe · Rekognition · Bedrock · S3 |
-| **Editor** | Vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) (Next.js) |
+| **Editor** | Vendored [OpenCut](https://github.com/OpenCut-app/OpenCut) fork (Next.js + Rust/WASM GPU renderer) with an AI editing agent (Bedrock tool-calling) |
+| **AI auto-edit** | Bedrock (Claude) EDL planner + deterministic scipy fallback (`pipeline/autoedit*.py`, `pipeline/compile_edl.py`) |
 | **Deploy** | Docker · Fly.io (single-container cached demo) |
 | **Cloud design** | AWS CDK (Step Functions / Lambda / MediaConvert — dormant) |
 
