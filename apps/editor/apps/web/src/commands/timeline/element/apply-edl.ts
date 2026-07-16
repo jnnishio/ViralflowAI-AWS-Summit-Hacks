@@ -18,7 +18,6 @@ import { mediaTimeFromSeconds, subMediaTime } from "@/wasm";
 import type { Edl, EdlEffect } from "@/services/highlight-api/schema";
 import type { ScalarAnimationKey, ScalarChannel, ElementAnimations } from "@/animation/types";
 
-const CAPTIONS_TRACK_NAME = "AI Captions";
 const ZOOM_CAPTIONS_TRACK_NAME = "AI Zoom Captions";
 const SFX_TRACK_NAME = "AI SFX";
 
@@ -154,20 +153,37 @@ export function applyEdlEffectsToTracks({
 				scaleXKeys.push(...buildZoomScaleKeys({ relativeAt, relativeEnd, base: base.scaleX, scale }));
 				scaleYKeys.push(...buildZoomScaleKeys({ relativeAt, relativeEnd, base: base.scaleY, scale }));
 			} else if (effect.effectId === "camera-pan") {
-				const fromX = base.position.x + (typeof params.fromX === "number" ? params.fromX : 0) * CANVAS_WIDTH;
-				const toX = base.position.x + (typeof params.toX === "number" ? params.toX : 0) * CANVAS_WIDTH;
-				const fromY = base.position.y + (typeof params.fromY === "number" ? params.fromY : 0) * CANVAS_HEIGHT;
-				const toY = base.position.y + (typeof params.toY === "number" ? params.toY : 0) * CANVAS_HEIGHT;
+				// A pan shifts the frame, which reveals black edges unless the
+				// video is overscanned (scaled up) enough to cover the shift.
+				// Clamp the drift, then scale up just enough that every panned
+				// position stays inside the frame. At scale s the frame can shift
+				// by (s-1)/2 of a dimension before black shows, so overscan =
+				// 1 + 2*maxDrift + margin keeps |drift| < (s-1)/2 always.
+				const PAN_LIMIT = 0.12; // max drift as a fraction of the dimension
+				const clampFrac = (v: unknown) =>
+					Math.max(-PAN_LIMIT, Math.min(PAN_LIMIT, typeof v === "number" ? v : 0));
+				const fx = clampFrac(params.fromX);
+				const tx = clampFrac(params.toX);
+				const fy = clampFrac(params.fromY);
+				const ty = clampFrac(params.toY);
+				const maxDrift = Math.max(Math.abs(fx), Math.abs(tx), Math.abs(fy), Math.abs(ty));
+				const overscan = 1 + 2 * maxDrift + 0.04; // cover the drift + safety margin
+				scaleXKeys.push(
+					...buildZoomScaleKeys({ relativeAt, relativeEnd, base: base.scaleX, scale: overscan }),
+				);
+				scaleYKeys.push(
+					...buildZoomScaleKeys({ relativeAt, relativeEnd, base: base.scaleY, scale: overscan }),
+				);
 				posXKeys.push(
 					...buildScalarKeys([
-						{ t: relativeAt, value: fromX, seg: "bezier" },
-						{ t: relativeEnd, value: toX, seg: "linear" },
+						{ t: relativeAt, value: base.position.x + fx * CANVAS_WIDTH, seg: "bezier" },
+						{ t: relativeEnd, value: base.position.x + tx * CANVAS_WIDTH, seg: "linear" },
 					]),
 				);
 				posYKeys.push(
 					...buildScalarKeys([
-						{ t: relativeAt, value: fromY, seg: "bezier" },
-						{ t: relativeEnd, value: toY, seg: "linear" },
+						{ t: relativeAt, value: base.position.y + fy * CANVAS_HEIGHT, seg: "bezier" },
+						{ t: relativeEnd, value: base.position.y + ty * CANVAS_HEIGHT, seg: "linear" },
 					]),
 				);
 			} else if (effect.effectId === "opacity-fade") {
@@ -219,7 +235,9 @@ export function applyEdlEffectsToTracks({
 		const params = (effect.params ?? {}) as Record<string, unknown>;
 		const text = typeof params.text === "string" ? params.text : "!";
 		const style = (params.style ?? {}) as Record<string, unknown>;
-		const fontSize = typeof style.fontSize === "number" ? style.fontSize : 48;
+		// User-tuned: in the editor's font unit, burst captions read best very
+		// small. Fixed at 5 regardless of the EDL's (ASS-scale) fontSize.
+		const fontSize = 5;
 		// Pass through optional rich styling the LLM may emit.
 		const textParams: Record<string, unknown> = {
 			content: text,
@@ -314,10 +332,11 @@ export function applyEdlEffectsToTracks({
  * reverts the whole AI edit.
  *
  * Rebuilds the main video track from `edl.segments` (so chip actions like
- * reorder/speed apply), lays down `edl.captions`/`hookOverlay` as text, then
- * delegates `edl.effects[]` (zoom / onomatopoeia / SFX) to
- * applyEdlEffectsToTracks — the same helper RemoteClipsManager uses to bake
- * effects into every scene at load. All become ordinary editable elements.
+ * reorder/speed apply), then delegates `edl.effects[]` (zoom / pan / fade /
+ * onomatopoeia / SFX) to applyEdlEffectsToTracks. Word-captions and the hook
+ * title are deliberately skipped — captions come from the editor's separate
+ * Auto Caption button — so AI Auto-Edit and captions don't duplicate. All
+ * produced elements are ordinary and editable.
  */
 export class ApplyEdlCommand extends Command {
 	private savedState: SceneTracks | null = null;
@@ -364,58 +383,14 @@ export class ApplyEdlCommand extends Command {
 
 		const mainTrack = { ...activeScene.tracks.main, elements: videoElements };
 
-		// --- Captions + hook overlay (from edl.captions / edl.hookOverlay) ---
-		const captionElements = [
-			...this.edl.captions.overlays.map((overlay) =>
-				buildTextElement({
-					raw: {
-						name: "AI caption",
-						duration: mediaTimeFromSeconds({ seconds: overlay.end - overlay.start }),
-						params: { content: overlay.text },
-					},
-					startTime: mediaTimeFromSeconds({ seconds: overlay.start }),
-				}),
-			),
-			...(this.edl.hookOverlay
-				? [
-						buildTextElement({
-							raw: {
-								name: "AI hook",
-								duration: mediaTimeFromSeconds({ seconds: this.edl.hookOverlay.duration }),
-								params: { content: this.edl.hookOverlay.text, fontSize: 88, textAlign: "center" },
-							},
-							startTime: mediaTimeFromSeconds({ seconds: this.edl.hookOverlay.start }),
-						}),
-					]
-				: []),
-		].map((created) => ({ ...created, id: generateUUID() }) as TextElement);
+		// Karaoke word-captions and the hook title are intentionally NOT laid down
+		// here. Captions are applied on demand via the editor's Auto Caption button
+		// (pipeline/caption_burn.py); AI Auto-Edit only contributes the visual
+		// effects, onomatopoeia bursts, and SFX so the two don't duplicate.
 
-		let overlay: OverlayTrack[] = activeScene.tracks.overlay;
-		if (captionElements.length > 0) {
-			const existingCaptionsTrack = overlay.find(
-				(track): track is TextTrack =>
-					track.type === "text" && track.name === CAPTIONS_TRACK_NAME,
-			);
-			if (existingCaptionsTrack) {
-				const updatedTrack: TextTrack = {
-					...existingCaptionsTrack,
-					elements: [...existingCaptionsTrack.elements, ...captionElements],
-				};
-				overlay = overlay.map((track) =>
-					track.id === existingCaptionsTrack.id ? updatedTrack : track,
-				);
-			} else {
-				const newTrack: TextTrack = {
-					...buildEmptyTrack({ id: generateUUID(), type: "text", name: CAPTIONS_TRACK_NAME }),
-					elements: captionElements,
-				};
-				overlay = [...overlay, newTrack];
-			}
-		}
-
-		// --- Effects (zoom / onomatopoeia / SFX) via the shared helper ---
+		// --- Effects (zoom / pan / fade / onomatopoeia / SFX) via the shared helper ---
 		const withEffects = applyEdlEffectsToTracks({
-			tracks: { ...activeScene.tracks, main: mainTrack, overlay },
+			tracks: { ...activeScene.tracks, main: mainTrack },
 			effects: this.edl.effects,
 		});
 
