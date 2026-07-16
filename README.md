@@ -4,7 +4,7 @@
 
 **Turn hours of livestream VODs into ranked, captioned, publish-ready vertical highlight clips — in minutes, for dollars.**
 
-🏆 **Hackathon Winner** &nbsp;·&nbsp; Built with AWS Transcribe · Rekognition · Bedrock
+🏆 **Amazon Web Services (AWS) Hackathon Winner** &nbsp;·&nbsp; Built with AWS Transcribe · Rekognition · Bedrock
 
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
@@ -199,7 +199,8 @@ docs/                Additional documentation + media
 
 ## 🏆 Awards
 
-🏆 **Hackathon Winner** *(add the specific award + event name here)*
+🏆 **Hackathon Winner**  
+🥉 3rd Prize - $10,000 NTD - AWS Summit Taipei AI Everywhere Hackathon 
 
 ## 📄 License
 
