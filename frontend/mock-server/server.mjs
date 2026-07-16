@@ -112,7 +112,14 @@ export function startServer(opts = {}) {
   const cwd = opts.cwd ?? REPO_ROOT
   const python = opts.python ?? resolvePython()
   const s3Bucket = opts.s3Bucket ?? DEFAULT_S3_BUCKET
-  const spawnEnabled = opts.spawnEnabled ?? true
+  // Cached-only deploy sets CACHED_ONLY=1 to disable the Python subprocess.
+  const spawnEnabled = opts.spawnEnabled ?? process.env.CACHED_ONLY !== '1'
+  // When set, any upload that matches no pre-rendered stream is bound to this
+  // demo stream (instead of hanging as `pending`) so the hosted flow always
+  // completes. Gated on spawn being disabled so live dev/tests are unaffected.
+  const demoFallbackStreamId = opts.demoFallbackStreamId ?? process.env.DEMO_STREAM_ID ?? null
+  // Replay a cached run as a paced "processing" animation (DEMO_PACING=1).
+  const pacedDemo = opts.pacedDemo ?? process.env.DEMO_PACING === '1'
   const log = opts.log ?? ((m) => console.log(m))
 
   // Per-server state (kept off the module scope so tests are isolated).
@@ -125,7 +132,13 @@ export function startServer(opts = {}) {
   let cachedStreams = [] // stream-ids with a complete manifest
 
   const ctx = { port: opts.port ?? 3000, wsPort: opts.wsPort ?? 3001 }
+  // Absolute base, used only to parse incoming request URLs.
   const baseUrl = () => `http://localhost:${ctx.port}`
+  // Base baked into client-facing media/upload URLs. In a container behind a
+  // different origin, set PUBLIC_BASE_URL='' so these become relative
+  // (/media/..., /mock-upload/...) and resolve same-origin on any domain.
+  const mediaBase = () =>
+    process.env.PUBLIC_BASE_URL != null ? process.env.PUBLIC_BASE_URL : baseUrl()
 
   function broadcast(jobId, event) {
     for (const ws of subscribers.get(jobId) ?? []) {
@@ -135,7 +148,7 @@ export function startServer(opts = {}) {
 
   async function completeFromManifest(job, streamId) {
     try {
-      const clips = await loadManifestClips(outRoot, streamId, baseUrl())
+      const clips = await loadManifestClips(outRoot, streamId, mediaBase())
       clipsByJob.set(job.jobId, clips)
       job.status = 'completed'
       broadcast(job.jobId, { jobId: job.jobId, stage: 'pipeline', status: 'completed' })
@@ -185,16 +198,40 @@ export function startServer(opts = {}) {
     job.pid = handle.state.pid
   }
 
+  // Scripted stage labels for the paced "processing" animation when replaying
+  // a cached run; each maps to a phase in the frontend stepper (STAGE_TO_PHASE).
+  const DEMO_STAGES = [
+    'Normalizing video',
+    'Transcribing speech',
+    'Analyzing video (Rekognition)',
+    'Analyzing audio',
+    'Analyzing chat',
+    'Scoring highlight candidates',
+    'Rendering clips',
+  ]
+
   // --- Cache path: bind to an already-rendered stream -------------------
   function bindCachedStream(job, streamId) {
     job.streamId = streamId
     job.source = 'cache'
     log(`[${job.jobId}] binding to cached stream ${streamId} (no subprocess)`)
-    setTimeout(() => {
-      job.status = 'in_progress'
-      broadcast(job.jobId, { jobId: job.jobId, stage: 'Loading cached highlights', status: 'started' })
-      completeFromManifest(job, streamId)
-    }, 300)
+    if (!pacedDemo) {
+      setTimeout(() => {
+        job.status = 'in_progress'
+        broadcast(job.jobId, { jobId: job.jobId, stage: 'Loading cached highlights', status: 'started' })
+        completeFromManifest(job, streamId)
+      }, 300)
+      return
+    }
+    // Paced replay: walk the stage labels over ~4.2s so the animation reads as
+    // a real run, then complete from the manifest. The 5s REST poll is a safety
+    // net if the client's WS subscription misses an early frame.
+    const step = 600
+    job.status = 'in_progress'
+    DEMO_STAGES.forEach((stage, i) => {
+      setTimeout(() => broadcast(job.jobId, { jobId: job.jobId, stage, status: 'started' }), i * step)
+    })
+    setTimeout(() => completeFromManifest(job, streamId), DEMO_STAGES.length * step)
   }
 
   const server = createServer(async (req, res) => {
@@ -240,7 +277,7 @@ export function startServer(opts = {}) {
       const key = `${jobDraftId}/${filename}`
       uploadedFilenames.set(key, filename)
       return sendJson(res, 200, {
-        uploadUrl: `${baseUrl()}/mock-upload/${encodeURIComponent(key)}`,
+        uploadUrl: `${mediaBase()}/mock-upload/${encodeURIComponent(key)}`,
         key,
         jobDraftId,
         expiresIn: 900,
@@ -278,6 +315,15 @@ export function startServer(opts = {}) {
       const cachedSid = matchCachedStream(videoName, cachedStreams)
       if (cachedSid) {
         bindCachedStream(job, cachedSid)
+        return sendJson(res, 200, { jobId, status: job.status })
+      }
+
+      // 1b. Cached-only demo fallback: bind ANY otherwise-unmatched upload to
+      // the configured demo stream so the hosted flow always completes instead
+      // of hanging as `pending`. Only active when spawn is disabled AND a valid
+      // fallback stream is configured, so live dev/tests keep their behavior.
+      if (!spawnEnabled && demoFallbackStreamId && cachedStreams.includes(demoFallbackStreamId)) {
+        bindCachedStream(job, demoFallbackStreamId)
         return sendJson(res, 200, { jobId, status: job.status })
       }
 
@@ -344,7 +390,7 @@ export function startServer(opts = {}) {
       // Fallback: load straight from an on-disk run's manifest.
       if (onDisk) {
         try {
-          const clips = await loadManifestClips(outRoot, jobId, baseUrl())
+          const clips = await loadManifestClips(outRoot, jobId, mediaBase())
           return sendJson(res, 200, { clips, compilations })
         } catch {
           return sendJson(res, 200, { clips: [], compilations })
@@ -535,8 +581,75 @@ export function startServer(opts = {}) {
       return sendJson(res, 200, clip)
     }
 
+    // Fall through to the built SPA (production single-container). Serves
+    // index.html for client routes (/upload, /processing/*) and hashed assets.
+    if (await serveStatic(res, req, path)) return
+
     sendJson(res, 404, { error: 'not found' })
   })
+
+  // --- static SPA serving (production single-container) ------------------
+  const STATIC_MIME = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8',
+    '.mjs': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.map': 'application/json; charset=utf-8',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.ico': 'image/x-icon',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.txt': 'text/plain; charset=utf-8',
+  }
+
+  async function serveStatic(res, req, pathname) {
+    const publicDir = process.env.PUBLIC_DIR
+    if (!publicDir) return false
+    if (req.method !== 'GET' && req.method !== 'HEAD') return false
+
+    const rootDir = resolve(publicDir)
+    const hasExt = /\.[a-zA-Z0-9]+$/.test(pathname)
+    // No extension => SPA client route (/upload, /processing/x): serve the shell.
+    const target = pathname === '/' || !hasExt ? '/index.html' : pathname
+    let filePath = resolve(rootDir, `.${target}`)
+    if (filePath !== rootDir && !filePath.startsWith(rootDir + '/')) return false // traversal guard
+
+    let s
+    try {
+      s = await stat(filePath)
+    } catch {
+      if (hasExt) return false // missing hashed asset -> real 404
+      filePath = resolve(rootDir, 'index.html') // unknown route -> SPA shell
+      try {
+        s = await stat(filePath)
+      } catch {
+        return false
+      }
+    }
+    if (!s.isFile()) return false
+
+    const ext = filePath.slice(filePath.lastIndexOf('.'))
+    const isShell = filePath.endsWith('index.html')
+    res.writeHead(200, {
+      'Content-Type': STATIC_MIME[ext] ?? 'application/octet-stream',
+      'Content-Length': s.size,
+      // The shell must never be cached; hashed assets are immutable.
+      'Cache-Control': isShell ? 'no-cache' : 'public, max-age=31536000, immutable',
+    })
+    if (req.method === 'HEAD') {
+      res.end()
+      return true
+    }
+    createReadStream(filePath).pipe(res)
+    return true
+  }
 
   // --- media serving with HTTP Range ------------------------------------
   async function serveMedia(res, req, streamId, file) {
@@ -582,8 +695,8 @@ export function startServer(opts = {}) {
     createReadStream(filePath, { start, end }).pipe(res)
   }
 
-  // --- WebSocket (progress) ---------------------------------------------
-  const wss = new WebSocketServer({ port: ctx.wsPort })
+  // --- WebSocket (progress) — shares the HTTP port via the upgrade event -
+  const wss = new WebSocketServer({ server })
   wss.on('connection', (ws) => {
     let subscribedJobId = null
     ws.on('message', (raw) => {
@@ -612,25 +725,19 @@ export function startServer(opts = {}) {
     await new Promise((resolveListen) => {
       server.listen(opts.port ?? 3000, () => {
         ctx.port = server.address().port
+        ctx.wsPort = ctx.port // WS shares the HTTP port via upgrade
         resolveListen()
       })
     })
-    await new Promise((resolveWs) => {
-      if (wss.address()) return resolveWs()
-      wss.on('listening', resolveWs)
-    }).then(() => {
-      const addr = wss.address()
-      if (addr && typeof addr === 'object') ctx.wsPort = addr.port
-    })
     log(`[local-server] REST API on ${baseUrl()}`)
-    log(`[local-server] Progress WS on ws://localhost:${ctx.wsPort}`)
+    log(`[local-server] Progress WS shares port ${ctx.port}`)
     log(`[local-server] pipeline interpreter: ${python}`)
     return { port: ctx.port, wsPort: ctx.wsPort }
   })()
 
   async function close() {
-    await new Promise((r) => server.close(r))
     await new Promise((r) => wss.close(r))
+    await new Promise((r) => server.close(r))
   }
 
   return { server, wss, close, whenReady, ctx, _state: { jobs, clipsByJob } }
@@ -639,5 +746,5 @@ export function startServer(opts = {}) {
 // Auto-start only when run directly (not when imported by tests).
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 if (isMain) {
-  startServer({ port: 3000, wsPort: 3001 })
+  startServer({ port: process.env.PORT ? Number(process.env.PORT) : 3000 })
 }

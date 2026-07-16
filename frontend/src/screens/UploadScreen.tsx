@@ -20,6 +20,15 @@ import './UploadScreen.css'
 const ACCEPTED_EXTENSIONS = ['mp4', 'mov', 'mkv', 'csv']
 const MAX_FILES = 10
 
+/** Pre-rendered demo stream shipped with the hosted build. The synthetic
+ * source keys carry this id in the filename so the server's cache path binds
+ * the job straight to that run — no real upload or pipeline needed. */
+const SAMPLE_STREAM_ID = '3654414'
+const SAMPLE_SOURCE_KEYS = [
+  `demo/${SAMPLE_STREAM_ID}_video.mp4`,
+  `demo/${SAMPLE_STREAM_ID}_chat.csv`,
+]
+
 function extensionOf(filename: string): string {
   const idx = filename.lastIndexOf('.')
   return idx === -1 ? '' : filename.slice(idx + 1).toLowerCase()
@@ -235,6 +244,25 @@ export function UploadScreen() {
     <section className="upload-screen">
       <h1 className="upload-screen__title">{t('upload.title')}</h1>
       <p className="upload-screen__subtitle">{t('upload.subtitle')}</p>
+
+      <div className="sample-cta">
+        <button
+          type="button"
+          className="sample-cta__btn"
+          onClick={() =>
+            navigate('/platforms', { state: { sourceKeys: SAMPLE_SOURCE_KEYS } })
+          }
+        >
+          ▶ Try the sample stream
+        </button>
+        <p className="sample-cta__hint">
+          No upload needed — see highlights from a pre-analyzed VOD.
+        </p>
+      </div>
+
+      <div className="upload-divider">
+        <span>or upload your own</span>
+      </div>
 
       <input
         ref={fileInputRef}
