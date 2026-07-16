@@ -1,0 +1,26 @@
+# Keep the build context lean. The image needs only: frontend/ (source + built
+# SPA), frontend/.env.production, and out/3654414 (the one cached run).
+
+**/node_modules
+.git
+.venv
+*.log
+
+# Dormant AWS cloud infra + the separate editor app — not part of the demo.
+backend
+apps
+scripts
+docs
+data
+uploads
+
+# Python pipeline is not run at runtime (cached-only deploy).
+pipeline
+**/__pycache__
+
+# SPA is rebuilt inside the image.
+frontend/dist
+
+# All pipeline output EXCEPT the single stream the demo serves.
+out/*
+!out/3654414
