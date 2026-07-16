@@ -16,8 +16,9 @@
  */
 import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
-import { manifestPath, mediaUrl } from './manifest.mjs'
+import { spawn } from 'node:child_process'
+import { basename, join } from 'node:path'
+import { clipsDir, manifestPath, mediaUrl } from './manifest.mjs'
 
 const num = (v, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
 
@@ -374,4 +375,72 @@ export async function editorClipPreviewUrl({ outRoot, jobs, baseUrl, scopedClipI
     return mediaUrl(baseUrl, streamId, autoedit)
   }
   return mediaUrl(baseUrl, streamId, entry.proxy ?? entry.file)
+}
+
+/** Spawn a one-shot python module and resolve on exit 0, reject otherwise. */
+function runPython({ python, args, cwd }) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(python, args, { cwd, env: process.env })
+    let stderr = ''
+    child.stderr?.on('data', (d) => (stderr += d.toString()))
+    child.on('error', reject)
+    child.on('exit', (code) => {
+      if (code === 0) resolve()
+      else reject(new Error(`caption_burn exited ${code}: ${stderr.trim()}`))
+    })
+  })
+}
+
+/**
+ * POST /api/clips/{clipId}/apply-captions — on-demand karaoke caption burn.
+ *
+ * Grid clips are RAW (pipeline/render.py). This burns the clip's EDL word
+ * overlays (pipeline/edl.py) onto its already-cut footage via
+ * pipeline/caption_burn.py, writing clip_NN_<mood>_captioned.mp4 next to the
+ * raw clip, and returns its previewUrl. Idempotent: a prior burn is reused.
+ */
+export async function applyClipCaptions({ outRoot, jobs, baseUrl, scopedClipId, python, cwd }) {
+  const { idPart, clipKey } = splitScopedClipId(scopedClipId)
+  const streamId = await resolveStreamId(idPart, outRoot, jobs)
+  if (!streamId) return { status: 404, error: 'clip not found' }
+
+  const raw = await readFile(manifestPath(outRoot, streamId), 'utf-8').catch(() => null)
+  if (!raw) return { status: 404, error: 'clip not found' }
+  const manifest = JSON.parse(raw)
+  const idx = Number(clipKey.replace('clip_', '')) - 1
+  const entry = manifest[idx]
+  if (!entry) return { status: 404, error: 'clip not found' }
+
+  // Burn onto the full-res raw clip (fall back to proxy if that's all there is).
+  const sourceFile = entry.file ?? entry.proxy
+  if (!sourceFile) return { status: 404, error: 'clip has no rendered file' }
+  const sourceBase = basename(String(sourceFile))
+  const captionedBase = sourceBase.replace(/\.mp4$/, '_captioned.mp4')
+
+  const dir = clipsDir(outRoot, streamId)
+  const sourcePath = join(dir, sourceBase)
+  const captionedPath = join(dir, captionedBase)
+  const edlPath = join(outRoot, streamId, 'edl', `${clipKey}.edl.json`)
+
+  if (!existsSync(sourcePath)) return { status: 404, error: 'source clip file missing' }
+  if (!existsSync(edlPath)) return { status: 404, error: 'clip EDL (caption data) missing' }
+
+  // Idempotent: reuse a prior burn unless the source clip is newer.
+  if (!existsSync(captionedPath)) {
+    await runPython({
+      python: python ?? 'python3',
+      cwd,
+      args: [
+        '-m', 'pipeline.caption_burn',
+        '--clip', sourcePath,
+        '--edl', edlPath,
+        '--out', captionedPath,
+      ],
+    })
+  }
+
+  return {
+    status: 200,
+    response: { status: 'ready', previewUrl: mediaUrl(baseUrl, streamId, captionedBase) },
+  }
 }

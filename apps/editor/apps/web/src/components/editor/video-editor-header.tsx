@@ -2,6 +2,7 @@
 
 import { useEditor } from "@/editor/use-editor";
 import { AiAutoEditButton } from "./ai-auto-edit-button";
+import { AutoCaptionButton } from "./auto-caption-button";
 import { ExportButton } from "./export-button";
 import { ThemeToggle } from "../theme-toggle";
 
@@ -25,6 +26,7 @@ export function VideoEditorHeader() {
 			</div>
 
 			<div className="flex items-center gap-2 shrink-0">
+				<AutoCaptionButton />
 				<AiAutoEditButton />
 				<ExportButton />
 				<ThemeToggle />

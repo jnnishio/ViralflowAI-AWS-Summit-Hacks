@@ -104,6 +104,26 @@ export async function getClipRenderStatus({
 	});
 }
 
+/**
+ * Burn TikTok-style karaoke captions onto this clip on the server, reusing the
+ * pipeline's word-level Transcribe timings (see pipeline/caption_burn.py).
+ * Returns a previewUrl for the captioned MP4. Applied on demand from the
+ * editor's "Auto Caption" button rather than baked into the highlights grid,
+ * so the creator keeps full editing control (e.g. skip captions on singing
+ * clips where Transcribe struggles).
+ */
+export async function applyClipCaptions({
+	clipId,
+}: {
+	clipId: string;
+}): Promise<RenderStatusResponse> {
+	return apiFetch({
+		path: `/clips/${clipId}/apply-captions`,
+		schema: renderStatusResponseSchema,
+		init: { method: "POST" },
+	});
+}
+
 export async function requestAiEdit({
 	clipId,
 	request,

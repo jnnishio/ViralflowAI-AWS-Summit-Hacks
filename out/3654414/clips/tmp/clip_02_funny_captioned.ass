@@ -1,0 +1,47 @@
+[Script Info]
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Outline, Shadow, Alignment, MarginL, MarginR, MarginV
+Style: karaoke,Noto Sans CJK TC,64,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,3,1,2,60,60,220
+
+[Events]
+Format: Layer, Start, End, Style, Text
+Dialogue: 0,0:00:00.00,0:00:02.88,karaoke,{\kf33}這個{\kf20}呢{\kf25}是{\kf36}這個
+Dialogue: 0,0:00:02.88,0:00:06.64,karaoke,{\kf52}是{\kf124}香菜{\kf92}花生{\kf108}冰心
+Dialogue: 0,0:00:06.64,0:00:07.80,karaoke,{\kf28}粽{\kf32}哇{\kf16}你{\kf16}一定
+Dialogue: 0,0:00:07.80,0:00:11.00,karaoke,{\kf20}覺得{\kf16}很{\kf67}好吃{\kf16}我
+Dialogue: 0,0:00:12.50,0:00:12.98,karaoke,{\kf8}等{\kf2}一下{\kf12}等{\kf12}一下
+Dialogue: 0,0:00:13.30,0:00:14.58,karaoke,{\kf20}好{\kf48}正經{\kf44}三觀{\kf16}哦
+Dialogue: 0,0:00:14.66,0:00:15.44,karaoke,{\kf16}你{\kf12}看{\kf21}Oh{\kf17}my
+Dialogue: 0,0:00:15.63,0:00:16.46,karaoke,{\kf23}God{\kf8}哎{\kf16}他{\kf28}怎麼
+Dialogue: 0,0:00:16.46,0:00:17.60,karaoke,{\kf45}裂開{\kf8}了{\kf30}他{\kf1}不是
+Dialogue: 0,0:00:18.10,0:00:19.02,karaoke,{\kf26}重點{\kf26}是{\kf24}他{\kf8}裡麵
+Dialogue: 0,0:00:19.02,0:00:21.18,karaoke,{\kf24}真的{\kf32}有{\kf80}香菜{\kf16}我
+Dialogue: 0,0:00:21.18,0:00:22.18,karaoke,{\kf24}以為{\kf12}他{\kf28}只是{\kf36}外面
+Dialogue: 0,0:00:22.18,0:00:23.22,karaoke,{\kf13}這個{\kf36}鏡頭{\kf20}看{\kf12}一下
+Dialogue: 0,0:00:23.34,0:00:25.40,karaoke,{\kf20}拍{\kf33}得到{\kf11}嗎{\kf2}真的
+Dialogue: 0,0:00:25.59,0:00:27.52,karaoke,{\kf5}拍{\kf9}得到{\kf2}真的{\kf27}是
+Dialogue: 0,0:00:27.98,0:00:29.16,karaoke,{\kf11}裡麵{\kf12}有{\kf60}香菜{\kf22}然後
+Dialogue: 0,0:00:29.26,0:00:31.18,karaoke,{\kf1}他{\kf1}的{\kf42}表情{\kf16}跟
+Dialogue: 0,0:00:31.18,0:00:32.90,karaoke,{\kf24}那個{\kf84}綠綠的{\kf20}香{\kf32}對
+Dialogue: 0,0:00:33.42,0:00:34.26,karaoke,{\kf24}好來{\kf20}我們{\kf12}就{\kf24}直接
+Dialogue: 0,0:00:34.26,0:00:35.64,karaoke,{\kf16}講{\kf28}吧{\kf20}他{\kf50}其實
+Dialogue: 0,0:00:35.64,0:00:37.10,karaoke,{\kf1}就是{\kf24}那個{\kf8}吧{\kf32}花蓮
+Dialogue: 0,0:00:37.10,0:00:37.78,karaoke,{\kf12}的{\kf16}麻{\kf24}糬{\kf16}吧
+Dialogue: 0,0:00:37.78,0:00:39.26,karaoke,{\kf18}大概{\kf1}的{\kf94}蠻{\kf16}像
+Dialogue: 0,0:00:39.26,0:00:40.26,karaoke,{\kf52}麻吉{\kf12}的{\kf16}因為{\kf16}他
+Dialogue: 0,0:00:40.26,0:00:42.63,karaoke,{\kf8}又{\kf56}冰心{\kf1}啊{\kf20}在
+Dialogue: 0,0:00:42.63,0:00:44.19,karaoke,{\kf64}看到{\kf28}今天{\kf12}有{\kf52}香菜
+Dialogue: 0,0:00:44.19,0:00:44.98,karaoke,{\kf4}的{\kf9}時候{\kf1}我{\kf1}就
+Dialogue: 0,0:00:46.39,0:00:47.31,karaoke,{\kf32}沒有{\kf16}啊{\kf16}我{\kf12}就
+Dialogue: 0,0:00:47.31,0:00:48.55,karaoke,{\kf16}問{\kf16}了{\kf72}大家{\kf20}說
+Dialogue: 0,0:00:48.71,0:00:50.03,karaoke,{\kf20}哎{\kf32}你們{\kf24}吃{\kf56}香菜
+Dialogue: 0,0:00:50.03,0:00:51.27,karaoke,{\kf19}嗎{\kf12}哎{\kf40}結果{\kf36}全部
+Dialogue: 0,0:00:51.27,0:00:52.23,karaoke,{\kf16}人{\kf24}都{\kf36}吃{\kf20}哎
+Dialogue: 0,0:00:52.47,0:00:53.59,karaoke,{\kf20}然後{\kf8}想{\kf32}說{\kf52}太好了
+Dialogue: 0,0:00:53.67,0:00:54.95,karaoke,{\kf36}交給{\kf31}你們{\kf17}了{\kf24}沒有
+Dialogue: 0,0:00:55.03,0:00:56.27,karaoke,{\kf60}然後哥{\kf8}就{\kf19}說{\kf37}太好了
+Dialogue: 0,0:00:56.35,0:00:56.85,karaoke,{\kf8}那{\kf20}就是{\kf16}你{\kf6}的

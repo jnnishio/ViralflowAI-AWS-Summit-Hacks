@@ -1,0 +1,1279 @@
+{
+ "edlId": "edl_clip_09_v1",
+ "jobId": "job_3654414",
+ "clipIds": [
+  "clip_09"
+ ],
+ "status": "draft",
+ "canvas": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30
+ },
+ "segments": [
+  {
+   "segmentId": "seg_01",
+   "clipId": "clip_09",
+   "sourceStart": 0,
+   "sourceEnd": 60.0,
+   "timelineStart": 0,
+   "timelineEnd": 60.0,
+   "transitionIn": null,
+   "crop": {
+    "mode": "face_track",
+    "cx": 0.5235
+   },
+   "vodStart": 1954.0,
+   "vodEnd": 2014.0
+  }
+ ],
+ "effects": [
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 4.0,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.5374,
+    "cy": 0.3509
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 4.069,
+   "duration": 0.8,
+   "params": {
+    "text": "哈哈哈!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 7.72,
+   "duration": 0.8,
+   "params": {
+    "text": "HAHA!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 7.8,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1693,
+    "cy": 0.3259
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 13.67,
+   "duration": 0.8,
+   "params": {
+    "text": "OMG!!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 13.8,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1764,
+    "cy": 0.3275
+   }
+  },
+  {
+   "effectId": "sfx-comedic-stinger",
+   "type": "sound",
+   "at": 15.05,
+   "duration": 1.0,
+   "params": {
+    "assetKey": "sfx/comedic_stinger.wav",
+    "gainDb": -4
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 19.4,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1864,
+    "cy": 0.3286
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 23.709,
+   "duration": 0.8,
+   "params": {
+    "text": "太扯了!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 23.8,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1865,
+    "cy": 0.3295
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 26.55,
+   "duration": 0.8,
+   "params": {
+    "text": "欸!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 27.6,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1707,
+    "cy": 0.3234
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 30.92,
+   "duration": 0.8,
+   "params": {
+    "text": "WHAT?!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 31.0,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1766,
+    "cy": 0.325
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 34.39,
+   "duration": 0.8,
+   "params": {
+    "text": "NO WAY!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 34.4,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.174,
+    "cy": 0.3246
+   }
+  },
+  {
+   "effectId": "sfx-comedic-stinger",
+   "type": "sound",
+   "at": 36.869,
+   "duration": 2.3,
+   "params": {
+    "assetKey": "sfx/comedic_stinger.wav",
+    "gainDb": -4
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 40.12,
+   "duration": 0.8,
+   "params": {
+    "text": "欸!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 40.2,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1672,
+    "cy": 0.325
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 47.729,
+   "duration": 0.8,
+   "params": {
+    "text": "哈哈哈!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 47.8,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1753,
+    "cy": 0.3251
+   }
+  },
+  {
+   "effectId": "onomatopoeia-caption",
+   "type": "visual",
+   "at": 59.12,
+   "duration": 0.8,
+   "params": {
+    "text": "笑死!",
+    "style": {
+     "fontSize": 120,
+     "burst": true
+    }
+   }
+  },
+  {
+   "effectId": "punch-in-zoom",
+   "type": "visual",
+   "at": 59.2,
+   "duration": 2.0,
+   "params": {
+    "scale": 1.3,
+    "cx": 0.1907,
+    "cy": 0.3332
+   }
+  }
+ ],
+ "captions": {
+  "source": "transcribe_word_karaoke",
+  "burnIn": true,
+  "style": {
+   "fontName": "Noto Sans CJK TC",
+   "fontSize": 64,
+   "alignment": 2,
+   "marginV": 220
+  },
+  "overlays": [
+   {
+    "start": 0.05,
+    "end": 0.729,
+    "words": [
+     {
+      "text": "我",
+      "start": 0.05,
+      "end": 0.17
+     },
+     {
+      "text": "剛剛",
+      "start": 0.17,
+      "end": 0.329
+     },
+     {
+      "text": "有",
+      "start": 0.329,
+      "end": 0.41
+     },
+     {
+      "text": "看到",
+      "start": 0.41,
+      "end": 0.729
+     }
+    ],
+    "text": "我剛剛有看到",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 0.81,
+    "end": 1.53,
+    "words": [
+     {
+      "text": "你",
+      "start": 0.81,
+      "end": 0.89
+     },
+     {
+      "text": "剛剛",
+      "start": 0.89,
+      "end": 1.089
+     },
+     {
+      "text": "拿",
+      "start": 1.089,
+      "end": 1.209
+     },
+     {
+      "text": "超小",
+      "start": 1.209,
+      "end": 1.53
+     }
+    ],
+    "text": "你剛剛拿超小",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 1.53,
+    "end": 3.349,
+    "words": [
+     {
+      "text": "一口",
+      "start": 1.53,
+      "end": 1.92
+     },
+     {
+      "text": "哦",
+      "start": 1.92,
+      "end": 1.93
+     },
+     {
+      "text": "他剛",
+      "start": 2.989,
+      "end": 3.229
+     },
+     {
+      "text": "只",
+      "start": 3.229,
+      "end": 3.349
+     }
+    ],
+    "text": "一口哦他剛只",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 3.349,
+    "end": 4.55,
+    "words": [
+     {
+      "text": "拿",
+      "start": 3.349,
+      "end": 3.51
+     },
+     {
+      "text": "了",
+      "start": 3.51,
+      "end": 3.79
+     },
+     {
+      "text": "這樣",
+      "start": 4.069,
+      "end": 4.349
+     },
+     {
+      "text": "吧",
+      "start": 4.349,
+      "end": 4.55
+     }
+    ],
+    "text": "拿了這樣吧",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 4.979,
+    "end": 6.219,
+    "words": [
+     {
+      "text": "就是",
+      "start": 4.979,
+      "end": 4.989
+     },
+     {
+      "text": "沒有",
+      "start": 5.229,
+      "end": 5.43
+     },
+     {
+      "text": "因為",
+      "start": 5.51,
+      "end": 5.67
+     },
+     {
+      "text": "我",
+      "start": 5.67,
+      "end": 6.219
+     }
+    ],
+    "text": "就是沒有因為我",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 6.229,
+    "end": 6.829,
+    "words": [
+     {
+      "text": "我",
+      "start": 6.229,
+      "end": 6.26
+     },
+     {
+      "text": "我",
+      "start": 6.27,
+      "end": 6.51
+     },
+     {
+      "text": "覺得",
+      "start": 6.51,
+      "end": 6.709
+     },
+     {
+      "text": "我",
+      "start": 6.709,
+      "end": 6.829
+     }
+    ],
+    "text": "我我覺得我",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 6.829,
+    "end": 9.489,
+    "words": [
+     {
+      "text": "有點",
+      "start": 6.829,
+      "end": 7.15
+     },
+     {
+      "text": "飽",
+      "start": 7.15,
+      "end": 7.51
+     },
+     {
+      "text": "了",
+      "start": 7.51,
+      "end": 7.63
+     },
+     {
+      "text": "我",
+      "start": 9.469,
+      "end": 9.489
+     }
+    ],
+    "text": "有點飽了我",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 9.63,
+    "end": 10.349,
+    "words": [
+     {
+      "text": "就",
+      "start": 9.63,
+      "end": 9.66
+     },
+     {
+      "text": "拿",
+      "start": 9.79,
+      "end": 9.969
+     },
+     {
+      "text": "了",
+      "start": 9.989,
+      "end": 10.109
+     },
+     {
+      "text": "一點",
+      "start": 10.189,
+      "end": 10.349
+     }
+    ],
+    "text": "就拿了一點",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 10.43,
+    "end": 11.579,
+    "words": [
+     {
+      "text": "但是",
+      "start": 10.43,
+      "end": 10.67
+     },
+     {
+      "text": "我",
+      "start": 10.67,
+      "end": 10.829
+     },
+     {
+      "text": "覺得",
+      "start": 10.829,
+      "end": 11.339
+     },
+     {
+      "text": "我",
+      "start": 11.55,
+      "end": 11.579
+     }
+    ],
+    "text": "但是我覺得我",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 11.589,
+    "end": 13.26,
+    "words": [
+     {
+      "text": "我",
+      "start": 11.589,
+      "end": 12.109
+     },
+     {
+      "text": "覺得",
+      "start": 12.109,
+      "end": 12.349
+     },
+     {
+      "text": "他",
+      "start": 12.349,
+      "end": 12.55
+     },
+     {
+      "text": "的",
+      "start": 12.55,
+      "end": 13.26
+     }
+    ],
+    "text": "我覺得他的",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 13.67,
+    "end": 14.75,
+    "words": [
+     {
+      "text": "很",
+      "start": 13.67,
+      "end": 13.989
+     },
+     {
+      "text": "不",
+      "start": 13.989,
+      "end": 14.229
+     },
+     {
+      "text": "搭",
+      "start": 14.229,
+      "end": 14.469
+     },
+     {
+      "text": "唉",
+      "start": 14.469,
+      "end": 14.75
+     }
+    ],
+    "text": "很不搭唉",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 16.06,
+    "end": 17.469,
+    "words": [
+     {
+      "text": "呃",
+      "start": 16.06,
+      "end": 16.229
+     },
+     {
+      "text": "因為",
+      "start": 16.39,
+      "end": 16.63
+     },
+     {
+      "text": "是",
+      "start": 16.63,
+      "end": 16.869
+     },
+     {
+      "text": "就是",
+      "start": 17.069,
+      "end": 17.469
+     }
+    ],
+    "text": "呃因為是就是",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 17.469,
+    "end": 18.43,
+    "words": [
+     {
+      "text": "飯",
+      "start": 17.469,
+      "end": 17.949
+     },
+     {
+      "text": "吃",
+      "start": 17.949,
+      "end": 18.109
+     },
+     {
+      "text": "飯",
+      "start": 18.109,
+      "end": 18.349
+     },
+     {
+      "text": "的",
+      "start": 18.349,
+      "end": 18.43
+     }
+    ],
+    "text": "飯吃飯的",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 18.43,
+    "end": 20.15,
+    "words": [
+     {
+      "text": "味道",
+      "start": 18.43,
+      "end": 18.79
+     },
+     {
+      "text": "然",
+      "start": 18.869,
+      "end": 19.03
+     },
+     {
+      "text": "後",
+      "start": 19.03,
+      "end": 19.589
+     },
+     {
+      "text": "火腿",
+      "start": 19.589,
+      "end": 20.15
+     }
+    ],
+    "text": "味道然後火腿",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 20.15,
+    "end": 21.39,
+    "words": [
+     {
+      "text": "是",
+      "start": 20.15,
+      "end": 20.349
+     },
+     {
+      "text": "火腿",
+      "start": 20.39,
+      "end": 20.869
+     },
+     {
+      "text": "的",
+      "start": 20.869,
+      "end": 20.989
+     },
+     {
+      "text": "味道",
+      "start": 20.989,
+      "end": 21.39
+     }
+    ],
+    "text": "是火腿的味道",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 21.689,
+    "end": 23.26,
+    "words": [
+     {
+      "text": "嗯",
+      "start": 21.689,
+      "end": 21.79
+     },
+     {
+      "text": "嗯",
+      "start": 21.81,
+      "end": 21.88
+     },
+     {
+      "text": "嗯",
+      "start": 21.89,
+      "end": 22.469
+     },
+     {
+      "text": "理解",
+      "start": 22.75,
+      "end": 23.26
+     }
+    ],
+    "text": "嗯嗯嗯理解",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 23.709,
+    "end": 25.589,
+    "words": [
+     {
+      "text": "對",
+      "start": 23.709,
+      "end": 23.9
+     },
+     {
+      "text": "它",
+      "start": 23.949,
+      "end": 24.109
+     },
+     {
+      "text": "就是",
+      "start": 24.109,
+      "end": 24.699
+     },
+     {
+      "text": "金華",
+      "start": 25.15,
+      "end": 25.589
+     }
+    ],
+    "text": "對它就是金華",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 25.589,
+    "end": 27.39,
+    "words": [
+     {
+      "text": "火腿",
+      "start": 25.589,
+      "end": 26.109
+     },
+     {
+      "text": "主體",
+      "start": 26.109,
+      "end": 26.55
+     },
+     {
+      "text": "重",
+      "start": 26.55,
+      "end": 26.829
+     },
+     {
+      "text": "這樣子",
+      "start": 26.949,
+      "end": 27.39
+     }
+    ],
+    "text": "火腿主體重這樣子",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 27.55,
+    "end": 28.79,
+    "words": [
+     {
+      "text": "嗯",
+      "start": 27.55,
+      "end": 27.75
+     },
+     {
+      "text": "好",
+      "start": 28.069,
+      "end": 28.27
+     },
+     {
+      "text": "的",
+      "start": 28.27,
+      "end": 28.469
+     },
+     {
+      "text": "那",
+      "start": 28.599,
+      "end": 28.79
+     }
+    ],
+    "text": "嗯好的那",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 28.79,
+    "end": 31.349,
+    "words": [
+     {
+      "text": "我們",
+      "start": 28.79,
+      "end": 29.109
+     },
+     {
+      "text": "給他",
+      "start": 29.109,
+      "end": 29.729
+     },
+     {
+      "text": "評分",
+      "start": 29.9,
+      "end": 30.51
+     },
+     {
+      "text": "滿分",
+      "start": 30.75,
+      "end": 31.349
+     }
+    ],
+    "text": "我們給他評分滿分",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 31.349,
+    "end": 33.949,
+    "words": [
+     {
+      "text": "5",
+      "start": 31.349,
+      "end": 31.51
+     },
+     {
+      "text": "分",
+      "start": 31.51,
+      "end": 31.829
+     },
+     {
+      "text": "3",
+      "start": 32.699,
+      "end": 33.15
+     },
+     {
+      "text": "2",
+      "start": 33.63,
+      "end": 33.949
+     }
+    ],
+    "text": "5分32",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 34.39,
+    "end": 39.209,
+    "words": [
+     {
+      "text": "1",
+      "start": 34.39,
+      "end": 34.689
+     },
+     {
+      "text": "耶",
+      "start": 34.959,
+      "end": 35.54
+     },
+     {
+      "text": "耶",
+      "start": 35.599,
+      "end": 36.51
+     },
+     {
+      "text": "差不多",
+      "start": 39.18,
+      "end": 39.209
+     }
+    ],
+    "text": "1耶耶差不多",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 41.65,
+    "end": 42.369,
+    "words": [
+     {
+      "text": "他",
+      "start": 41.65,
+      "end": 41.89
+     },
+     {
+      "text": "很",
+      "start": 41.89,
+      "end": 41.9
+     },
+     {
+      "text": "不",
+      "start": 42.05,
+      "end": 42.29
+     },
+     {
+      "text": "喜歡",
+      "start": 42.29,
+      "end": 42.369
+     }
+    ],
+    "text": "他很不喜歡",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 42.369,
+    "end": 44.01,
+    "words": [
+     {
+      "text": "就是",
+      "start": 42.369,
+      "end": 42.53
+     },
+     {
+      "text": "不喜歡",
+      "start": 42.53,
+      "end": 42.88
+     },
+     {
+      "text": "我們",
+      "start": 43.29,
+      "end": 43.569
+     },
+     {
+      "text": "嚴格",
+      "start": 43.569,
+      "end": 44.01
+     }
+    ],
+    "text": "就是不喜歡我們嚴格",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 44.01,
+    "end": 45.849,
+    "words": [
+     {
+      "text": "的",
+      "start": 44.01,
+      "end": 44.13
+     },
+     {
+      "text": "評審",
+      "start": 44.13,
+      "end": 44.68
+     },
+     {
+      "text": "講話",
+      "start": 45.199,
+      "end": 45.689
+     },
+     {
+      "text": "都",
+      "start": 45.689,
+      "end": 45.849
+     }
+    ],
+    "text": "的評審講話都",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 45.849,
+    "end": 47.329,
+    "words": [
+     {
+      "text": "輕聲",
+      "start": 45.849,
+      "end": 46.369
+     },
+     {
+      "text": "細語",
+      "start": 46.369,
+      "end": 46.65
+     },
+     {
+      "text": "然後給",
+      "start": 47.06,
+      "end": 47.209
+     },
+     {
+      "text": "出",
+      "start": 47.209,
+      "end": 47.329
+     }
+    ],
+    "text": "輕聲細語然後給出",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 47.329,
+    "end": 50.599,
+    "words": [
+     {
+      "text": "最",
+      "start": 47.329,
+      "end": 47.489
+     },
+     {
+      "text": "嚴厲",
+      "start": 47.489,
+      "end": 47.729
+     },
+     {
+      "text": "的",
+      "start": 47.729,
+      "end": 47.81
+     },
+     {
+      "text": "他",
+      "start": 50.4,
+      "end": 50.599
+     }
+    ],
+    "text": "最嚴厲的他",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 50.599,
+    "end": 51.319,
+    "words": [
+     {
+      "text": "就",
+      "start": 50.599,
+      "end": 50.709
+     },
+     {
+      "text": "已",
+      "start": 50.709,
+      "end": 50.76
+     },
+     {
+      "text": "經給",
+      "start": 50.76,
+      "end": 51.079
+     },
+     {
+      "text": "了",
+      "start": 51.079,
+      "end": 51.319
+     }
+    ],
+    "text": "就已經給了",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 51.319,
+    "end": 52.4,
+    "words": [
+     {
+      "text": "很多",
+      "start": 51.319,
+      "end": 51.52
+     },
+     {
+      "text": "一根",
+      "start": 51.52,
+      "end": 51.839
+     },
+     {
+      "text": "手指",
+      "start": 51.839,
+      "end": 52.16
+     },
+     {
+      "text": "頭",
+      "start": 52.16,
+      "end": 52.4
+     }
+    ],
+    "text": "很多一根手指頭",
+    "speaker": "spk_2"
+   },
+   {
+    "start": 53.56,
+    "end": 54.319,
+    "words": [
+     {
+      "text": "這是",
+      "start": 53.56,
+      "end": 53.76
+     },
+     {
+      "text": "第",
+      "start": 53.76,
+      "end": 53.92
+     },
+     {
+      "text": "2",
+      "start": 53.92,
+      "end": 54.04
+     },
+     {
+      "text": "顆了",
+      "start": 54.04,
+      "end": 54.319
+     }
+    ],
+    "text": "這是第2顆了",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 54.54,
+    "end": 55.04,
+    "words": [
+     {
+      "text": "對",
+      "start": 54.54,
+      "end": 54.55
+     },
+     {
+      "text": "我",
+      "start": 54.76,
+      "end": 54.77
+     },
+     {
+      "text": "接下",
+      "start": 54.81,
+      "end": 54.959
+     },
+     {
+      "text": "來",
+      "start": 54.959,
+      "end": 55.04
+     }
+    ],
+    "text": "對我接下來",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 55.079,
+    "end": 55.569,
+    "words": [
+     {
+      "text": "看",
+      "start": 55.079,
+      "end": 55.199
+     },
+     {
+      "text": "第",
+      "start": 55.199,
+      "end": 55.329
+     },
+     {
+      "text": "3",
+      "start": 55.359,
+      "end": 55.52
+     },
+     {
+      "text": "個",
+      "start": 55.56,
+      "end": 55.569
+     }
+    ],
+    "text": "看第3個",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 55.839,
+    "end": 58.119,
+    "words": [
+     {
+      "text": "是",
+      "start": 55.839,
+      "end": 56.04
+     },
+     {
+      "text": "誰",
+      "start": 56.04,
+      "end": 56.16
+     },
+     {
+      "text": "我們",
+      "start": 57.479,
+      "end": 57.65
+     },
+     {
+      "text": "好像",
+      "start": 57.76,
+      "end": 58.119
+     }
+    ],
+    "text": "是誰我們好像",
+    "speaker": "spk_1"
+   },
+   {
+    "start": 58.319,
+    "end": 60.04,
+    "words": [
+     {
+      "text": "把",
+      "start": 58.319,
+      "end": 58.719
+     },
+     {
+      "text": "鹹",
+      "start": 58.959,
+      "end": 59.52
+     },
+     {
+      "text": "的",
+      "start": 59.52,
+      "end": 59.8
+     },
+     {
+      "text": "都",
+      "start": 59.8,
+      "end": 60.04
+     }
+    ],
+    "text": "把鹹的都",
+    "speaker": "spk_2"
+   }
+  ]
+ },
+ "hookOverlay": {
+  "text": "最嚴格評審出現了",
+  "start": 0,
+  "duration": 2.5,
+  "style": {
+   "fontSize": 88,
+   "fontColor": "white",
+   "borderWidth": 6,
+   "borderColor": "black"
+  }
+ },
+ "musicBed": null
+}
