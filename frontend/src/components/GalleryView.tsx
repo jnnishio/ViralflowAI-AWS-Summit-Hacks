@@ -77,10 +77,43 @@ export function GalleryView({
                     <p className="comp-en">{group.titleEnglish}</p>
                   )}
                 </div>
-                <span className="comp-count">
-                  {group.clips.length}{' '}
-                  {group.clips.length === 1 ? 'clip' : 'clips'}
-                </span>
+                <div className="comp-header__meta">
+                  <span className="comp-count">
+                    {group.clips.length}{' '}
+                    {group.clips.length === 1 ? 'clip' : 'clips'}
+                  </span>
+                  {onAddToCompilation && candidates.length > 0 && (
+                    <details className="comp-add">
+                      <summary aria-label="Add clip to this reel" title="Add clip to this reel">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+                          aria-hidden="true">
+                          <path d="M12 5v14" />
+                          <path d="M5 12h14" />
+                        </svg>
+                        Add clip
+                      </summary>
+                      <div className="comp-add-list">
+                        {candidates.map((clip) => (
+                          <button
+                            type="button"
+                            key={clip.clipId}
+                            onClick={() =>
+                              onAddToCompilation(group.id, clip.clipId)
+                            }
+                          >
+                            <ScoreRing score={clip.score} size={30} stroke={4} />
+                            <span className="comp-add-title">
+                              {clip.titleNative ||
+                                clip.titleEnglish ||
+                                clip.clipId}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                </div>
               </header>
               {group.reason && <p className="comp-reason">{group.reason}</p>}
 
@@ -90,34 +123,6 @@ export function GalleryView({
                 onRemoveFromCompilation
                   ? (clipId) => onRemoveFromCompilation(group.id, clipId)
                   : undefined,
-              )}
-
-              {onAddToCompilation && candidates.length > 0 && (
-                <details className="comp-add">
-                  <summary>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                      aria-hidden="true">
-                      <path d="M12 5v14" />
-                      <path d="M5 12h14" />
-                    </svg>
-                    Add clip to this reel
-                  </summary>
-                  <div className="comp-add-list">
-                    {candidates.map((clip) => (
-                      <button
-                        type="button"
-                        key={clip.clipId}
-                        onClick={() => onAddToCompilation(group.id, clip.clipId)}
-                      >
-                        <ScoreRing score={clip.score} size={30} stroke={4} />
-                        <span className="comp-add-title">
-                          {clip.titleNative || clip.titleEnglish || clip.clipId}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </details>
               )}
             </section>
           )
