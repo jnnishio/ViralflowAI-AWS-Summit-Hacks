@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { LaunchScreen } from './components/LaunchScreen'
 import {
   HighlightsGridScreen,
   PlatformSelectScreen,
@@ -8,15 +10,21 @@ import {
 import './App.css'
 
 function App() {
+  const [showLaunch, setShowLaunch] = useState(true)
+  const handleLaunchFinish = useCallback(() => setShowLaunch(false), [])
+
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/upload" replace />} />
-      <Route path="/upload" element={<UploadScreen />} />
-      <Route path="/platforms" element={<PlatformSelectScreen />} />
-      <Route path="/processing/:jobId" element={<ProcessingScreen />} />
-      <Route path="/highlights/:jobId" element={<HighlightsGridScreen />} />
-      <Route path="*" element={<Navigate to="/upload" replace />} />
-    </Routes>
+    <>
+      {showLaunch && <LaunchScreen onFinish={handleLaunchFinish} />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/upload" replace />} />
+        <Route path="/upload" element={<UploadScreen />} />
+        <Route path="/platforms" element={<PlatformSelectScreen />} />
+        <Route path="/processing/:jobId" element={<ProcessingScreen />} />
+        <Route path="/highlights/:jobId" element={<HighlightsGridScreen />} />
+        <Route path="*" element={<Navigate to="/upload" replace />} />
+      </Routes>
+    </>
   )
 }
 
