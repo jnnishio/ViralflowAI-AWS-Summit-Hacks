@@ -14,6 +14,7 @@ import {
   useUploadItems,
   type UploadItem,
 } from '../state/uploadStore'
+import './UploadScreen.css'
 
 const ACCEPTED_EXTENSIONS = ['mp4', 'mov', 'mkv', 'csv']
 const MAX_FILES = 10
@@ -48,14 +49,6 @@ function partitionSelection(files: File[]): {
     rejectedExtension,
     rejectedBatchLimit: extensionOk.slice(MAX_FILES),
   }
-}
-
-function formatEta(seconds: number): string {
-  const whole = Math.max(1, Math.round(seconds))
-  if (whole < 60) return `${whole}s`
-  const minutes = Math.floor(whole / 60)
-  const secs = whole % 60
-  return `${minutes}m ${secs}s`
 }
 
 /** In-flight XHRs keyed by upload item id, so a removed/cancelled item can
@@ -111,6 +104,42 @@ function cancelUpload(id: string): void {
   removeUploadItem(id)
 }
 
+/** Upload glyph: an upward arrow with two stacked base bars. */
+function UploadArrow() {
+  return (
+    <svg
+      className="dropzone__arrow"
+      viewBox="0 0 48 50"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M24 3 L44 26 L33 26 L33 33 L15 33 L15 26 L4 26 Z" />
+      <rect x="15" y="36" width="18" height="5" rx="2.5" />
+      <rect x="15" y="43.5" width="18" height="4.5" rx="2.25" />
+    </svg>
+  )
+}
+
+function RetryIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  )
+}
+
 export function UploadScreen() {
   const navigate = useNavigate()
   const items = useUploadItems()
@@ -118,6 +147,7 @@ export function UploadScreen() {
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
   )
+  const [isDragOver, setIsDragOver] = useState(false)
 
   const handleAddFilesClick = useCallback(() => {
     fileInputRef.current?.click()
@@ -153,6 +183,31 @@ export function UploadScreen() {
     newItems.forEach(startUpload)
   }, [])
 
+  const handleDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      setIsDragOver(false)
+      handleFilesSelected(event.dataTransfer.files)
+    },
+    [handleFilesSelected],
+  )
+
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsDragOver(true)
+  }, [])
+
+  const handleDragLeave = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      // Only clear when the pointer actually leaves the dropzone, not when it
+      // moves over a child element.
+      if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+        setIsDragOver(false)
+      }
+    },
+    [],
+  )
+
   const retry = useCallback((id: string) => {
     const item = getUploadItems().find((it) => it.id === id)
     if (item) startUpload(item)
@@ -162,13 +217,24 @@ export function UploadScreen() {
     cancelUpload(id)
   }, [])
 
+  const isUploading = items.some((it) => it.status === 'uploading')
   const canProceed =
     items.length > 0 && items.every((it) => it.status === 'uploaded')
 
+  const dropzoneClass = [
+    'dropzone',
+    isDragOver ? 'is-dragover' : '',
+    isUploading ? 'is-uploading' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <section>
-      <h1>Upload</h1>
-      <p>Upload one or more VOD files to generate highlights.</p>
+    <section className="upload-screen">
+      <h1 className="upload-screen__title">Upload</h1>
+      <p className="upload-screen__subtitle">
+        Upload one or more VOD files to generate highlights.
+      </p>
 
       <input
         ref={fileInputRef}
@@ -182,43 +248,137 @@ export function UploadScreen() {
         aria-label="Select VOD and Chat Log files"
         hidden
       />
-      <button type="button" onClick={handleAddFilesClick}>
-        Add files
-      </button>
 
-      {validationMessage && <p role="alert">{validationMessage}</p>}
+      <div
+        className={dropzoneClass}
+        role="button"
+        tabIndex={0}
+        aria-label="Drag and drop files here, or browse to select files"
+        onClick={handleAddFilesClick}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            handleAddFilesClick()
+          }
+        }}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragOver}
+        onDragLeave={handleDragLeave}
+      >
+        <div className="dropzone__icon-wrap">
+          <div className="dropzone__lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <UploadArrow />
+        </div>
 
-      <ul>
-        {items.map((item) => (
-          <li key={item.id}>
-            <span>{item.file.name}</span>{' '}
-            {item.status === 'error' ? (
-              <span role="alert">Upload failed</span>
-            ) : (
-              <span>
-                {item.status === 'uploaded'
-                  ? 'Uploaded'
-                  : `${item.progress}%${
-                      item.etaSeconds != null
-                        ? ` · ${formatEta(item.etaSeconds)} remaining`
-                        : ''
-                    }`}
-              </span>
-            )}{' '}
-            {item.status === 'error' && (
-              <button type="button" onClick={() => retry(item.id)}>
-                Retry
-              </button>
-            )}{' '}
-            <button type="button" onClick={() => remove(item.id)}>
-              {item.status === 'uploading' ? 'Cancel' : 'Remove'}
-            </button>
-          </li>
-        ))}
-      </ul>
+        <p className="dropzone__prompt">
+          <strong>Drag &amp; drop</strong> your files here
+        </p>
+
+        <button
+          type="button"
+          className="browse-btn"
+          onClick={(event) => {
+            event.stopPropagation()
+            handleAddFilesClick()
+          }}
+        >
+          Browse files
+        </button>
+
+        <p className="dropzone__hint">
+          Accepted: {ACCEPTED_EXTENSIONS.join(', ')} · up to {MAX_FILES} files
+        </p>
+      </div>
+
+      {validationMessage && (
+        <p className="upload-alert" role="alert">
+          {validationMessage}
+        </p>
+      )}
+
+      {items.length > 0 && (
+        <ul className="file-list">
+          {items.map((item) => {
+            const isError = item.status === 'error'
+            const isDone = item.status === 'uploaded'
+            return (
+              <li key={item.id} className="file-card">
+                <span className="file-card__name" title={item.file.name}>
+                  {item.file.name}
+                </span>
+
+                <div className="file-card__actions">
+                  <span
+                    className={`file-card__status${
+                      isDone ? ' is-done' : ''
+                    }${isError ? ' is-error' : ''}`}
+                  >
+                    {isError
+                      ? 'Failed'
+                      : isDone
+                        ? 'Done'
+                        : `${item.progress}%`}
+                  </span>
+
+                  {isError && (
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      onClick={() => retry(item.id)}
+                      aria-label={`Retry upload of ${item.file.name}`}
+                      title="Retry"
+                    >
+                      <RetryIcon />
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    onClick={() => remove(item.id)}
+                    aria-label={`${
+                      item.status === 'uploading' ? 'Cancel' : 'Remove'
+                    } ${item.file.name}`}
+                    title={item.status === 'uploading' ? 'Cancel' : 'Remove'}
+                  >
+                    <CloseIcon />
+                  </button>
+                </div>
+
+                <div className="file-card__bar-wrap">
+                  <div
+                    className="progress-track"
+                    role="progressbar"
+                    aria-valuenow={item.progress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Upload progress for ${item.file.name}`}
+                  >
+                    <div
+                      className={`progress-fill${isError ? ' is-error' : ''}`}
+                      style={{ width: `${isError ? 100 : item.progress}%` }}
+                    />
+                  </div>
+                  <span className="progress-pct">
+                    {isError ? '—' : `${item.progress}%`}
+                  </span>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
 
       <button
         type="button"
+        className="continue-btn"
         disabled={!canProceed}
         onClick={() =>
           navigate('/platforms', {

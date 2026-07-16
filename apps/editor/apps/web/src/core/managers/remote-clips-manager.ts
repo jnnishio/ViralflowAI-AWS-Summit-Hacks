@@ -49,6 +49,13 @@ export class RemoteClipsManager {
 	// the Assets panel shows just that clip's footage, not all of them (see
 	// syncMediaAssetsForActiveScene).
 	private clipAssets = new Map<string, MediaAsset>();
+	// Raw (pre-caption) asset per clip, stashed the first time captions are
+	// applied so the "Auto Caption" button can toggle back to unedited footage.
+	private rawClipAssets = new Map<string, MediaAsset>();
+	// Captioned asset per clip, cached after the first burn so toggling
+	// captions back on is an instant in-memory swap (the server burn is also
+	// idempotent, but this avoids the re-fetch/re-probe round-trip).
+	private captionedAssets = new Map<string, MediaAsset>();
 	private activeAssetSceneId: string | null = null;
 	private unsubscribeFromScenes: (() => void) | null = null;
 	private isLoading = false;
@@ -323,29 +330,57 @@ export class RemoteClipsManager {
 		const clip = this.clips.get(clipId);
 		if (!clip) throw new Error(`Unknown clip ${clipId}`);
 
-		const { previewUrl } = await applyClipCaptions({ clipId });
-		if (!previewUrl) throw new Error("Caption burn returned no preview URL");
-
-		const blob = await fetch(previewUrl).then((res) => res.blob());
-		const file = new File([blob], `${clipId}_captioned.mp4`, {
-			type: blob.type || "video/mp4",
-		});
-
-		const [processed] = await processMediaAssets({ files: [file] });
-		if (!processed) {
-			throw new Error(`Failed to probe captioned media for clip ${clipId}`);
+		// Stash the current (raw) asset once, so undo can restore it.
+		if (!this.rawClipAssets.has(clipId)) {
+			const current = this.clipAssets.get(clipId);
+			if (current) this.rawClipAssets.set(clipId, current);
 		}
 
-		// Reuse the clip's media id so the scene's video element keeps
-		// referencing it — we only swap the underlying footage in place. Clear
-		// the decoded-frame cache (keyed by mediaId, see video-cache/service.ts)
-		// so the preview re-decodes from the captioned file rather than the
-		// stale raw frames.
-		const mediaAssetId = `media_${clipId}`;
-		const asset: MediaAsset = { ...processed, id: mediaAssetId };
-		videoCache.clearVideo({ mediaId: mediaAssetId });
-		this.clipAssets.set(clipId, asset);
+		let asset = this.captionedAssets.get(clipId);
+		if (!asset) {
+			const { previewUrl } = await applyClipCaptions({ clipId });
+			if (!previewUrl) throw new Error("Caption burn returned no preview URL");
 
+			const blob = await fetch(previewUrl).then((res) => res.blob());
+			const file = new File([blob], `${clipId}_captioned.mp4`, {
+				type: blob.type || "video/mp4",
+			});
+
+			const [processed] = await processMediaAssets({ files: [file] });
+			if (!processed) {
+				throw new Error(`Failed to probe captioned media for clip ${clipId}`);
+			}
+
+			// Reuse the clip's media id so the scene's video element keeps
+			// referencing it — we only swap the underlying footage in place.
+			asset = { ...processed, id: `media_${clipId}` };
+			this.captionedAssets.set(clipId, asset);
+		}
+
+		this.swapClipFootage({ clipId, asset });
+	}
+
+	/** Reverts applyServerCaptions by swapping the captioned footage back to
+	 * the clip's original raw footage. No-op if captions were never applied. */
+	removeServerCaptions({ clipId }: { clipId: string }): void {
+		const raw = this.rawClipAssets.get(clipId);
+		if (!raw) return;
+		this.swapClipFootage({ clipId, asset: raw });
+	}
+
+	/** Swaps a clip's underlying footage in place (same media id, so the
+	 * scene's video element keeps referencing it). Clears the decoded-frame
+	 * cache (keyed by mediaId, see video-cache/service.ts) so the preview
+	 * re-decodes from the new file rather than showing stale frames. */
+	private swapClipFootage({
+		clipId,
+		asset,
+	}: {
+		clipId: string;
+		asset: MediaAsset;
+	}): void {
+		videoCache.clearVideo({ mediaId: asset.id });
+		this.clipAssets.set(clipId, asset);
 		if (this.editor.scenes.getActiveSceneOrNull()?.id === clipId) {
 			this.editor.media.setAssets({ assets: [asset] });
 		}
@@ -460,6 +495,8 @@ export class RemoteClipsManager {
 		this.videoId = null;
 		this.clips = new Map();
 		this.clipAssets = new Map();
+		this.rawClipAssets = new Map();
+		this.captionedAssets = new Map();
 		this.activeAssetSceneId = null;
 		this.notify();
 	}
