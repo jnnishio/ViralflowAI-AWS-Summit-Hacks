@@ -11,7 +11,7 @@ npm install
 npm run dev:mock
 ```
 
-This starts a local mock backend (`mock-server/`, REST on :3000 + WebSocket
+This starts a local mock backend (`local-server/`, REST on :3000 + WebSocket
 on :3001) alongside Vite, implementing the same contract the real backend
 does (see `../.kiro/specs/webapp-skeleton/design.md`) but backed by
 in-memory fixture data instead of Cognito/S3/DynamoDB/Step Functions. Open

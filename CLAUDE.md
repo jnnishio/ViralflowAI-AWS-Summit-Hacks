@@ -61,7 +61,7 @@ If nothing new was introduced, state: "No new dependencies or setup requirements
 Full detail: `.kiro/steering/local-first.md` (authoritative).
 
 - The "Processing" / highlight flow runs LOCAL-FIRST ONLY. The local Node dev
-  server (`frontend/mock-server/server.mjs`) is the active backend: it runs the
+  server (`frontend/local-server/server.mjs`) is the active backend: it runs the
   real pipeline (`python3 -m pipeline.run`) as a subprocess, or serves
   pre-computed cached results from `out/<streamId>/clips/`.
 - The AWS cloud orchestration (CDK / Lambdas / Step Functions / API Gateway under

@@ -5,6 +5,17 @@ AWSCLIV2.pkg
 *.mp4
 *.wav
 .env
+frontend/.env
+
+# Accidental shell-redirect junk (e.g. `pip install >=1.2` -> a file named "=1.2",
+# or a broken shell profile dumping `brew` output into Casks/Formulae/Searching)
+=[0-9]*
+Casks
+Formulae
+Searching
+
+# Personal Claude Code skills (local tooling, not project code)
+.claude/skills/
 # Anchor to the repo-root sample-VOD dir only. Unanchored `data/` also matched
 # nested source dirs like apps/editor/apps/web/src/data/, which silently
 # dropped the editor's color data files and broke the /editor route.
@@ -14,7 +25,7 @@ dist/
 target/
 .turbo/
 
-# Local-first demo: uploaded bytes written by mock-server
+# Local-first demo: uploaded bytes written by local-server
 uploads/
 
 # Python Virtual Environment
