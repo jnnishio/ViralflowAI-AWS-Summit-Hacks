@@ -339,3 +339,45 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* --- per-platform metadata tabs -------------------------------------- */
+.clip-platforms {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+.clip-platform {
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid #2a2f3a;
+  background: transparent;
+  color: var(--clip-muted);
+  cursor: pointer;
+}
+.clip-platform:hover {
+  color: var(--clip-fg);
+}
+.clip-platform.is-active {
+  background: var(--clip-accent);
+  border-color: var(--clip-accent);
+  color: #0e0f13;
+  font-weight: 600;
+}
+.clip-copy {
+  margin-left: auto;
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #2a2f3a;
+  background: transparent;
+  color: var(--clip-muted);
+  cursor: pointer;
+}
+.clip-copy:hover {
+  color: var(--clip-fg);
+}
