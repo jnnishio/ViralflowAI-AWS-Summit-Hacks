@@ -2,146 +2,321 @@
  {
   "start_s": 2074.0,
   "end_s": 2134.0,
-  "virality_score": 72,
+  "virality_score": 74,
   "mood": "funny",
   "category": "food reaction",
   "factors": {
    "chat": 3.498,
    "audio": 1.267,
-   "visual": 0.622,
    "speech": -0.142
   },
-  "title_zh": "減重粽竟然沒有味道😂",
-  "title_en": "Trying a 'Diet Zongzi' and Forgetting the Sugar 😂",
-  "hook_zh": "減重粽是什麼👀",
-  "caption_zh": "第一次吃減重粽，結果忘記沾糖，吃到完全沒味道的皮😂大家有吃過嗎？",
-  "caption_en": "First time trying a low-cal 'diet zongzi' — forgot to dip it in sugar and ended up eating a completely flavorless skin 😂 Have you ever tried one?",
+  "title_zh": "減重粽竟然沒有味道？！表情全崩了😂",
+  "title_en": "Trying a 'Diet Zongzi' with No Flavor… Their Faces Say It All 😂",
+  "hook_zh": "減重粽零味道😱",
+  "caption_zh": "第一次吃減重粽，結果沒有任何調味，忘記沾糖直接入口，表情全部崩掉哈哈哈😂 你們吃過嗎？",
+  "caption_en": "They tried a 'diet zongzi' for the first time — no seasoning, forgot to dip in sugar, and their faces completely gave them away 😂 Have you ever tried one?",
   "hashtags": [
    "#減重粽",
-   "#端午節",
-   "#吃播",
-   "#foodreaction",
-   "#台灣美食",
-   "#直播精華",
-   "#zongzi"
+   "#粽子",
+   "#食物挑戰",
+   "#表情管理失敗",
+   "#FoodReaction",
+   "#Zongzi",
+   "#直播精華"
   ],
-  "file": "out/3654414/clips/clip_01_funny.mp4",
-  "thumb": "out/3654414/clips/clip_01_funny.jpg"
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_01_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_01_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_01_funny.proxy.mp4"
  },
  {
   "start_s": 2698.0,
-  "end_s": 2758.0,
+  "end_s": 2756.0,
   "virality_score": 72,
   "mood": "funny",
   "category": "funny moment",
   "factors": {
    "chat": 1.782,
    "audio": 1.523,
-   "visual": 0.437,
    "speech": 1.972
   },
-  "title_zh": "香菜粽子裂開的瞬間😱",
-  "title_en": "Cilantro Rice Dumpling Jumpscare 😱",
-  "hook_zh": "香菜粽？！😱",
-  "caption_zh": "香菜花生冰心粽裂開的瞬間⋯裡面真的有香菜😭大家吃香菜嗎？哥說「太好了，那就是你的！」笑死🤣 #端午節 #奇葩粽子",
-  "caption_en": "They cracked open a cilantro peanut ice-cream dumpling and the filling was VERY green 😭 Host immediately volunteered the cilantro-hater to eat it all 🤣",
+  "title_zh": "香菜花生冰心粽！裡面真的有香菜😱",
+  "title_en": "Cilantro INSIDE the zongzi?! Their reactions say it all 😱",
+  "hook_zh": "裡面真的有香菜！",
+  "caption_zh": "香菜花生冰心粽挑戰🌿粽子裡竟然真的藏著香菜，表情全說了哈哈哈！你敢吃嗎？👇",
+  "caption_en": "Cilantro peanut ice-heart zongzi challenge 🌿 They thought it was just decoration… nope, it's ALL the way inside 😂 Would you dare try it?",
   "hashtags": [
-   "#香菜粽",
+   "#香菜",
+   "#粽子",
    "#端午節",
-   "#奇葩美食",
-   "#試吃挑戰",
-   "#FoodChallenge",
+   "#食物挑戰",
+   "#funnyreaction",
    "#台灣美食",
-   "#直播精華"
+   "#zongzi"
   ],
-  "file": "out/3654414/clips/clip_02_funny.mp4",
-  "thumb": "out/3654414/clips/clip_02_funny.jpg"
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_02_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_02_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_02_funny.proxy.mp4"
  },
  {
   "start_s": 3320.0,
-  "end_s": 3366.0,
+  "end_s": 3355.0,
   "virality_score": 72,
   "mood": "funny",
   "category": "funny moment",
   "factors": {
    "chat": 1.322,
    "audio": 0.725,
-   "visual": 0.839,
    "speech": 1.76
   },
-  "title_zh": "女團看到鏡子就停不下來😂",
-  "title_en": "Girl Group Can't Walk Past a Mirror Without Stopping 😂",
-  "hook_zh": "女團鏡子魔力🪞",
-  "caption_zh": "女團的神奇魔力：路過任何鏡子都必須停下來整理儀容😂 這根本是職業病吧！",
-  "caption_en": "Girl group secret: they literally CANNOT walk past a mirror without stopping to fix themselves 😂 It's a talent at this point.",
+  "title_zh": "女團成員排練無聊偷跳舞😂",
+  "title_en": "Girl Group Member Secretly Dances During Rehearsal 😂",
+  "hook_zh": "女團鏡子魔力😂",
+  "caption_zh": "排練太無聊就自己找事做？女團成員親口爆料：只要有鏡子，所有人都忍不住！😂 #一席 #女團日常",
+  "caption_en": "Too bored during rehearsal so she just… started dancing? Girl group members can't resist any mirror they walk past 😂 #girlgroup #behindthescenes",
   "hashtags": [
-   "#女團日常",
+   "#女團",
+   "#排練日常",
    "#鏡子魔力",
-   "#台灣女團",
-   "#直播精華",
+   "#搞笑",
    "#girlgroup",
-   "#relatable",
-   "#funny"
+   "#behindthescenes",
+   "#livestream"
   ],
-  "file": "out/3654414/clips/clip_03_funny.mp4",
-  "thumb": "out/3654414/clips/clip_03_funny.jpg"
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_03_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_03_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_03_funny.proxy.mp4"
  },
  {
-  "start_s": 1954.0,
-  "end_s": 2000.0,
-  "virality_score": 62,
+  "start_s": 3417.0,
+  "end_s": 3476.0,
+  "virality_score": 72,
   "mood": "funny",
-  "category": "food review / funny moment",
+  "category": "funny moment",
   "factors": {
-   "chat": 1.94,
-   "audio": 0.959,
-   "visual": 0.994,
-   "speech": 1.338
+   "chat": 1.45,
+   "audio": 1.819,
+   "speech": 3.029
   },
-  "title_zh": "金華火腿粽大評分！只拿超小一口？",
-  "title_en": "Jin Hua Ham Zongzi Review — Someone Only Took a Tiny Bite 😂",
-  "hook_zh": "你只拿這樣？！",
-  "caption_zh": "吃粽子還被抓包只拿超小一口🤏 米飯超黏好吃但火腿味道不搭？嚴格評審倒數給分，結果出乎意料😂 #端午節 #粽子測評",
-  "caption_en": "Got caught taking the tiniest bite of Jin Hua ham zongzi 🤏 The rice is amazing but the flavors clash? Strict judges count down their scores and the results are hilarious 😂",
+  "title_zh": "把浣熊當貓帶回家？還是自信唱錯歌詞？",
+  "title_en": "Would You Bring a Raccoon Home Thinking It's a Cat?",
+  "hook_zh": "浣熊當貓養😂",
+  "caption_zh": "問卷題目太荒唐😂 誰會把浣熊當貓帶回家？結果本人說「就算當成貓我也不會帶，因為我嚴重貓過敏」🤣 下一題：誰會自信滿滿地唱錯歌詞？",
+  "caption_en": "The quiz question was wild 😂 'Who would bring a raccoon home thinking it's a cat?' — only to get 'I wouldn't even if I thought it was a cat, I'm severely allergic!' 🤣 Next up: who sings lyrics wrong with full confidence?",
+  "hashtags": [
+   "#爆笑直播",
+   "#問卷遊戲",
+   "#浣熊",
+   "#貓過敏",
+   "#唱錯歌詞",
+   "#funnymoment",
+   "#livestream"
+  ],
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_04_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_04_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_04_funny.proxy.mp4"
+ },
+ {
+  "start_s": 2494.0,
+  "end_s": 2553.0,
+  "virality_score": 72,
+  "mood": "funny",
+  "category": "funny moment",
+  "factors": {
+   "chat": 1.962,
+   "audio": 0.219,
+   "speech": 0.915
+  },
+  "title_zh": "粽子不想出來😂邀請找妮吃朋友！",
+  "title_en": "The Zongzi Doesn't Want to Come Out 😂 Idol Eats Her 'Friend'",
+  "hook_zh": "粽子不想出來😂",
+  "caption_zh": "打開粽子葉，粽子硬是不肯出來🤣主持人直接邀請找妮來吃她的「朋友」，這梗也太衝擊了吧！#端午節快樂",
+  "caption_en": "The zongzi refused to come out of its leaf 🤣 so the host invited the member literally named 'Zhaoni' to eat her 'friend' — the most chaotic Dragon Boat Festival moment ever.",
   "hashtags": [
    "#粽子",
    "#端午節",
-   "#美食測評",
-   "#金華火腿",
-   "#直播精華",
-   "#foodreview",
-   "#zongzi"
+   "#搞笑時刻",
+   "#女團",
+   "#FunnyMoment",
+   "#DragonBoatFestival",
+   "#idol日常"
   ],
-  "file": "out/3654414/clips/clip_04_funny.mp4",
-  "thumb": "out/3654414/clips/clip_04_funny.jpg"
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_05_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_05_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_05_funny.proxy.mp4"
+ },
+ {
+  "start_s": 1218.6,
+  "end_s": 1270.0,
+  "virality_score": 72,
+  "mood": "funny",
+  "category": "funny moment",
+  "factors": {
+   "chat": 1.415,
+   "audio": 0.864,
+   "speech": 2.395
+  },
+  "title_zh": "評分舉手舉出兩隻手😂",
+  "title_en": "Accidentally Raised TWO Hands While Scoring 😂",
+  "hook_zh": "不小心生了2隻手😂",
+  "caption_zh": "評分環節直接出包🤣 明明說好舉一隻手，結果不小心生出兩隻手，自己也笑翻了！#粽子試吃 #直播名場面",
+  "caption_en": "Rating snacks and accidentally raised BOTH hands 🤣 Even she couldn't keep a straight face after that blunder!",
+  "hashtags": [
+   "#直播名場面",
+   "#粽子",
+   "#試吃",
+   "#搞笑瞬間",
+   "#foodreview",
+   "#funnymoment",
+   "#台灣美食",
+   "#livestream"
+  ],
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_06_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_06_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_06_funny.proxy.mp4"
  },
  {
   "start_s": 4060.0,
   "end_s": 4120.0,
-  "virality_score": 62,
+  "virality_score": 68,
   "mood": "funny",
   "category": "funny moment",
   "factors": {
    "chat": 1.909,
    "audio": 1.989,
-   "visual": 0.406,
    "speech": 0.915
   },
   "title_zh": "吵架假哭獲勝？成員互相爆料！",
-  "title_en": "Who Fake-Cries to Win Arguments? Members Call Each Other Out!",
+  "title_en": "Who Fake Cries to Win Arguments? Members Call Each Other Out!",
   "hook_zh": "假哭獲勝術😂",
-  "caption_zh": "吵架的時候誰會假哭來獲得優勢？成員們互相指認，笑到不行🤣 #互揭底細",
-  "caption_en": "Which member fake-cries to win fights? The girls call each other out and chaos ensues 😂",
+  "caption_zh": "「誰會在吵架時假哭來獲得優勢？」這題直接讓成員們互相爆料，笑到不行🤣 #直播精華",
+  "caption_en": "'Who fake cries during arguments to get the upper hand?' — the members immediately start calling each other out 😂 #LivestreamHighlight",
   "hashtags": [
    "#假哭",
-   "#成員互揭",
+   "#成員爆料",
    "#直播精華",
-   "#funnymoment",
-   "#idol",
-   "#台灣女團",
-   "#reels"
+   "#搞笑時刻",
+   "#LivestreamFunny",
+   "#台灣直播",
+   "#閨蜜日常"
   ],
-  "file": "out/3654414/clips/clip_05_funny.mp4",
-  "thumb": "out/3654414/clips/clip_05_funny.jpg"
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_07_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_07_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_07_funny.proxy.mp4"
+ },
+ {
+  "start_s": 1406.0,
+  "end_s": 1451.0,
+  "virality_score": 62,
+  "mood": "funny",
+  "category": "food reaction",
+  "factors": {
+   "chat": 2.489,
+   "audio": 1.234,
+   "speech": 1.972
+  },
+  "title_zh": "粽子裡藏整隻麻油雞腿？！",
+  "title_en": "There's a Whole Chicken Leg Inside This Zongzi?!",
+  "hook_zh": "粽子裡有雞腿😱",
+  "caption_zh": "剝開粽葉才發現裡面藏了整隻麻油雞腿🍗「天哪還要啃骨頭！」這粽子也太狂了吧😂 #端午節 #粽子",
+  "caption_en": "They unwrapped a giant zongzi only to find a WHOLE sesame-oil chicken leg inside 🍗😱 \"We still have to gnaw the bone?!\" Most chaotic dumpling ever 😂",
+  "hashtags": [
+   "#粽子",
+   "#端午節",
+   "#麻油雞腿",
+   "#台灣美食",
+   "#FoodReaction",
+   "#ZongziChallenge",
+   "#直播highlights"
+  ],
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_08_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_08_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_08_funny.proxy.mp4"
+ },
+ {
+  "start_s": 1954.0,
+  "end_s": 2014.0,
+  "virality_score": 62,
+  "mood": "funny",
+  "category": "food tasting / reaction",
+  "factors": {
+   "chat": 1.94,
+   "audio": 0.959,
+   "speech": 1.549
+  },
+  "title_zh": "嚴格評審只給一根手指頭😂金華火腿粽評分時刻",
+  "title_en": "Harsh Judge Gives Only One Finger 😂 Zongzi Rating Moment",
+  "hook_zh": "最嚴格評審出現了",
+  "caption_zh": "拿超小一口、給超低分，這位評審也太嚴格了吧😂 金華火腿粽你敢挑戰嗎？",
+  "caption_en": "Took the tiniest bite and still gave the harshest score 😂 Would you try a Jinhua ham zongzi?",
+  "hashtags": [
+   "#粽子",
+   "#端午節",
+   "#食物評測",
+   "#直播精華",
+   "#FoodReview",
+   "#ZongziChallenge",
+   "#台灣美食"
+  ],
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_09_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_09_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_09_funny.proxy.mp4"
+ },
+ {
+  "start_s": 1796.0,
+  "end_s": 1856.0,
+  "virality_score": 62,
+  "mood": "funny",
+  "category": "food tasting",
+  "factors": {
+   "chat": 2.144,
+   "audio": -0.355,
+   "speech": 1.126
+  },
+  "title_zh": "以為很難切結果誤會它了😂｜粽子開箱試吃",
+  "title_en": "We Totally Misjudged This Food 😂 | Live Taste Test",
+  "hook_zh": "剪不斷？我們誤會它了！",
+  "caption_zh": "一開始以為皮超難切，結果根本很好切😂 米飯看起來超南部風！開動～ 你們喜歡哪種米的粽子？👇",
+  "caption_en": "Thought it was impossible to cut… turns out we totally misjudged it 😂 The rice looks so Southern-style and the smell is amazing. Which style do you prefer? 👇",
+  "hashtags": [
+   "#試吃",
+   "#粽子",
+   "#直播精華",
+   "#foodtasting",
+   "#台灣美食",
+   "#開箱",
+   "#LiveStream"
+  ],
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_10_funny.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_10_funny.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_10_funny.proxy.mp4"
+ },
+ {
+  "start_s": 3114.0,
+  "end_s": 3174.0,
+  "virality_score": 52,
+  "mood": "hype",
+  "category": "giveaway reveal & game intro",
+  "factors": {
+   "chat": 2.054,
+   "audio": 0.783,
+   "speech": 1.126
+  },
+  "title_zh": "告白氣球得獎啦！接下來玩遊戲🎈",
+  "title_en": "Giveaway Winner Announced + Game Time!",
+  "hook_zh": "5秒倒數揭曉🎈",
+  "caption_zh": "粽子開箱結束，告白氣球抽獎倒數5秒揭曉得獎者，接著宣布下一個環節——考驗默契的團隊遊戲，米粉跟麋鹿恭喜中獎！🎉",
+  "caption_en": "Zongzi unboxing done! The giveaway countdown hits zero, winners are revealed, and the girls tease a fun team chemistry game up next 🎈🎉",
+  "hashtags": [
+   "#告白氣球",
+   "#抽獎",
+   "#直播精華",
+   "#粽子",
+   "#團隊遊戲",
+   "#LiveStream",
+   "#giveaway"
+  ],
+  "file": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_11_hype.mp4",
+  "thumb": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_11_hype.jpg",
+  "proxy": "/Users/local/Github/AWS-Live-Highlight-Generation/out/3654414/clips/clip_11_hype.proxy.mp4"
  }
 ]

@@ -19,12 +19,14 @@ import { DEFAULT_FPS } from "@/fps/defaults";
 import { floatToFrameRate } from "@/fps/utils";
 import { CURRENT_PROJECT_VERSION } from "@/services/storage/migrations";
 import {
+	applyClipCaptions,
 	getClipRenderStatus,
 	getVideoClips,
 	requestAiEdit,
 	startClipRender,
 	updateClip,
 } from "@/services/highlight-api/client";
+import { videoCache } from "@/services/video-cache/service";
 import type {
 	AiEditRequest,
 	AiEditResponse,
@@ -303,6 +305,51 @@ export class RemoteClipsManager {
 	 * existing command/undo system — Ctrl+Z reverts the whole AI edit. */
 	applyEdl({ edl }: { edl: Edl }): void {
 		this.editor.command.execute({ command: new ApplyEdlCommand(edl) });
+	}
+
+	/**
+	 * Burns TikTok-style karaoke captions onto this clip SERVER-SIDE (reusing
+	 * the pipeline's word-level Transcribe timings, see
+	 * pipeline/caption_burn.py) and swaps the active clip's footage in place
+	 * for the captioned result. Grid clips ship RAW; this is the on-demand
+	 * "Auto Caption" action, so the creator opts in per clip (and can skip it,
+	 * e.g. on singing clips where Transcribe struggles).
+	 *
+	 * The captions are burned into the footage (matching the old baked-in
+	 * quality) rather than added as editable text elements — that's the
+	 * deliberate tradeoff for pixel-identical output.
+	 */
+	async applyServerCaptions({ clipId }: { clipId: string }): Promise<void> {
+		const clip = this.clips.get(clipId);
+		if (!clip) throw new Error(`Unknown clip ${clipId}`);
+
+		const { previewUrl } = await applyClipCaptions({ clipId });
+		if (!previewUrl) throw new Error("Caption burn returned no preview URL");
+
+		const blob = await fetch(previewUrl).then((res) => res.blob());
+		const file = new File([blob], `${clipId}_captioned.mp4`, {
+			type: blob.type || "video/mp4",
+		});
+
+		const [processed] = await processMediaAssets({ files: [file] });
+		if (!processed) {
+			throw new Error(`Failed to probe captioned media for clip ${clipId}`);
+		}
+
+		// Reuse the clip's media id so the scene's video element keeps
+		// referencing it — we only swap the underlying footage in place. Clear
+		// the decoded-frame cache (keyed by mediaId, see video-cache/service.ts)
+		// so the preview re-decodes from the captioned file rather than the
+		// stale raw frames.
+		const mediaAssetId = `media_${clipId}`;
+		const asset: MediaAsset = { ...processed, id: mediaAssetId };
+		videoCache.clearVideo({ mediaId: mediaAssetId });
+		this.clipAssets.set(clipId, asset);
+
+		if (this.editor.scenes.getActiveSceneOrNull()?.id === clipId) {
+			this.editor.media.setAssets({ assets: [asset] });
+		}
+		this.notify();
 	}
 
 	private getClipTrimSeconds({ clipId }: { clipId: string }): {

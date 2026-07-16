@@ -1,12 +1,15 @@
-"""Clip renderer: highlight manifest -> vertical 9:16 clips with burned-in
-captions and a hook overlay.
+"""Clip renderer: highlight manifest -> RAW vertical 9:16 clips.
 
 For each kept highlight:
   1. cut [start_s, end_s] from the VOD
   2. reframe 16:9 -> 9:16: face-guided crop when visual signals are available,
      center crop otherwise
-  3. burn zh captions (ASS built from Transcribe word timestamps)
-  4. overlay the AI Director's hook line for the first 2.5 seconds
+
+Clips are intentionally RAW: captions and the hook overlay are NOT burned in
+here, so the highlights grid shows unedited footage and the creator keeps full
+editing control. Captions (karaoke TikTok-style) are applied on demand later,
+in the editor, via pipeline/caption_burn.py — which reuses the ASS helpers
+(build_ass / build_ass_karaoke / CAPTION_STYLE) still defined in this module.
 
 Local ffmpeg engine (demo path). The orchestrator can alternatively submit the
 cut/transcode as a MediaConvert job (cloud path) via --engine mediaconvert.
@@ -180,6 +183,13 @@ def build_ass_karaoke(transcript, start_s, end_s, path, play_res=(1080, 1920),
 
 
 def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path("out/tmp")):
+    """Cut [start_s, end_s] and reframe 16:9 -> 9:16. RAW output: no captions
+    and no hook overlay are burned in here anymore — the highlights grid shows
+    unedited clips so the creator keeps full editing control. Captions are
+    applied later, on demand, in the editor (see pipeline/caption_burn.py, wired
+    to the editor's "Auto Caption" button). `transcript` is accepted for a
+    stable call signature but is no longer used for burning.
+    """
     start_s, end_s = hl["start_s"], hl["end_s"]
     workdir.mkdir(parents=True, exist_ok=True)
 
@@ -188,32 +198,6 @@ def render_clip(video, hl, out_path, transcript=None, visual=None, workdir=Path(
     # x offset clamped so the crop window stays inside the frame
     crop = f"crop=w=ih*9/16:h=ih:x=clip(iw*{cx:.4f}-(ih*9/16)/2\\,0\\,iw-ih*9/16):y=0"
     vf = [crop, "scale=1080:1920"]
-
-    font_file = _local_font_file(workdir) if IS_WINDOWS else None
-
-    if transcript:
-        if transcript.get("words"):
-            ass = build_ass_karaoke(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
-        else:
-            ass = build_ass(transcript, start_s, end_s, workdir / f"{out_path.stem}.ass")
-        # ffmpeg filtergraph syntax treats "\" as an escape char, so a native
-        # Windows path (out\tmp\x.ass) gets mangled when embedded in -vf;
-        # forward slashes parse correctly on Windows ffmpeg builds too.
-        ass_filter = f"ass={Path(ass).as_posix()}"
-        if font_file:
-            # Sidestep the broken fontconfig lookup (see IS_WINDOWS block
-            # above) by pointing libass straight at a local font file.
-            ass_filter += f":fontsdir={font_file.parent.as_posix()}"
-        vf.append(ass_filter)
-
-    hook = (hl.get("hook_zh") or "").replace("'", "").replace(":", "")
-    if hook:
-        font_arg = f"fontfile='{font_file.as_posix()}'" if font_file else f"font='{ZH_FONT}'"
-        vf.append(
-            f"drawtext={font_arg}:text='{hook}':fontsize=88:fontcolor=white:"
-            "borderw=6:bordercolor=black:x=(w-text_w)/2:y=h*0.18:"
-            f"enable='lt(t,{HOOK_DURATION_S})'"
-        )
 
     cmd = [
         "ffmpeg", "-y", "-v", "error",

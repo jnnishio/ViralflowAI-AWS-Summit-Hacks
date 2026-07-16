@@ -9,76 +9,197 @@
  .en{color:#9aa;font-size:12px;margin:0} .cap{font-size:13px;color:#ccd}
  .tags{color:#6cf;font-size:12px} .score{font-size:18px;font-weight:700}
  .mood{margin-left:8px;font-size:11px;background:#2a2f3a;padding:2px 8px;border-radius:99px;vertical-align:middle}
+ .ai-badge{margin-left:8px;font-size:10px;background:#2d6b3f;color:#7fef9a;padding:2px 8px;border-radius:99px;vertical-align:middle}
  .factor{display:flex;align-items:center;gap:8px;font-size:11px;margin:3px 0}
  .factor span{width:44px;color:#9aa} .factor em{color:#9aa;font-style:normal}
  .bar{flex:1;height:6px;background:#2a2f3a;border-radius:3px} .bar div{height:100%;background:#6cf;border-radius:3px}
  .range{color:#889;font-size:11px}
  details summary{cursor:pointer;color:#9aa;font-size:12px;margin-top:6px}
+ .btn{display:block;margin-top:10px;padding:8px 12px;background:#6cf;color:#0e0f13;
+   text-align:center;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px}
+ .btn:hover{background:#8fd6ff}
+ .version-toggle{display:flex;gap:0;padding:6px 10px;background:#11131a}
+ .vtog{flex:1;padding:5px 0;border:none;background:#1e2130;color:#8899aa;font-size:11px;
+   font-weight:500;cursor:pointer;border-radius:6px;transition:all .15s}
+ .vtog.active{background:#6cf;color:#0e0f13;font-weight:700}
+ .vtog:first-child{border-radius:6px 0 0 6px} .vtog:last-child{border-radius:0 6px 6px 0}
 </style>
 <h1>StreamSmith — auto-generated highlights</h1>
+
 <div class="grid">
 <article class="card">
-  <video controls preload="none" poster="clip_01_funny.jpg" src="clip_01_funny.mp4"></video>
+  <video id="vid_clip_01" controls preload="none" poster="clip_01_funny.jpg" src="clip_01_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_01','clip_01_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_01','clip_01_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 72<span class="mood">funny</span></div>
-    <h2>減重粽竟然沒有味道😂</h2>
-    <p class="en">Trying a &#x27;Diet Zongzi&#x27; and Forgetting the Sugar 😂</p>
-    <p class="cap">第一次吃減重粽，結果忘記沾糖，吃到完全沒味道的皮😂大家有吃過嗎？</p>
-    <p class="tags">#減重粽 #端午節 #吃播 #foodreaction #台灣美食 #直播精華 #zongzi</p>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:100%'></div></div><em>3.50</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:42%'></div></div><em>1.27</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:21%'></div></div><em>0.62</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.14</em></div>
+    <div class="score">🔥 74<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>減重粽竟然沒有味道？！表情全崩了😂</h2>
+    <p class="en">Trying a &#x27;Diet Zongzi&#x27; with No Flavor… Their Faces Say It All 😂</p>
+    <p class="cap">第一次吃減重粽，結果沒有任何調味，忘記沾糖直接入口，表情全部崩掉哈哈哈😂 你們吃過嗎？</p>
+    <p class="tags">#減重粽 #粽子 #食物挑戰 #表情管理失敗 #FoodReaction #Zongzi #直播精華</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_01">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:100%'></div></div><em>3.50</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:42%'></div></div><em>1.27</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:0%'></div></div><em>-0.14</em></div>
       <p class="range">2074s – 2134s · food reaction</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_02_funny.jpg" src="clip_02_funny.mp4"></video>
+  <video id="vid_clip_02" controls preload="none" poster="clip_02_funny.jpg" src="clip_02_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_02','clip_02_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_02','clip_02_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 72<span class="mood">funny</span></div>
-    <h2>香菜粽子裂開的瞬間😱</h2>
-    <p class="en">Cilantro Rice Dumpling Jumpscare 😱</p>
-    <p class="cap">香菜花生冰心粽裂開的瞬間⋯裡面真的有香菜😭大家吃香菜嗎？哥說「太好了，那就是你的！」笑死🤣 #端午節 #奇葩粽子</p>
-    <p class="tags">#香菜粽 #端午節 #奇葩美食 #試吃挑戰 #FoodChallenge #台灣美食 #直播精華</p>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:59%'></div></div><em>1.78</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:50%'></div></div><em>1.52</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:14%'></div></div><em>0.44</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:65%'></div></div><em>1.97</em></div>
-      <p class="range">2698s – 2758s · funny moment</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>香菜花生冰心粽！裡面真的有香菜😱</h2>
+    <p class="en">Cilantro INSIDE the zongzi?! Their reactions say it all 😱</p>
+    <p class="cap">香菜花生冰心粽挑戰🌿粽子裡竟然真的藏著香菜，表情全說了哈哈哈！你敢吃嗎？👇</p>
+    <p class="tags">#香菜 #粽子 #端午節 #食物挑戰 #funnyreaction #台灣美食 #zongzi</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_02">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:59%'></div></div><em>1.78</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:50%'></div></div><em>1.52</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:65%'></div></div><em>1.97</em></div>
+      <p class="range">2698s – 2756s · funny moment</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_03_funny.jpg" src="clip_03_funny.mp4"></video>
+  <video id="vid_clip_03" controls preload="none" poster="clip_03_funny.jpg" src="clip_03_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_03','clip_03_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_03','clip_03_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 72<span class="mood">funny</span></div>
-    <h2>女團看到鏡子就停不下來😂</h2>
-    <p class="en">Girl Group Can&#x27;t Walk Past a Mirror Without Stopping 😂</p>
-    <p class="cap">女團的神奇魔力：路過任何鏡子都必須停下來整理儀容😂 這根本是職業病吧！</p>
-    <p class="tags">#女團日常 #鏡子魔力 #台灣女團 #直播精華 #girlgroup #relatable #funny</p>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:44%'></div></div><em>1.32</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:24%'></div></div><em>0.72</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:28%'></div></div><em>0.84</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:58%'></div></div><em>1.76</em></div>
-      <p class="range">3320s – 3366s · funny moment</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>女團成員排練無聊偷跳舞😂</h2>
+    <p class="en">Girl Group Member Secretly Dances During Rehearsal 😂</p>
+    <p class="cap">排練太無聊就自己找事做？女團成員親口爆料：只要有鏡子，所有人都忍不住！😂 #一席 #女團日常</p>
+    <p class="tags">#女團 #排練日常 #鏡子魔力 #搞笑 #girlgroup #behindthescenes #livestream</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_03">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:44%'></div></div><em>1.32</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:24%'></div></div><em>0.72</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:58%'></div></div><em>1.76</em></div>
+      <p class="range">3320s – 3355s · funny moment</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_04_funny.jpg" src="clip_04_funny.mp4"></video>
+  <video id="vid_clip_04" controls preload="none" poster="clip_04_funny.jpg" src="clip_04_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_04','clip_04_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_04','clip_04_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 62<span class="mood">funny</span></div>
-    <h2>金華火腿粽大評分！只拿超小一口？</h2>
-    <p class="en">Jin Hua Ham Zongzi Review — Someone Only Took a Tiny Bite 😂</p>
-    <p class="cap">吃粽子還被抓包只拿超小一口🤏 米飯超黏好吃但火腿味道不搭？嚴格評審倒數給分，結果出乎意料😂 #端午節 #粽子測評</p>
-    <p class="tags">#粽子 #端午節 #美食測評 #金華火腿 #直播精華 #foodreview #zongzi</p>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:64%'></div></div><em>1.94</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:32%'></div></div><em>0.96</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:33%'></div></div><em>0.99</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:44%'></div></div><em>1.34</em></div>
-      <p class="range">1954s – 2000s · food review / funny moment</p>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>把浣熊當貓帶回家？還是自信唱錯歌詞？</h2>
+    <p class="en">Would You Bring a Raccoon Home Thinking It&#x27;s a Cat?</p>
+    <p class="cap">問卷題目太荒唐😂 誰會把浣熊當貓帶回家？結果本人說「就算當成貓我也不會帶，因為我嚴重貓過敏」🤣 下一題：誰會自信滿滿地唱錯歌詞？</p>
+    <p class="tags">#爆笑直播 #問卷遊戲 #浣熊 #貓過敏 #唱錯歌詞 #funnymoment #livestream</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_04">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:48%'></div></div><em>1.45</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:60%'></div></div><em>1.82</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:100%'></div></div><em>3.03</em></div>
+      <p class="range">3417s – 3476s · funny moment</p>
     </details>
   </div>
 </article>
 <article class="card">
-  <video controls preload="none" poster="clip_05_funny.jpg" src="clip_05_funny.mp4"></video>
+  <video id="vid_clip_05" controls preload="none" poster="clip_05_funny.jpg" src="clip_05_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_05','clip_05_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_05','clip_05_funny.mp4',this)">Original</button></div>
   <div class="meta">
-    <div class="score">🔥 62<span class="mood">funny</span></div>
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>粽子不想出來😂邀請找妮吃朋友！</h2>
+    <p class="en">The Zongzi Doesn&#x27;t Want to Come Out 😂 Idol Eats Her &#x27;Friend&#x27;</p>
+    <p class="cap">打開粽子葉，粽子硬是不肯出來🤣主持人直接邀請找妮來吃她的「朋友」，這梗也太衝擊了吧！#端午節快樂</p>
+    <p class="tags">#粽子 #端午節 #搞笑時刻 #女團 #FunnyMoment #DragonBoatFestival #idol日常</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_05">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:65%'></div></div><em>1.96</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:7%'></div></div><em>0.22</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:30%'></div></div><em>0.92</em></div>
+      <p class="range">2494s – 2553s · funny moment</p>
+    </details>
+  </div>
+</article>
+<article class="card">
+  <video id="vid_clip_06" controls preload="none" poster="clip_06_funny.jpg" src="clip_06_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_06','clip_06_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_06','clip_06_funny.mp4',this)">Original</button></div>
+  <div class="meta">
+    <div class="score">🔥 72<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>評分舉手舉出兩隻手😂</h2>
+    <p class="en">Accidentally Raised TWO Hands While Scoring 😂</p>
+    <p class="cap">評分環節直接出包🤣 明明說好舉一隻手，結果不小心生出兩隻手，自己也笑翻了！#粽子試吃 #直播名場面</p>
+    <p class="tags">#直播名場面 #粽子 #試吃 #搞笑瞬間 #foodreview #funnymoment #台灣美食 #livestream</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_06">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:47%'></div></div><em>1.42</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:29%'></div></div><em>0.86</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:79%'></div></div><em>2.40</em></div>
+      <p class="range">1219s – 1270s · funny moment</p>
+    </details>
+  </div>
+</article>
+<article class="card">
+  <video id="vid_clip_07" controls preload="none" poster="clip_07_funny.jpg" src="clip_07_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_07','clip_07_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_07','clip_07_funny.mp4',this)">Original</button></div>
+  <div class="meta">
+    <div class="score">🔥 68<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
     <h2>吵架假哭獲勝？成員互相爆料！</h2>
-    <p class="en">Who Fake-Cries to Win Arguments? Members Call Each Other Out!</p>
-    <p class="cap">吵架的時候誰會假哭來獲得優勢？成員們互相指認，笑到不行🤣 #互揭底細</p>
-    <p class="tags">#假哭 #成員互揭 #直播精華 #funnymoment #idol #台灣女團 #reels</p>
-    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:63%'></div></div><em>1.91</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:66%'></div></div><em>1.99</em></div><div class='factor'><span>visual</span><div class='bar'><div style='width:13%'></div></div><em>0.41</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:30%'></div></div><em>0.92</em></div>
+    <p class="en">Who Fake Cries to Win Arguments? Members Call Each Other Out!</p>
+    <p class="cap">「誰會在吵架時假哭來獲得優勢？」這題直接讓成員們互相爆料，笑到不行🤣 #直播精華</p>
+    <p class="tags">#假哭 #成員爆料 #直播精華 #搞笑時刻 #LivestreamFunny #台灣直播 #閨蜜日常</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_07">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:63%'></div></div><em>1.91</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:66%'></div></div><em>1.99</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:30%'></div></div><em>0.92</em></div>
       <p class="range">4060s – 4120s · funny moment</p>
     </details>
   </div>
+</article>
+<article class="card">
+  <video id="vid_clip_08" controls preload="none" poster="clip_08_funny.jpg" src="clip_08_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_08','clip_08_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_08','clip_08_funny.mp4',this)">Original</button></div>
+  <div class="meta">
+    <div class="score">🔥 62<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>粽子裡藏整隻麻油雞腿？！</h2>
+    <p class="en">There&#x27;s a Whole Chicken Leg Inside This Zongzi?!</p>
+    <p class="cap">剝開粽葉才發現裡面藏了整隻麻油雞腿🍗「天哪還要啃骨頭！」這粽子也太狂了吧😂 #端午節 #粽子</p>
+    <p class="tags">#粽子 #端午節 #麻油雞腿 #台灣美食 #FoodReaction #ZongziChallenge #直播highlights</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_08">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:82%'></div></div><em>2.49</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:41%'></div></div><em>1.23</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:65%'></div></div><em>1.97</em></div>
+      <p class="range">1406s – 1451s · food reaction</p>
+    </details>
+  </div>
+</article>
+<article class="card">
+  <video id="vid_clip_09" controls preload="none" poster="clip_09_funny.jpg" src="clip_09_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_09','clip_09_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_09','clip_09_funny.mp4',this)">Original</button></div>
+  <div class="meta">
+    <div class="score">🔥 62<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>嚴格評審只給一根手指頭😂金華火腿粽評分時刻</h2>
+    <p class="en">Harsh Judge Gives Only One Finger 😂 Zongzi Rating Moment</p>
+    <p class="cap">拿超小一口、給超低分，這位評審也太嚴格了吧😂 金華火腿粽你敢挑戰嗎？</p>
+    <p class="tags">#粽子 #端午節 #食物評測 #直播精華 #FoodReview #ZongziChallenge #台灣美食</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_09">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:64%'></div></div><em>1.94</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:32%'></div></div><em>0.96</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:51%'></div></div><em>1.55</em></div>
+      <p class="range">1954s – 2014s · food tasting / reaction</p>
+    </details>
+  </div>
+</article>
+<article class="card">
+  <video id="vid_clip_10" controls preload="none" poster="clip_10_funny.jpg" src="clip_10_funny_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_10','clip_10_funny_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_10','clip_10_funny.mp4',this)">Original</button></div>
+  <div class="meta">
+    <div class="score">🔥 62<span class="mood">funny</span><span class="ai-badge">AI edited</span></div>
+    <h2>以為很難切結果誤會它了😂｜粽子開箱試吃</h2>
+    <p class="en">We Totally Misjudged This Food 😂 | Live Taste Test</p>
+    <p class="cap">一開始以為皮超難切，結果根本很好切😂 米飯看起來超南部風！開動～ 你們喜歡哪種米的粽子？👇</p>
+    <p class="tags">#試吃 #粽子 #直播精華 #foodtasting #台灣美食 #開箱 #LiveStream</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_10">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:71%'></div></div><em>2.14</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:0%'></div></div><em>-0.35</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:37%'></div></div><em>1.13</em></div>
+      <p class="range">1796s – 1856s · food tasting</p>
+    </details>
+  </div>
+</article>
+<article class="card">
+  <video id="vid_clip_11" controls preload="none" poster="clip_11_hype.jpg" src="clip_11_hype_autoedit.mp4"></video>
+  <div class="version-toggle"><button class="vtog active" onclick="switchVid('vid_clip_11','clip_11_hype_autoedit.mp4',this)">AI Edited</button><button class="vtog" onclick="switchVid('vid_clip_11','clip_11_hype.mp4',this)">Original</button></div>
+  <div class="meta">
+    <div class="score">🔥 52<span class="mood">hype</span><span class="ai-badge">AI edited</span></div>
+    <h2>告白氣球得獎啦！接下來玩遊戲🎈</h2>
+    <p class="en">Giveaway Winner Announced + Game Time!</p>
+    <p class="cap">粽子開箱結束，告白氣球抽獎倒數5秒揭曉得獎者，接著宣布下一個環節——考驗默契的團隊遊戲，米粉跟麋鹿恭喜中獎！🎉</p>
+    <p class="tags">#告白氣球 #抽獎 #直播精華 #粽子 #團隊遊戲 #LiveStream #giveaway</p>
+    <a class="btn" href="http://localhost:3000/editor/video/video_3654414/edit/clip_11">Open in Editor →</a>
+    <details><summary>score details</summary><div class='factor'><span>chat</span><div class='bar'><div style='width:68%'></div></div><em>2.05</em></div><div class='factor'><span>audio</span><div class='bar'><div style='width:26%'></div></div><em>0.78</em></div><div class='factor'><span>speech</span><div class='bar'><div style='width:37%'></div></div><em>1.13</em></div>
+      <p class="range">3114s – 3174s · giveaway reveal &amp; game intro</p>
+    </details>
+  </div>
 </article></div>
+<script>
+function switchVid(vidId, src, btn) {
+  var v = document.getElementById(vidId);
+  if (v.src.endsWith(src)) return;
+  var wasPlaying = !v.paused;
+  v.src = src; v.load();
+  if (wasPlaying) v.play();
+  btn.parentElement.querySelectorAll('.vtog').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>

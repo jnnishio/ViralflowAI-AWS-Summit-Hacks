@@ -38,6 +38,7 @@ import {
   getEditorAiEdit,
   getEditorClip,
   editorClipPreviewUrl,
+  applyClipCaptions,
 } from './lib/editor-api.mjs'
 import { contentTypeFor, parseRange } from './lib/media-range.mjs'
 import { deriveStreamId } from './lib/stream-id.mjs'
@@ -460,6 +461,22 @@ export function startServer(opts = {}) {
       if (!clip) return sendJson(res, 404, { error: 'clip not found' })
       const previewUrl = await editorClipPreviewUrl({ outRoot, jobs, baseUrl: baseUrl(), scopedClipId })
       return sendJson(res, 200, { ...clip, renderStatus: 'ready', previewUrl })
+    }
+
+    // POST /api/clips/:clipId/apply-captions  — burn karaoke captions on demand.
+    const applyCaptionsMatch = path.match(/^\/api\/clips\/([^/]+)\/apply-captions$/)
+    if (req.method === 'POST' && applyCaptionsMatch) {
+      const scopedClipId = decodeURIComponent(applyCaptionsMatch[1])
+      try {
+        const out = await applyClipCaptions({
+          outRoot, jobs, baseUrl: baseUrl(), scopedClipId, python, cwd,
+        })
+        if (out.error) return sendJson(res, out.status ?? 404, { error: out.error })
+        return sendJson(res, 200, out.response)
+      } catch (err) {
+        log(`[apply-captions] ${scopedClipId} failed: ${err.message}`)
+        return sendJson(res, 500, { error: `caption burn failed: ${err.message}` })
+      }
     }
 
     // PATCH /api/clips/:clipId  — accept metadata/trim edits, echo the clip.

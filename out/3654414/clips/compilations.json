@@ -1,0 +1,50 @@
+{
+ "compilations": [
+  {
+   "id": "comp_01",
+   "title_zh": "粽子大挑战：奇葩口味一个都跑不掉",
+   "title_en": "Zongzi Chaos: Every Weird Flavor They Were Forced to Try",
+   "reason": "All these clips center on the group reacting to surprising, bizarre, or over-the-top zongzi varieties during the same taste-test segment.",
+   "clipIds": [
+    "clip_01",
+    "clip_02",
+    "clip_05",
+    "clip_08",
+    "clip_09",
+    "clip_10"
+   ]
+  },
+  {
+   "id": "comp_02",
+   "title_zh": "粽子评分现场：表情比分数更诚实 😂",
+   "title_en": "Zongzi Scorecards: Their Faces Are the Real Rating",
+   "reason": "These clips all feature exaggerated, unfiltered physical reactions and scoring moments during the zongzi tasting, making them a natural reaction-compilation reel.",
+   "clipIds": [
+    "clip_01",
+    "clip_06",
+    "clip_09",
+    "clip_10"
+   ]
+  },
+  {
+   "id": "comp_03",
+   "title_zh": "互相揭底！成员问答翻车合集",
+   "title_en": "Members Calling Each Other Out: Quiz & Confession Fails",
+   "reason": "Both clips revolve around personality quiz questions that spark chaotic mutual call-outs and confessions among the members.",
+   "clipIds": [
+    "clip_04",
+    "clip_07"
+   ]
+  },
+  {
+   "id": "comp_04",
+   "title_zh": "女团本色：排练间隙的搞笑日常",
+   "title_en": "Girl Group Off-Guard: Candid Behind-the-Scenes Chaos",
+   "reason": "These clips capture spontaneous, unscripted girl-group behavior — dancing in mirrors and accidentally raising both hands — that reveal their unfiltered personalities.",
+   "clipIds": [
+    "clip_03",
+    "clip_06"
+   ]
+  }
+ ]
+}
