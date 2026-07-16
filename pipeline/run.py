@@ -75,6 +75,9 @@ def run(argv=None):
     ap.add_argument("--visual-mode", choices=["fast", "full", "off"], default="fast",
                     help="fast: face-detect only candidate windows (default); "
                          "full: whole-VOD Rekognition (4-modal fusion); off: skip visual")
+    ap.add_argument("--autoedit-mode", choices=["auto", "llm", "rules"], default="auto",
+                    help="auto: LLM auto-edit brain w/ deterministic fallback (default); "
+                         "llm: LLM only; rules: deterministic scipy detectors only")
     ap.add_argument("--emit-contracts", dest="emit_contracts", action="store_true", default=True,
                     help="emit canonical clips.json + per-clip EDLs (default on)")
     ap.add_argument("--no-emit-contracts", dest="emit_contracts", action="store_false")
@@ -277,15 +280,15 @@ def run(argv=None):
         # ---- 10b. AI auto-edit: detect reaction zooms, onomatopoeia, SFX
         from pipeline import autoedit as autoedit_mod
 
-        log("autoedit: detecting reaction zooms, onomatopoeia, SFX")
+        log(f"autoedit: generating effects (mode={args.autoedit_mode})")
         autoedit_updated = autoedit_mod.emit(
             hl_json, str(args.video), out / "edl",
             transcript_path=str(transcript_json) if transcript_json.exists() else None,
             visual_path=str(visual_json) if visual_json.exists() else None,
             chat_path=str(chat_json) if chat_json.exists() else None,
-            top=args.top_clips)
-        for clip_id, n_effects in autoedit_updated:
-            log(f"  {clip_id}: {n_effects} auto-edit effects")
+            top=args.top_clips, mode=args.autoedit_mode)
+        for clip_id, n_effects, source in autoedit_updated:
+            log(f"  {clip_id}: {n_effects} auto-edit effects ({source})")
 
         # ---- 10c. render burned-in "director's cut" (autoedit effects baked into MP4)
         from pipeline import render_autoedit as render_ae_mod

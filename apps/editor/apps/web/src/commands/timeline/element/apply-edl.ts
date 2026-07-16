@@ -13,6 +13,7 @@ import type {
 import { buildEmptyTrack } from "@/timeline/placement/track-factory";
 import { buildTextElement, buildLibraryAudioElement } from "@/timeline/element-utils";
 import { generateUUID } from "@/utils/id";
+import { buildTransformFromParams, readOpacityFromParams } from "@/rendering";
 import { mediaTimeFromSeconds, subMediaTime } from "@/wasm";
 import type { Edl, EdlEffect } from "@/services/highlight-api/schema";
 import type { ScalarAnimationKey, ScalarChannel, ElementAnimations } from "@/animation/types";
@@ -23,52 +24,56 @@ const SFX_TRACK_NAME = "AI SFX";
 
 const TICKS_PER_SECOND = Number(mediaTimeFromSeconds({ seconds: 1 }));
 
+// Vertical 9:16 export canvas. camera-pan params are normalized fractions of the
+// frame (−0.3..0.3); transform.positionX/Y are canvas-pixel offsets from center
+// (see preview/preview-coords.ts), so we scale by these dimensions.
+const CANVAS_WIDTH = 1080;
+const CANVAS_HEIGHT = 1920;
+
+/** Build scalar animation keys from plain (time, value) control points. */
+function buildScalarKeys(
+	points: { t: number; value: number; seg?: "linear" | "bezier" | "step" }[],
+): ScalarAnimationKey[] {
+	return points.map((p) => ({
+		id: generateUUID(),
+		time: mediaTimeFromSeconds({ seconds: Math.max(0, p.t) }),
+		value: p.value,
+		segmentToNext: p.seg ?? "linear",
+		tangentMode: "auto",
+	}));
+}
+
 /**
- * Build the base→scale→base keyframe set for a punch-in zoom, relative to the
+ * Build the base→peak→base keyframe set for a punch-in zoom, relative to the
  * host element's start time. Ease in, hold, ease out.
+ *
+ * `base` is the element's existing scale on this axis and `peak = base * scale`.
+ * Composing against the base matters: once a channel has keys, the renderer
+ * ignores the element's base transform for the whole clip and uses the channel's
+ * held edge value — so the keys must return to `base`, not a hard-coded 1.0, or
+ * the clip's normal framing breaks outside the zoom window.
  */
 function buildZoomScaleKeys({
 	relativeAt,
 	relativeEnd,
+	base,
 	scale,
 }: {
 	relativeAt: number;
 	relativeEnd: number;
+	base: number;
 	scale: number;
 }): ScalarAnimationKey[] {
 	const span = relativeEnd - relativeAt;
 	const rampIn = Math.min(0.3, span * 0.2);
 	const rampOut = Math.min(0.3, span * 0.2);
-	return [
-		{
-			id: generateUUID(),
-			time: mediaTimeFromSeconds({ seconds: relativeAt }),
-			value: 1.0,
-			segmentToNext: "bezier",
-			tangentMode: "auto",
-		},
-		{
-			id: generateUUID(),
-			time: mediaTimeFromSeconds({ seconds: relativeAt + rampIn }),
-			value: scale,
-			segmentToNext: "linear",
-			tangentMode: "auto",
-		},
-		{
-			id: generateUUID(),
-			time: mediaTimeFromSeconds({ seconds: relativeEnd - rampOut }),
-			value: scale,
-			segmentToNext: "bezier",
-			tangentMode: "auto",
-		},
-		{
-			id: generateUUID(),
-			time: mediaTimeFromSeconds({ seconds: relativeEnd }),
-			value: 1.0,
-			segmentToNext: "linear",
-			tangentMode: "auto",
-		},
-	];
+	const peak = base * scale;
+	return buildScalarKeys([
+		{ t: relativeAt, value: base, seg: "bezier" },
+		{ t: relativeAt + rampIn, value: peak, seg: "linear" },
+		{ t: relativeEnd - rampOut, value: peak, seg: "bezier" },
+		{ t: relativeEnd, value: base, seg: "linear" },
+	]);
 }
 
 /**
@@ -77,9 +82,15 @@ function buildZoomScaleKeys({
  * editor for you": each AI decision becomes a normal element the creator can
  * select, move, resize, retime, reparametrize, or delete.
  *
- * - "punch-in-zoom" → transform.scaleX/scaleY keyframes on the video element
- *   whose timeline span contains the effect's `at`.
- * - "onomatopoeia-caption" → TextElement on a dedicated "AI Zoom Captions" track.
+ * Host-element effects attach to the main video element whose timeline span
+ * contains the effect's `at`:
+ * - "punch-in-zoom" → transform.scaleX/scaleY keyframes.
+ * - "camera-pan" → transform.positionX/positionY keyframes (normalized params
+ *   scaled by the 9:16 canvas dimensions).
+ * - "opacity-fade" → opacity keyframes (mode: in | out | both).
+ * Standalone-element effects:
+ * - "onomatopoeia-caption" → TextElement on a dedicated "AI Zoom Captions" track
+ *   (honors optional style: fontSize/color/fontFamily/fontWeight/background).
  * - type:"sound" (sfx-*) → LibraryAudioElement on an "AI SFX" audio track,
  *   sourced from /sfx/<asset>.wav (served from the editor's public folder).
  *
@@ -96,9 +107,16 @@ export function applyEdlEffectsToTracks({
 }): SceneTracks {
 	if (!effects || effects.length === 0) return tracks;
 
-	// --- 1. Zoom keyframes on the video elements they land within ---
-	const zoomEffects = effects.filter(
-		(e) => e.effectId === "punch-in-zoom" && e.type === "visual",
+	// --- 1. Host-element effects (zoom / pan / opacity fade) ---
+	// These all attach to the main video element whose timeline span contains
+	// the effect's `at`, as keyframe animation channels.
+	const hostEffectIds = new Set([
+		"punch-in-zoom",
+		"camera-pan",
+		"opacity-fade",
+	]);
+	const hostEffects = effects.filter(
+		(e) => e.type === "visual" && hostEffectIds.has(e.effectId),
 	);
 
 	const videoElements: TimelineElement[] = tracks.main.elements.map((el) => {
@@ -106,35 +124,89 @@ export function applyEdlEffectsToTracks({
 		const elEnd = elStart + Number(el.duration);
 		const elStartSeconds = elStart / TICKS_PER_SECOND;
 
-		const zoomsForEl = zoomEffects.filter((effect) => {
+		const effectsForEl = hostEffects.filter((effect) => {
 			const atTicks = Number(mediaTimeFromSeconds({ seconds: effect.at }));
 			return atTicks >= elStart && atTicks < elEnd;
 		});
-		if (zoomsForEl.length === 0) return el;
+		if (effectsForEl.length === 0) return el;
 
-		// Merge all zoom keyframes for this element onto scaleX/scaleY channels.
 		const scaleXKeys: ScalarAnimationKey[] = [];
 		const scaleYKeys: ScalarAnimationKey[] = [];
-		for (const effect of zoomsForEl) {
+		const posXKeys: ScalarAnimationKey[] = [];
+		const posYKeys: ScalarAnimationKey[] = [];
+		const opacityKeys: ScalarAnimationKey[] = [];
+
+		// Compose all keyframes against the element's existing base transform, so
+		// the channel's held value outside an effect window equals the real base
+		// (not a hard-coded 1.0/0), preserving normal framing between effects.
+		const base = buildTransformFromParams({ params: el.params });
+		const baseOpacity = readOpacityFromParams({ params: el.params });
+
+		for (const effect of effectsForEl) {
 			const params = (effect.params ?? {}) as Record<string, unknown>;
-			const scale = typeof params.scale === "number" ? params.scale : 1.3;
 			const relativeAt = effect.at - elStartSeconds;
 			const relativeEnd = effect.at + effect.duration - elStartSeconds;
-			scaleXKeys.push(...buildZoomScaleKeys({ relativeAt, relativeEnd, scale }));
-			scaleYKeys.push(...buildZoomScaleKeys({ relativeAt, relativeEnd, scale }));
+			const span = Math.max(0.01, relativeEnd - relativeAt);
+			const ramp = Math.min(0.5, span * 0.3);
+
+			if (effect.effectId === "punch-in-zoom") {
+				const scale = typeof params.scale === "number" ? params.scale : 1.3;
+				scaleXKeys.push(...buildZoomScaleKeys({ relativeAt, relativeEnd, base: base.scaleX, scale }));
+				scaleYKeys.push(...buildZoomScaleKeys({ relativeAt, relativeEnd, base: base.scaleY, scale }));
+			} else if (effect.effectId === "camera-pan") {
+				const fromX = base.position.x + (typeof params.fromX === "number" ? params.fromX : 0) * CANVAS_WIDTH;
+				const toX = base.position.x + (typeof params.toX === "number" ? params.toX : 0) * CANVAS_WIDTH;
+				const fromY = base.position.y + (typeof params.fromY === "number" ? params.fromY : 0) * CANVAS_HEIGHT;
+				const toY = base.position.y + (typeof params.toY === "number" ? params.toY : 0) * CANVAS_HEIGHT;
+				posXKeys.push(
+					...buildScalarKeys([
+						{ t: relativeAt, value: fromX, seg: "bezier" },
+						{ t: relativeEnd, value: toX, seg: "linear" },
+					]),
+				);
+				posYKeys.push(
+					...buildScalarKeys([
+						{ t: relativeAt, value: fromY, seg: "bezier" },
+						{ t: relativeEnd, value: toY, seg: "linear" },
+					]),
+				);
+			} else if (effect.effectId === "opacity-fade") {
+				const mode = typeof params.mode === "string" ? params.mode : "in";
+				if (mode === "in" || mode === "both") {
+					opacityKeys.push(
+						...buildScalarKeys([
+							{ t: relativeAt, value: 0, seg: "bezier" },
+							{ t: relativeAt + ramp, value: baseOpacity, seg: "linear" },
+						]),
+					);
+				}
+				if (mode === "out" || mode === "both") {
+					opacityKeys.push(
+						...buildScalarKeys([
+							{ t: relativeEnd - ramp, value: baseOpacity, seg: "bezier" },
+							{ t: relativeEnd, value: 0, seg: "linear" },
+						]),
+					);
+				}
+			}
 		}
 
-		const scaleXChannel: ScalarChannel = { keys: scaleXKeys };
-		const scaleYChannel: ScalarChannel = { keys: scaleYKeys };
 		const existing: ElementAnimations = el.animations ?? {};
-		return {
-			...el,
-			animations: {
-				...existing,
-				"transform.scaleX": scaleXChannel,
-				"transform.scaleY": scaleYChannel,
-			},
-		};
+		const animations: ElementAnimations = { ...existing };
+		if (scaleXKeys.length > 0) {
+			animations["transform.scaleX"] = { keys: scaleXKeys } as ScalarChannel;
+			animations["transform.scaleY"] = { keys: scaleYKeys } as ScalarChannel;
+		}
+		if (posXKeys.length > 0) {
+			animations["transform.positionX"] = { keys: posXKeys } as ScalarChannel;
+			animations["transform.positionY"] = { keys: posYKeys } as ScalarChannel;
+		}
+		if (opacityKeys.length > 0) {
+			opacityKeys.sort((a, b) => Number(a.time) - Number(b.time));
+			animations.opacity = { keys: opacityKeys } as ScalarChannel;
+		}
+
+		return { ...el, animations };
 	});
 
 	const mainTrack = { ...tracks.main, elements: videoElements as VideoElement[] };
@@ -147,18 +219,25 @@ export function applyEdlEffectsToTracks({
 		const params = (effect.params ?? {}) as Record<string, unknown>;
 		const text = typeof params.text === "string" ? params.text : "!";
 		const style = (params.style ?? {}) as Record<string, unknown>;
-		const fontSize = typeof style.fontSize === "number" ? style.fontSize : 120;
+		const fontSize = typeof style.fontSize === "number" ? style.fontSize : 48;
+		// Pass through optional rich styling the LLM may emit.
+		const textParams: Record<string, unknown> = {
+			content: text,
+			fontSize,
+			textAlign: "center",
+			fontWeight: typeof style.fontWeight === "string" ? style.fontWeight : "bold",
+		};
+		if (typeof style.color === "string") textParams.color = style.color;
+		if (typeof style.fontFamily === "string") textParams.fontFamily = style.fontFamily;
+		if (style.background && typeof style.background === "object") {
+			textParams.background = style.background;
+		}
 		return {
 			...buildTextElement({
 				raw: {
 					name: `AI burst: ${text}`,
 					duration: mediaTimeFromSeconds({ seconds: effect.duration }),
-					params: {
-						content: text,
-						fontSize,
-						textAlign: "center",
-						fontWeight: "bold",
-					},
+					params: textParams,
 				},
 				startTime: mediaTimeFromSeconds({ seconds: effect.at }),
 			}),

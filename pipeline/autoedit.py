@@ -396,14 +396,34 @@ def autoedit_effects(highlight, video_path, transcript=None, visual=None,
 # Batch emit: process all highlights, update EDL files in place
 # ---------------------------------------------------------------------------
 
+def _make_bedrock_client():
+    """Create a shared bedrock-runtime client, or None if unavailable."""
+    try:
+        import boto3
+
+        from pipeline.autoedit_llm import REGION
+        return boto3.client("bedrock-runtime", region_name=REGION)
+    except Exception:
+        return None
+
+
 def emit(highlights_path, video_path, outdir, transcript_path=None,
-         visual_path=None, chat_path=None, top=None):
+         visual_path=None, chat_path=None, top=None, mode="auto"):
     """Run autoedit on all highlights and update existing EDL files with effects.
 
     If video_path is a single clip file (e.g. out/clips/clip_01_funny.mp4),
     processes only that clip with start_s=0, end_s=duration.
     If video_path points to the source VOD, processes all clips using their
     VOD-relative timestamps from highlights.json.
+
+    mode:
+      "auto"  — LLM brain (pipeline/autoedit_llm) per clip, falling back to the
+                deterministic detectors on any failure/missing creds (default).
+      "llm"   — LLM only; if a clip's LLM call fails, its effects are empty.
+      "rules" — deterministic scipy detectors only (original behavior).
+
+    Each returned tuple is (clip_id, n_effects, source) where source is
+    "llm" or "rules".
     """
     highlights = json.loads(Path(highlights_path).read_text(encoding="utf-8"))["highlights"]
     if top:
@@ -416,6 +436,15 @@ def emit(highlights_path, video_path, outdir, transcript_path=None,
     chat_signals = (json.loads(Path(chat_path).read_text(encoding="utf-8"))
                     if chat_path and Path(chat_path).exists() else None)
 
+    llm_gen = None
+    brt = None
+    if mode in ("auto", "llm"):
+        try:
+            from pipeline import autoedit_llm as llm_gen  # noqa: F401
+            brt = _make_bedrock_client()
+        except Exception:
+            llm_gen = None
+
     outdir = Path(outdir)
     updated = []
 
@@ -426,16 +455,28 @@ def emit(highlights_path, video_path, outdir, transcript_path=None,
         if not edl_path.exists():
             continue
 
-        # Compute effects
-        effects = autoedit_effects(hl, video_path, transcript, visual,
-                                   chat_signals)
+        # Compute effects: LLM brain first (auto/llm), else deterministic.
+        effects = None
+        source = "rules"
+        if llm_gen is not None and brt is not None:
+            effects = llm_gen.generate(hl, video_path, transcript, visual,
+                                       chat_signals, brt=brt)
+            if effects:
+                source = "llm"
+        if not effects:
+            if mode == "llm":
+                effects = []           # llm-only: no rules fallback
+            else:
+                effects = autoedit_effects(hl, video_path, transcript, visual,
+                                           chat_signals)
+                source = "rules"
 
         # Update EDL in place
         edl = json.loads(edl_path.read_text(encoding="utf-8"))
         edl["effects"] = effects
         edl_path.write_text(json.dumps(edl, ensure_ascii=False, indent=1),
                             encoding="utf-8")
-        updated.append((clip_id, len(effects)))
+        updated.append((clip_id, len(effects), source))
 
     return updated
 
@@ -454,12 +495,16 @@ def main(argv=None):
     ap.add_argument("--chat", default=None)
     ap.add_argument("--outdir", required=True, help="Directory with existing EDL files")
     ap.add_argument("--top", type=int, default=None)
+    ap.add_argument("--mode", choices=["auto", "llm", "rules"], default="auto",
+                    help="auto: LLM brain w/ deterministic fallback (default); "
+                         "llm: LLM only; rules: deterministic detectors only")
     args = ap.parse_args(argv)
 
     updated = emit(args.highlights, args.video, args.outdir,
-                   args.transcript, args.visual, args.chat, args.top)
-    for clip_id, n in updated:
-        print(f"  {clip_id}: {n} effects")
+                   args.transcript, args.visual, args.chat, args.top,
+                   mode=args.mode)
+    for clip_id, n, source in updated:
+        print(f"  {clip_id}: {n} effects ({source})")
     print(f"Updated {len(updated)} EDLs in {args.outdir}/")
 
 
