@@ -25,3 +25,7 @@ cdk.out/
 
 # Pytest cache
 .pytest_cache/
+
+# pipeline scratch/output (regenerated; not source)
+out/tmp/
+out/logs/
