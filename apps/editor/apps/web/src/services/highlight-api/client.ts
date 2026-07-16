@@ -3,11 +3,13 @@ import {
 	type AiEditResponse,
 	type Clip,
 	type ClipPatch,
+	type Edl,
 	type RenderStatusResponse,
 	type Video,
 	type VideoClipsResponse,
 	aiEditResponseSchema,
 	clipSchema,
+	edlSchema,
 	renderStatusResponseSchema,
 	videoClipsResponseSchema,
 	videoSchema,
@@ -64,6 +66,25 @@ export async function getVideoClips({
 	return apiFetch({
 		path: `/videos/${videoId}/clips`,
 		schema: videoClipsResponseSchema,
+	});
+}
+
+/**
+ * Fetch a compilation reel's multi-clip EDL (pipeline/compile_edl.py output),
+ * loaded when the highlights grid deep-links in with `?compilation=<id>`. The
+ * editor concatenates its member clips onto one timeline (remote-clips-manager
+ * openCompilation).
+ */
+export async function getCompilationEdl({
+	videoId,
+	compilationId,
+}: {
+	videoId: string;
+	compilationId: string;
+}): Promise<{ edl: Edl }> {
+	return apiFetch({
+		path: `/videos/${videoId}/compilations/${compilationId}/edl`,
+		schema: z.object({ edl: edlSchema }),
 	});
 }
 

@@ -36,7 +36,7 @@ import type {
 	RenderStatusValue,
 	ShotBoundary,
 } from "@/services/highlight-api/schema";
-import { ApplyEdlCommand } from "@/commands/timeline/element/apply-edl";
+import { ApplyEdlCommand, applyEdlEffectsToTracks } from "@/commands/timeline/element/apply-edl";
 
 const RENDER_POLL_INTERVAL_MS = 2500;
 const RENDER_POLL_TIMEOUT_MS = 60_000;
@@ -49,6 +49,15 @@ export class RemoteClipsManager {
 	// the Assets panel shows just that clip's footage, not all of them (see
 	// syncMediaAssetsForActiveScene).
 	private clipAssets = new Map<string, MediaAsset>();
+	// Each clip's probed source duration (MediaTime), needed to lay a clip's
+	// footage onto the shared compilation timeline (see openCompilation).
+	private clipSourceDurations = new Map<string, MediaTime>();
+	// When a compilation reel is opened (openCompilation), the id of the
+	// synthetic scene concatenating its member clips, and every member clip's
+	// media asset — so the Assets panel / preview see ALL of them at once
+	// rather than the single-asset-per-scene default (syncMediaAssets...).
+	private compilationSceneId: string | null = null;
+	private compilationMemberAssets: MediaAsset[] = [];
 	// Raw (pre-caption) asset per clip, stashed the first time captions are
 	// applied so the "Auto Caption" button can toggle back to unedited footage.
 	private rawClipAssets = new Map<string, MediaAsset>();
@@ -114,6 +123,9 @@ export class RemoteClipsManager {
 
 			this.clipAssets = new Map(
 				sceneBuildInputs.map(({ clip, asset }) => [clip.id, asset]),
+			);
+			this.clipSourceDurations = new Map(
+				sceneBuildInputs.map(({ clip, sourceDuration }) => [clip.id, sourceDuration]),
 			);
 
 			// Clips open CLEAN — no baked-in effects. The AI auto-edit
@@ -190,6 +202,15 @@ export class RemoteClipsManager {
 		const activeSceneId = this.editor.scenes.getActiveSceneOrNull()?.id ?? null;
 		if (!activeSceneId || activeSceneId === this.activeAssetSceneId) return;
 
+		// The compilation scene concatenates several clips, so it needs ALL its
+		// member assets registered at once — not the single-asset default.
+		if (activeSceneId === this.compilationSceneId) {
+			if (this.compilationMemberAssets.length === 0) return;
+			this.activeAssetSceneId = activeSceneId;
+			this.editor.media.setAssets({ assets: this.compilationMemberAssets });
+			return;
+		}
+
 		const asset = this.clipAssets.get(activeSceneId);
 		if (!asset) return;
 
@@ -248,6 +269,128 @@ export class RemoteClipsManager {
 			id: clip.id,
 			name: clip.hook || clip.category,
 			isMain,
+			tracks,
+			bookmarks: [],
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+	}
+
+	/**
+	 * Opens a COMPILATION reel (pipeline/compile_edl.py's multi-clip EDL) as a
+	 * single new scene whose main track concatenates the reel's member clips
+	 * end to end — each segment cut from its OWN already-probed footage (unlike
+	 * ApplyEdlCommand, which re-cuts one clip). The EDL's cross-clip effects
+	 * (reaction zooms / fades / transitions) are materialized as ordinary,
+	 * editable timeline elements via the shared applyEdlEffectsToTracks helper,
+	 * so the creator can tweak the AI's compilation edit just like any clip's.
+	 *
+	 * Requires loadVideo() to have run first (it probes every clip's asset).
+	 * Adds the scene as a new tab and switches to it.
+	 */
+	openCompilation({ compilationId, edl }: { compilationId: string; edl: Edl }): void {
+		const sceneId = `compilation_${compilationId}`;
+
+		// Collect each referenced member clip's asset once, preserving order.
+		const memberAssets: MediaAsset[] = [];
+		const seen = new Set<string>();
+		for (const segment of edl.segments) {
+			const asset = this.clipAssets.get(segment.clipId);
+			if (asset && !seen.has(asset.id)) {
+				seen.add(asset.id);
+				memberAssets.push(asset);
+			}
+		}
+		if (memberAssets.length === 0) {
+			throw new Error("Compilation references no loaded clips");
+		}
+
+		const scene = this.buildCompilationScene({ sceneId, edl });
+
+		this.compilationSceneId = sceneId;
+		this.compilationMemberAssets = memberAssets;
+
+		const scenes = this.editor.scenes
+			.getScenes()
+			.filter((existing) => existing.id !== sceneId);
+		this.editor.scenes.setScenes({
+			scenes: [...scenes, scene],
+			activeSceneId: sceneId,
+		});
+
+		// Force a re-sync (the guard short-circuits when the active id is
+		// unchanged, but the compilation scene is brand new here).
+		this.activeAssetSceneId = null;
+		this.syncMediaAssetsForActiveScene();
+		this.notify();
+	}
+
+	/** Build the compilation scene's tracks: one video element per EDL segment,
+	 * each cut from its member clip's footage and positioned on the shared
+	 * timeline, then the EDL's effects laid down as editable elements. */
+	private buildCompilationScene({
+		sceneId,
+		edl,
+	}: {
+		sceneId: string;
+		edl: Edl;
+	}): TScene {
+		const videoElements: VideoElement[] = [];
+		for (const segment of edl.segments) {
+			const asset = this.clipAssets.get(segment.clipId);
+			const sourceDuration = this.clipSourceDurations.get(segment.clipId);
+			if (!asset || !sourceDuration) continue;
+
+			const startTime = mediaTimeFromSeconds({ seconds: segment.timelineStart });
+			const duration = subMediaTime({
+				a: mediaTimeFromSeconds({ seconds: segment.timelineEnd }),
+				b: startTime,
+			});
+			const trimStart = mediaTimeFromSeconds({ seconds: segment.sourceStart });
+			const trimEnd = subMediaTime({
+				a: sourceDuration,
+				b: mediaTimeFromSeconds({ seconds: segment.sourceEnd }),
+			});
+
+			const created = buildElementFromMedia({
+				mediaId: asset.id,
+				mediaType: "video",
+				name: segment.segmentId,
+				duration,
+				startTime,
+			});
+
+			videoElements.push({
+				...(created as Omit<VideoElement, "id">),
+				id: generateUUID(),
+				trimStart,
+				trimEnd,
+				sourceDuration,
+			} as VideoElement);
+		}
+
+		const baseTracks: SceneTracks = {
+			overlay: [],
+			main: {
+				id: generateUUID(),
+				name: MAIN_TRACK_NAME,
+				type: "video",
+				elements: videoElements,
+				muted: false,
+				hidden: false,
+			},
+			audio: [],
+		};
+
+		const tracks = applyEdlEffectsToTracks({
+			tracks: baseTracks,
+			effects: edl.effects,
+		});
+
+		return {
+			id: sceneId,
+			name: "Compilation reel",
+			isMain: false,
 			tracks,
 			bookmarks: [],
 			createdAt: new Date(),
@@ -495,9 +638,12 @@ export class RemoteClipsManager {
 		this.videoId = null;
 		this.clips = new Map();
 		this.clipAssets = new Map();
+		this.clipSourceDurations = new Map();
 		this.rawClipAssets = new Map();
 		this.captionedAssets = new Map();
 		this.activeAssetSceneId = null;
+		this.compilationSceneId = null;
+		this.compilationMemberAssets = [];
 		this.notify();
 	}
 

@@ -74,9 +74,15 @@ function compareClips(a: Clip, b: Clip, sortOrder: SortOrder): number {
   return a.clipId < b.clipId ? -1 : a.clipId > b.clipId ? 1 : 0
 }
 
+/** Sort a clip list by score in the given direction (clipId ascending
+ * tiebreak). Shared by the flat list and per-compilation sort controls. */
+export function sortClipsByScore(clips: Clip[], sortOrder: SortOrder): Clip[] {
+  return [...clips].sort((a, b) => compareClips(a, b, sortOrder))
+}
+
 /** Flat sorted list of all clips (default, non-compilation view). */
 export function deriveDisplayList(state: GridState): Clip[] {
-  return [...state.clips].sort((a, b) => compareClips(a, b, state.sortOrder))
+  return sortClipsByScore(state.clips, state.sortOrder)
 }
 
 /**

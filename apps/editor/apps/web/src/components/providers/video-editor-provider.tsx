@@ -13,13 +13,16 @@ import {
 	initializeGpuRenderer,
 	isGpuAvailable,
 } from "@/services/renderer/gpu-renderer";
-import { listVideos } from "@/services/highlight-api/client";
+import { getCompilationEdl, listVideos } from "@/services/highlight-api/client";
 
 interface VideoEditorProviderProps {
 	videoId: string;
 	/** Clip to open first, e.g. from the clips gallery's "Open in Editor"
 	 * button. See remote-clips-manager.ts loadVideo's initialClipId. */
 	initialClipId?: string;
+	/** When set (highlights grid's "Open compilation in editor"), load this
+	 * reel's multi-clip EDL after the clips and open it as one timeline. */
+	compilationId?: string;
 	children: React.ReactNode;
 }
 
@@ -33,6 +36,7 @@ interface VideoEditorProviderProps {
 export function VideoEditorProvider({
 	videoId,
 	initialClipId,
+	compilationId,
 	children,
 }: VideoEditorProviderProps) {
 	const isRemoteLoading = useEditor((e) => e.remoteClips.getIsLoading());
@@ -68,6 +72,17 @@ export function VideoEditorProvider({
 
 				if (cancelled) return;
 
+				// Deep-linked from a compiled reel: load its multi-clip EDL and
+				// open it as one concatenated timeline over the clips just built.
+				if (compilationId) {
+					const { edl } = await getCompilationEdl({
+						videoId: video.id,
+						compilationId,
+					});
+					if (cancelled) return;
+					editor.remoteClips.openCompilation({ compilationId, edl });
+				}
+
 				setHasStarted(true);
 				loadFontAtlas();
 			} catch (err) {
@@ -83,7 +98,7 @@ export function VideoEditorProvider({
 			cancelled = true;
 			editor.remoteClips.clear();
 		};
-	}, [videoId, initialClipId]);
+	}, [videoId, initialClipId, compilationId]);
 
 	if (error) {
 		return (

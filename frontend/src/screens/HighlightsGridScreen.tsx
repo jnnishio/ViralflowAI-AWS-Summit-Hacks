@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useI18n } from '../i18n'
 import { listClips } from '../api/highlightsApi'
 import { getJob } from '../api/jobApi'
 import { CompilationModeToggle } from '../components/CompilationModeToggle'
@@ -21,6 +22,7 @@ import '../components/clips.css'
  * into themed reels. Each card deep-links into the built-in editor. */
 export function HighlightsGridScreen() {
   const { jobId } = useParams<{ jobId: string }>()
+  const { t } = useI18n()
 
   const [jobStatus, setJobStatus] = useState<JobStatus | null>(null)
   const [fetchError, setFetchError] = useState<string | null>(null)
@@ -46,9 +48,9 @@ export function HighlightsGridScreen() {
       })
       .catch(() => {
         // Keep last known state visible, show an error indication (Req 16.5).
-        setFetchError('Could not refresh job status. Showing last known data.')
+        setFetchError(t('highlights.refreshError'))
       })
-  }, [jobId])
+  }, [jobId, t])
 
   useEffect(() => {
     refetch()
@@ -73,7 +75,7 @@ export function HighlightsGridScreen() {
   if (fetchError && state.clips.length === 0 && jobStatus === null) {
     return (
       <section className="highlights">
-        <h1>Highlights</h1>
+        <h1>{t('highlights.title')}</h1>
         <p role="alert">{fetchError}</p>
       </section>
     )
@@ -82,8 +84,8 @@ export function HighlightsGridScreen() {
   if (jobStatus === 'failed') {
     return (
       <section className="highlights">
-        <h1>Highlights</h1>
-        <p role="alert">Processing failed.</p>
+        <h1>{t('highlights.title')}</h1>
+        <p role="alert">{t('highlights.failed')}</p>
       </section>
     )
   }
@@ -91,8 +93,8 @@ export function HighlightsGridScreen() {
   if (jobStatus === 'pending' || jobStatus === 'in_progress') {
     return (
       <section className="highlights">
-        <h1>Highlights</h1>
-        <p className="highlights__subtitle">Processing is still in progress…</p>
+        <h1>{t('highlights.title')}</h1>
+        <p className="highlights__subtitle">{t('highlights.inProgress')}</p>
       </section>
     )
   }
@@ -100,27 +102,29 @@ export function HighlightsGridScreen() {
   if (jobStatus === 'completed' && state.clips.length === 0) {
     return (
       <section className="highlights">
-        <h1>Highlights</h1>
-        <p className="highlights__subtitle">
-          No highlights were found for this job.
-        </p>
+        <h1>{t('highlights.title')}</h1>
+        <p className="highlights__subtitle">{t('highlights.empty')}</p>
       </section>
     )
   }
 
   return (
     <section className="highlights">
-      <h1>Highlights</h1>
-      <p className="highlights__subtitle">
-        Your top viral moments, ranked and ready to share.
-      </p>
+      <h1>{t('highlights.title')}</h1>
+      <p className="highlights__subtitle">{t('highlights.subtitle')}</p>
       {fetchError && <p role="alert">{fetchError}</p>}
 
       <div className="highlights-controls">
-        <SortControl
-          sortOrder={state.sortOrder}
-          onChange={(sortOrder) => dispatch({ type: 'setSortOrder', sortOrder })}
-        />
+        {/* In compilation mode each reel carries its own sort control, so the
+            global one is hidden to avoid a control that spans all groups. */}
+        {!state.compilationMode && (
+          <SortControl
+            sortOrder={state.sortOrder}
+            onChange={(sortOrder) =>
+              dispatch({ type: 'setSortOrder', sortOrder })
+            }
+          />
+        )}
         <CompilationModeToggle
           compilationMode={state.compilationMode}
           onChange={(compilationMode) =>
@@ -132,6 +136,7 @@ export function HighlightsGridScreen() {
       <GalleryView
         clips={displayClips}
         groups={groups}
+        jobId={jobId}
         videoId={editorVideoId}
         onOpenScoreDetails={handleOpenScoreDetails}
         onAddToCompilation={(compilationId, clipId) =>

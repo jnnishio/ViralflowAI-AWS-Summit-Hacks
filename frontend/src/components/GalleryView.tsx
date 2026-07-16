@@ -1,11 +1,14 @@
+import { useI18n } from '../i18n'
 import type { Clip, CompilationGroup } from '../types'
 import { ClipCard } from './ClipCard'
-import { ScoreRing } from './ScoreRing'
+import { CompilationSection } from './CompilationSection'
 import { StoriesCarousel } from './StoriesCarousel'
 
 export interface GalleryViewProps {
   clips: Clip[]
   groups: CompilationGroup[] | null
+  /** The job these clips belong to — threaded to each reel's compile action. */
+  jobId?: string
   /** `video_{streamId}` — threaded to each card's "Open in Editor" link. */
   videoId?: string
   onOpenScoreDetails: (clipId: string) => void
@@ -16,122 +19,66 @@ export interface GalleryViewProps {
 
 /** Stories-style focused gallery of rich clip cards. When `groups` is provided
  * (Compilation mode), renders one titled reel section per compilation — each
- * its own carousel — with light add/remove curation; otherwise a single
- * carousel over all clips. */
+ * its own carousel with an independent Sort-by-Score control and scroll-in
+ * dividers; otherwise a single carousel over all clips. */
 export function GalleryView({
   clips,
   groups,
+  jobId,
   videoId,
   onOpenScoreDetails,
   onAddToCompilation,
   onRemoveFromCompilation,
 }: GalleryViewProps) {
-  function renderCarousel(
-    list: Clip[],
-    ariaLabel: string,
-    onRemove?: (clipId: string) => void,
-  ) {
-    return (
-      <StoriesCarousel
-        clips={list}
-        ariaLabel={ariaLabel}
-        renderCard={(clip, active) => (
-          <ClipCard
-            clip={clip}
-            active={active}
-            videoId={videoId}
-            onOpenScoreDetails={() => onOpenScoreDetails(clip.clipId)}
-            onRemove={onRemove ? () => onRemove(clip.clipId) : undefined}
-          />
-        )}
-      />
-    )
-  }
-
+  const { t } = useI18n()
   if (groups) {
     if (groups.length === 0) {
-      return (
-        <p className="comp-empty">
-          No compilation reels were suggested for these clips.
-        </p>
-      )
+      return <p className="comp-empty">{t('gallery.noReels')}</p>
     }
     return (
       <div className="comp-list">
         {groups.map((group) => {
           const memberIds = new Set(group.clips.map((clip) => clip.clipId))
-          const candidates = clips.filter(
-            (clip) => !memberIds.has(clip.clipId),
-          )
-          const heading = group.titleNative || group.titleEnglish || group.id
+          const candidates = clips.filter((clip) => !memberIds.has(clip.clipId))
           return (
-            <section
+            <CompilationSection
               key={group.id}
-              className="comp-section"
-              aria-label={`Compilation reel: ${heading}`}
-            >
-              <header className="comp-header">
-                <div className="comp-title">
-                  <h2>{heading}</h2>
-                  {group.titleNative && group.titleEnglish && (
-                    <p className="comp-en">{group.titleEnglish}</p>
-                  )}
-                </div>
-                <div className="comp-header__meta">
-                  <span className="comp-count">
-                    {group.clips.length}{' '}
-                    {group.clips.length === 1 ? 'clip' : 'clips'}
-                  </span>
-                  {onAddToCompilation && candidates.length > 0 && (
-                    <details className="comp-add">
-                      <summary aria-label="Add clip to this reel" title="Add clip to this reel">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
-                          aria-hidden="true">
-                          <path d="M12 5v14" />
-                          <path d="M5 12h14" />
-                        </svg>
-                        Add clip
-                      </summary>
-                      <div className="comp-add-list">
-                        {candidates.map((clip) => (
-                          <button
-                            type="button"
-                            key={clip.clipId}
-                            onClick={() =>
-                              onAddToCompilation(group.id, clip.clipId)
-                            }
-                          >
-                            <ScoreRing score={clip.score} size={30} stroke={4} />
-                            <span className="comp-add-title">
-                              {clip.titleNative ||
-                                clip.titleEnglish ||
-                                clip.clipId}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </details>
-                  )}
-                </div>
-              </header>
-              {group.reason && <p className="comp-reason">{group.reason}</p>}
-
-              {renderCarousel(
-                group.clips,
-                `Compilation reel: ${heading}`,
+              group={group}
+              candidates={candidates}
+              jobId={jobId}
+              videoId={videoId}
+              onOpenScoreDetails={onOpenScoreDetails}
+              onAddToCompilation={
+                onAddToCompilation
+                  ? (clipId) => onAddToCompilation(group.id, clipId)
+                  : undefined
+              }
+              onRemoveFromCompilation={
                 onRemoveFromCompilation
                   ? (clipId) => onRemoveFromCompilation(group.id, clipId)
-                  : undefined,
-              )}
-            </section>
+                  : undefined
+              }
+            />
           )
         })}
       </div>
     )
   }
 
-  return renderCarousel(clips, 'Suggested highlights')
+  return (
+    <StoriesCarousel
+      clips={clips}
+      ariaLabel={t('carousel.suggested')}
+      renderCard={(clip, active) => (
+        <ClipCard
+          clip={clip}
+          active={active}
+          videoId={videoId}
+          onOpenScoreDetails={() => onOpenScoreDetails(clip.clipId)}
+        />
+      )}
+    />
+  )
 }
 
 export default GalleryView

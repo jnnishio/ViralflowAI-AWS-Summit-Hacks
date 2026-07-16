@@ -18,7 +18,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import { basename, join } from 'node:path'
-import { clipsDir, manifestPath, mediaUrl } from './manifest.mjs'
+import { clipsDir, manifestPath, compilationsPath, mediaUrl } from './manifest.mjs'
 
 const num = (v, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
 
@@ -444,4 +444,165 @@ export async function applyClipCaptions({ outRoot, jobs, baseUrl, scopedClipId, 
     status: 200,
     response: { status: 'ready', previewUrl: mediaUrl(baseUrl, streamId, captionedBase) },
   }
+}
+
+// ---- Compilation reels: multi-clip auto-edit --------------------------
+// The frontend "Compile this reel" button (CompilationSection) POSTs to
+// /jobs/:jobId/compilations/:compilationId/compile, which runs
+// pipeline/compile_edl.py to plan+write a multi-clip EDL for that reel; the
+// editor then loads it via GET /api/videos/:videoId/compilations/:id/edl and
+// concatenates the member clips onto one timeline (remote-clips-manager.ts).
+
+/** Path to a compilation's generated EDL under a stream's out dir. */
+function compilationEdlPath(outRoot, streamId, compilationId) {
+  return join(outRoot, streamId, 'edl', `compilation_${compilationId}.edl.json`)
+}
+
+/**
+ * POST /jobs/{jobId}/compilations/{compilationId}/compile — plan + render the
+ * reel's EDL with pipeline/compile_edl.py (LLM brain when AWS is configured,
+ * deterministic vibe planner otherwise). Idempotent-ish: always regenerates so
+ * the reel reflects the user's latest add/remove curation. Returns a summary;
+ * the frontend builds the editor deep-link itself (it owns EDITOR_BASE_URL).
+ */
+export async function compileCompilation({ outRoot, jobs, jobId, compilationId, python, cwd }) {
+  const streamId = await resolveStreamId(jobId, outRoot, jobs)
+  if (!streamId) return { status: 404, error: 'job not found' }
+
+  const manifest = manifestPath(outRoot, streamId)
+  const compilations = compilationsPath(outRoot, streamId)
+  if (!existsSync(manifest) || !existsSync(compilations)) {
+    return { status: 404, error: 'no clips/compilations for this job' }
+  }
+
+  const outPath = compilationEdlPath(outRoot, streamId, compilationId)
+  const stdout = await runPythonCapture({
+    python: python ?? 'python3',
+    cwd,
+    args: [
+      '-m', 'pipeline.compile_edl', manifest,
+      '--compilations', compilations,
+      '--compilation-id', compilationId,
+      '--out', outPath,
+      '--stream-id', streamId,
+    ],
+  })
+
+  // compile_edl prints the human summary first, then a "wrote N segments" line;
+  // surface just the summary sentence to the UI.
+  const summary = stdout.split('\n').map((l) => l.trim()).filter(Boolean)[0] ?? ''
+  return { status: 200, response: { compilationId, summary } }
+}
+
+/**
+ * GET /api/videos/{videoId}/compilations/{compilationId}/edl — the editor-shaped
+ * compilation EDL. Reads the file the compile step wrote (generating it on the
+ * fly with the deterministic planner if the editor is opened before an explicit
+ * compile), then scopes every segment's clipId to the editor's stream-scoped
+ * clip ids ("<idPart>__clip_NN") so remote-clips-manager can resolve each
+ * segment to that member clip's already-probed footage.
+ */
+export async function loadCompilationEdl({ outRoot, jobs, videoId, compilationId, python, cwd }) {
+  const idPart = videoId.replace(/^video_/, '')
+  const streamId = await resolveStreamId(idPart, outRoot, jobs)
+  if (!streamId) return { status: 404, error: 'video not found' }
+
+  const edlPath = compilationEdlPath(outRoot, streamId, compilationId)
+  if (!existsSync(edlPath)) {
+    // Opened without an explicit compile first: generate deterministically so
+    // the editor still has something to show (no AWS round-trip on this path).
+    const manifest = manifestPath(outRoot, streamId)
+    const compilations = compilationsPath(outRoot, streamId)
+    if (!existsSync(manifest) || !existsSync(compilations)) {
+      return { status: 404, error: 'no compilation data for this video' }
+    }
+    await runPythonCapture({
+      python: python ?? 'python3',
+      cwd,
+      args: [
+        '-m', 'pipeline.compile_edl', manifest,
+        '--compilations', compilations,
+        '--compilation-id', compilationId,
+        '--out', edlPath,
+        '--stream-id', streamId,
+        '--no-bedrock',
+      ],
+    })
+  }
+  if (!existsSync(edlPath)) return { status: 404, error: 'compilation EDL not found' }
+
+  const raw = JSON.parse(await readFile(edlPath, 'utf-8'))
+  return { status: 200, response: { edl: mapCompilationEdl(raw, idPart) } }
+}
+
+/** Scope a pipeline compilation EDL's clip ids to the editor's "<idPart>__clip_NN"
+ * form (segments keep their own per-clip source; that's what makes it a
+ * concatenation across DIFFERENT clips' footage rather than one clip re-cut). */
+function mapCompilationEdl(edl, idPart) {
+  const scope = (clipKey) => `${idPart}__${clipKey}`
+  return {
+    edlId: edl.edlId ?? `edl_compilation_${idPart}`,
+    jobId: edl.jobId ?? `job_${idPart}`,
+    clipIds: (edl.clipIds ?? []).map(scope),
+    status: edl.status ?? 'draft',
+    canvas: edl.canvas ?? { width: 1080, height: 1920, fps: 30 },
+    segments: (edl.segments ?? []).map((s) => ({
+      segmentId: s.segmentId,
+      clipId: scope(s.clipId),
+      sourceStart: num(s.sourceStart),
+      sourceEnd: num(s.sourceEnd),
+      timelineStart: num(s.timelineStart),
+      timelineEnd: num(s.timelineEnd),
+      transitionIn: s.transitionIn ?? null,
+      crop: s.crop
+        ? {
+            mode: s.crop.mode === 'face_track' ? 'face_track' : 'center',
+            ...(typeof s.crop.cx === 'number' ? { cx: s.crop.cx } : {}),
+          }
+        : { mode: 'center' },
+    })),
+    effects: (edl.effects ?? []).map((e) => ({
+      effectId: e.effectId,
+      type: e.type === 'sound' ? 'sound' : 'visual',
+      at: num(e.at),
+      duration: num(e.duration),
+      ...(e.params ? { params: e.params } : {}),
+    })),
+    captions: {
+      source: 'transcribe_word_timeline',
+      burnIn: !!edl.captions?.burnIn,
+      ...(edl.captions?.style ? { style: edl.captions.style } : {}),
+      overlays: (edl.captions?.overlays ?? []).map((o) => ({
+        start: num(o.start),
+        end: num(o.end),
+        text: o.text ?? '',
+        ...(o.speaker ? { speaker: o.speaker } : {}),
+      })),
+    },
+    hookOverlay: edl.hookOverlay
+      ? {
+          text: edl.hookOverlay.text ?? '',
+          start: num(edl.hookOverlay.start),
+          duration: num(edl.hookOverlay.duration, 2.5),
+          ...(edl.hookOverlay.style ? { style: edl.hookOverlay.style } : {}),
+        }
+      : null,
+    musicBed: edl.musicBed ?? null,
+  }
+}
+
+/** Spawn a one-shot python module, resolving with its stdout on exit 0. */
+function runPythonCapture({ python, args, cwd }) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(python, args, { cwd, env: process.env })
+    let stdout = ''
+    let stderr = ''
+    child.stdout?.on('data', (d) => (stdout += d.toString()))
+    child.stderr?.on('data', (d) => (stderr += d.toString()))
+    child.on('error', reject)
+    child.on('exit', (code) => {
+      if (code === 0) resolve(stdout)
+      else reject(new Error(`compile_edl exited ${code}: ${stderr.trim()}`))
+    })
+  })
 }

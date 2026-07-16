@@ -39,6 +39,8 @@ import {
   getEditorClip,
   editorClipPreviewUrl,
   applyClipCaptions,
+  compileCompilation,
+  loadCompilationEdl,
 } from './lib/editor-api.mjs'
 import { contentTypeFor, parseRange } from './lib/media-range.mjs'
 import { deriveStreamId } from './lib/stream-id.mjs'
@@ -405,6 +407,28 @@ export function startServer(opts = {}) {
       return sendJson(res, 200, { handoffId })
     }
 
+    // POST /jobs/:jobId/compilations/:compilationId/compile — plan + write the
+    // reel's multi-clip EDL (pipeline/compile_edl.py). The frontend "Compile
+    // this reel" button calls this, then deep-links into the editor.
+    const compileMatch = path.match(
+      /^\/jobs\/([^/]+)\/compilations\/([^/]+)\/compile$/,
+    )
+    if (req.method === 'POST' && compileMatch) {
+      const jobId = decodeURIComponent(compileMatch[1])
+      const compilationId = decodeURIComponent(compileMatch[2])
+      try {
+        const out = await compileCompilation({
+          outRoot, jobs, jobId, compilationId, python, cwd,
+        })
+        if (out.error) return sendJson(res, out.status ?? 404, { error: out.error })
+        log(`[${jobId}] compiled reel ${compilationId}: ${out.response.summary}`)
+        return sendJson(res, 200, out.response)
+      } catch (err) {
+        log(`[compile] ${jobId}/${compilationId} failed: ${err.message}`)
+        return sendJson(res, 500, { error: `compilation failed: ${err.message}` })
+      }
+    }
+
     // GET /handoff/:handoffId
     const handoffMatch = path.match(/^\/handoff\/([^/]+)$/)
     if (req.method === 'GET' && handoffMatch) {
@@ -432,6 +456,26 @@ export function startServer(opts = {}) {
       if (!streamId) return sendJson(res, 404, { error: 'video not found' })
       const clips = await loadEditorClips(outRoot, idPart, streamId, baseUrl())
       return sendJson(res, 200, { clips })
+    }
+
+    // GET /api/videos/:videoId/compilations/:compilationId/edl — the editor
+    // loads this to concatenate a reel's member clips onto one timeline.
+    const evCompMatch = path.match(
+      /^\/api\/videos\/([^/]+)\/compilations\/([^/]+)\/edl$/,
+    )
+    if (req.method === 'GET' && evCompMatch) {
+      const videoId = decodeURIComponent(evCompMatch[1])
+      const compilationId = decodeURIComponent(evCompMatch[2])
+      try {
+        const out = await loadCompilationEdl({
+          outRoot, jobs, videoId, compilationId, python, cwd,
+        })
+        if (out.error) return sendJson(res, out.status ?? 404, { error: out.error })
+        return sendJson(res, 200, out.response)
+      } catch (err) {
+        log(`[compilation-edl] ${videoId}/${compilationId} failed: ${err.message}`)
+        return sendJson(res, 500, { error: `compilation EDL failed: ${err.message}` })
+      }
     }
 
     // POST /api/clips/:clipId/ai-edit

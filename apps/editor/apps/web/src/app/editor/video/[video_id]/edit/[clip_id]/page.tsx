@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import {
 	ResizablePanelGroup,
 	ResizablePanel,
@@ -24,12 +24,18 @@ import { usePanelStore } from "@/editor/panel-store";
  */
 export default function VideoEditorPage() {
 	const params = useParams();
+	const searchParams = useSearchParams();
 	const videoId = params.video_id as string;
 	const clipId = params.clip_id as string;
+	const compilationId = searchParams.get("compilation") ?? undefined;
 
 	return (
 		<MobileGate>
-			<VideoEditorProvider videoId={videoId} initialClipId={clipId}>
+			<VideoEditorProvider
+				videoId={videoId}
+				initialClipId={clipId}
+				compilationId={compilationId}
+			>
 				<div className="bg-background flex h-screen w-screen flex-col overflow-hidden">
 					<VideoEditorHeader />
 					<div className="min-h-0 min-w-0 flex-1">

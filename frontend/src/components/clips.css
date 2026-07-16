@@ -520,10 +520,72 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 44px;
+  gap: 0;
 }
 .comp-section {
   width: 100%;
+}
+
+/* Each reel (divider + section) reveals with a subtle scroll-in effect. */
+.comp-block {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 600ms ease,
+    transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.comp-block.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Decorative separator above every reel (the first one also separates the
+   page head from the first compilation). The line grows and the diamond pops
+   in as the block scrolls into view. */
+.comp-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 640px;
+  margin: 40px auto 20px;
+}
+/* The first reel sits right under the page controls — keep that gap tight so
+   the focused video is visible top-to-bottom without scrolling. */
+.comp-block:first-child .comp-divider {
+  margin-top: 6px;
+}
+.comp-divider__line {
+  flex: 1;
+  height: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border) 22%,
+    var(--border) 78%,
+    transparent
+  );
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1) 120ms;
+}
+.comp-divider__mark {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 0 5px var(--accent-soft);
+  transform: rotate(45deg) scale(0);
+  transition: transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 240ms;
+}
+.comp-block.is-visible .comp-divider__line {
+  transform: scaleX(1);
+}
+.comp-block.is-visible .comp-divider__mark {
+  transform: rotate(45deg) scale(1);
 }
 .comp-header {
   position: relative;
@@ -532,23 +594,25 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 .comp-header__meta {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .comp-title h2 {
-  font-size: 1.25rem;
+  font-size: 1.02rem;
   font-weight: 600;
   color: var(--text-h);
   margin: 0;
   text-align: center;
 }
 .comp-en {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: var(--text);
   margin: 2px 0 0;
 }
@@ -563,11 +627,28 @@
   border-radius: 999px;
   white-space: nowrap;
 }
+
+/* Compact the per-reel sort control so it matches the count / add-clip pills. */
+.comp-header__meta .sort-control {
+  gap: 4px;
+  padding: 3px 5px 3px 11px;
+}
+.comp-header__meta .sort-control__label {
+  font-size: 0.72rem;
+}
+.comp-header__meta .sort-control__arrow {
+  width: 24px;
+  height: 24px;
+}
+.comp-header__meta .sort-control__arrow svg {
+  width: 13px;
+  height: 13px;
+}
 .comp-reason {
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   color: var(--text);
-  margin: 8px auto 18px;
-  max-width: 60ch;
+  margin: 6px auto 12px;
+  max-width: 58ch;
 }
 .comp-empty {
   color: var(--text);
@@ -655,6 +736,102 @@
   white-space: nowrap;
 }
 
+/* --- Compile-this-reel button --------------------------------------- */
+/* A bright gradient pill (matching .btn / the open Add-clip trigger) that
+   auto-edits the whole reel into one compilation video. Three states:
+   idle (bright, inviting), compiling (muted + circular spinner), ready
+   (brightened, becomes an "Open compilation in editor" link). */
+.comp-compile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 8px 20px -12px var(--accent-ring);
+  transition:
+    transform 160ms ease,
+    filter 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease,
+    background-color 180ms ease;
+}
+.comp-compile svg {
+  width: 14px;
+  height: 14px;
+}
+.comp-compile:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.comp-compile:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+/* Compiling: mute the pill (desaturated, dimmed) and swap in the spinner.
+   Non-interactive while the LLM plans the edit. */
+.comp-compile.is-compiling {
+  cursor: progress;
+  color: var(--text);
+  background: var(--surface-muted);
+  border-color: var(--border);
+  box-shadow: none;
+  filter: saturate(0.7);
+  opacity: 0.75;
+}
+.comp-compile:disabled {
+  cursor: not-allowed;
+}
+.comp-compile:disabled:not(.is-compiling) {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+/* Ready: brighten into a go-ahead link. A slightly more vivid gradient +
+   stronger glow signals the reel is compiled and ready to open. */
+.comp-compile.is-ready {
+  background: linear-gradient(135deg, #22c55e 0%, var(--accent-2) 100%);
+  box-shadow: 0 10px 26px -10px rgba(34, 197, 94, 0.6);
+  animation: comp-compile-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.comp-compile.is-error {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+/* Circular processing spinner (drawn as a spinning conic ring). */
+.comp-compile__spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(120, 120, 140, 0.35);
+  border-top-color: var(--accent);
+  animation: comp-compile-spin 640ms linear infinite;
+}
+
+@keyframes comp-compile-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes comp-compile-pop {
+  0% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* --- per-platform metadata tabs -------------------------------------- */
 .clip-platforms {
   display: flex;
@@ -704,8 +881,32 @@
   .stories__dot,
   .sort-control__arrow,
   .btn,
+  .comp-compile,
   .score-ring circle,
   .clip-details summary::after {
+    transition: none;
+  }
+
+  /* Keep the spinner readable without spinning; drop the pop. */
+  .comp-compile__spinner {
+    animation-duration: 1400ms;
+  }
+  .comp-compile.is-ready {
+    animation: none;
+  }
+
+  /* Skip the scroll-in choreography; show reels and dividers immediately. */
+  .comp-block {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .comp-divider__line {
+    transform: scaleX(1);
+    transition: none;
+  }
+  .comp-divider__mark {
+    transform: rotate(45deg) scale(1);
     transition: none;
   }
 }
