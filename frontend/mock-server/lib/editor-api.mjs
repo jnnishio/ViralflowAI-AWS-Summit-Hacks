@@ -181,12 +181,13 @@ function mapPipelineEdl(edl, scopedClipId) {
 
 function summarizeEffects(effects) {
   if (!effects.length) return 'No auto-edit effects detected for this clip.'
-  const zooms = effects.filter((e) => e.effectId === 'punch-in-zoom').length
-  const caps = effects.filter((e) => e.effectId === 'onomatopoeia-caption').length
-  const sfx = effects.filter((e) => e.type === 'sound').length
+  const count = (id) => effects.filter((e) => e.effectId === id).length
   const parts = []
-  if (zooms) parts.push(`${zooms} reaction zoom(s)`)
-  if (caps) parts.push(`${caps} burst caption(s)`)
+  if (count('punch-in-zoom')) parts.push(`${count('punch-in-zoom')} reaction zoom(s)`)
+  if (count('camera-pan')) parts.push(`${count('camera-pan')} camera pan(s)`)
+  if (count('opacity-fade')) parts.push(`${count('opacity-fade')} fade(s)`)
+  if (count('onomatopoeia-caption')) parts.push(`${count('onomatopoeia-caption')} burst caption(s)`)
+  const sfx = effects.filter((e) => e.type === 'sound').length
   if (sfx) parts.push(`${sfx} sound effect(s)`)
   const detail = parts.length ? parts.join(', ') : `${effects.length} effect(s)`
   return `Applied AI auto-edit: ${detail}. All edits are user-adjustable on the timeline.`
