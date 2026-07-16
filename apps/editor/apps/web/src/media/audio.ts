@@ -422,10 +422,15 @@ async function fetchLibraryAudioClip({
 			id: element.id,
 			sourceKey: element.id,
 			file,
-			startTime: element.startTime,
-			duration: element.duration,
-			trimStart: element.trimStart,
-			trimEnd: element.trimEnd,
+			// Timing fields must be in SECONDS for the scheduler (audio-manager
+			// compares against getPlaybackTime() in seconds). Mirror
+			// fetchLibraryAudioSource / collectMediaAudioClip, which divide by
+			// TICKS_PER_SECOND — without this the huge tick value is always past
+			// the schedule window and the clip never plays.
+			startTime: element.startTime / TICKS_PER_SECOND,
+			duration: element.duration / TICKS_PER_SECOND,
+			trimStart: element.trimStart / TICKS_PER_SECOND,
+			trimEnd: element.trimEnd / TICKS_PER_SECOND,
 			volume,
 			muted,
 			retime: element.retime,
