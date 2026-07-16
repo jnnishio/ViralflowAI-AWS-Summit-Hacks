@@ -41,9 +41,15 @@ flowchart LR
 
 > **TODO (media):** drop your assets into [`docs/media/`](docs/media/) and update the links below.
 
-**▶ Live demo:** `<add your deployed URL here>`
+**▶ Walkthrough video:** *(talked over the silent video during presentation/pitch)*
 
-**Walkthrough video:** `<add YouTube/Loom link here>`
+[![Walkthrough video](docs/media/demo-thumbnail.png)](https://youtu.be/0ntHNhyz9Xo)
+
+
+**Demonstrates**:
+1. AI highlight detection with real-time process updates through 3 data modalities (live stream chat analysis, audio analysis, and video analysis)
+2. Highlight carousel for selecting detected highlights
+3. Built-in video editor, including AI auto-editing, auto-captioning, and seamless exporting
 
 <!-- 🎞️ VISUAL PLACEHOLDER — hero demo GIF (30–60s loop of the full flow). Add as docs/media/demo.gif,
      then swap the line below for:  ![Demo](docs/media/demo.gif)
@@ -53,7 +59,7 @@ flowchart LR
 <!-- 📸 VISUAL PLACEHOLDER — screenshot gallery. Replace each cell with ![alt](docs/media/<file>.png) once captured. -->
 | Upload | Processing | Highlights gallery |
 |---|---|---|
-| 📸 `docs/media/screenshot-upload.png` | 📸 `docs/media/screenshot-processing.png` | 📸 `docs/media/screenshot-gallery.png` |
+| 📸 ![](docs/media/screenshot-upload.png) | 📸 ![](docs/media/screenshot-processing.png) | 📸 ![](docs/media/screenshot-gallery.png) |
 | **Per-platform metadata** | **Agentic editor** | **Compilation reels** |
 | 📸 `docs/media/screenshot-metadata.png` | 📸 `docs/media/screenshot-editor.png` | 📸 `docs/media/screenshot-compilation.png` |
 

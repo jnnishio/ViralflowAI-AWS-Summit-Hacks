@@ -6,6 +6,7 @@ AWSCLIV2.pkg
 *.wav
 .env
 frontend/.env
+out
 
 # Accidental shell-redirect junk (e.g. `pip install >=1.2` -> a file named "=1.2",
 # or a broken shell profile dumping `brew` output into Casks/Formulae/Searching)
