@@ -76,13 +76,13 @@ seconds), "duration" (seconds), "params" (object). Use ONLY these effectIds:
 VISUAL (type "visual"):
 - "punch-in-zoom": params {"scale": 1.1-1.8, "cx": 0-1, "cy": 0-1}
   Zoom in on a reaction. cx/cy = zoom center; target a face when one is on screen.
-- "camera-pan": params {"fromX": -0.3..0.3, "fromY": -0.3..0.3, "toX": -0.3..0.3, "toY": -0.3..0.3}
-  Slow push/drift. 0,0 = centered; small values only.
+- "camera-pan": params {"fromX": -0.1..0.1, "fromY": -0.1..0.1, "toX": -0.1..0.1, "toY": -0.1..0.1}
+  Slow push/drift. 0,0 = centered; keep values small (the frame overscans to stay in-bounds).
 - "opacity-fade": params {"mode": "in" | "out" | "both"}
   Fade the shot in/out (good at the very start or very end of the clip).
 - "onomatopoeia-caption": params {"text": "<short punchy caption, zh or en>",
-  "style": {"fontSize": 32-64, "color": "#RRGGBB", "fontWeight": "bold"}}
-  A punchy burst caption ON the beat of a laugh/gasp/impact.
+  "style": {"fontSize": 20-36, "color": "#RRGGBB", "fontWeight": "bold"}}
+  A small, punchy burst caption ON the beat of a laugh/gasp/impact. Keep it short.
 
 SOUND (type "sound"):
 - Pick effectId + assetKey from this exact catalog (assetKey must match one):
@@ -242,7 +242,7 @@ def validate_effects(raw_effects, clip_duration, mood=""):
             p["cy"] = round(_clamp(cy, 0.0, 1.0), 4)
         elif eid == "camera-pan":
             for k, d in (("fromX", 0.0), ("fromY", 0.0), ("toX", 0.0), ("toY", 0.0)):
-                p[k] = round(_clamp(_num(params.get(k), d), -0.3, 0.3), 4)
+                p[k] = round(_clamp(_num(params.get(k), d), -0.1, 0.1), 4)
         elif eid == "opacity-fade":
             mode = params.get("mode")
             p["mode"] = mode if mode in ("in", "out", "both") else "in"
@@ -251,7 +251,7 @@ def validate_effects(raw_effects, clip_duration, mood=""):
             if not isinstance(text, str) or not text.strip():
                 continue
             style_in = params.get("style") if isinstance(params.get("style"), dict) else {}
-            style = {"fontSize": int(_clamp(_num(style_in.get("fontSize"), 48), 24, 72)),
+            style = {"fontSize": int(_clamp(_num(style_in.get("fontSize"), 28), 16, 40)),
                      "burst": True}
             for k in ("color", "fontFamily", "fontWeight", "background"):
                 if k in style_in:
