@@ -66,7 +66,7 @@ https://youtu.be/0ntHNhyz9Xo
 
 
 <table align="center">
-    <tr><tr>
+    <tr></tr>
     <tr>
         <td align="center"><b>Upload VODs Screen</b></td>
         <td align="center"><b>Transparent AI Processing Screen</b></td>
@@ -77,13 +77,12 @@ https://youtu.be/0ntHNhyz9Xo
     </tr>
     <tr> 
         <td align="center"><b>Highlights Gallery<b></td>
-        <td align="center"><b>Per-platform Metadata<b><td>
+        <td align="center"><b>Per-platform Metadata<b></td>
+    </tr>
     <tr>
-        <td><img src="docs/media/screenshot-gallery.png" width = 100%" /><td>
-        <td><img src="docs/media/screenshot-metadata.png>" width = 100%" /><td>
-    <tr>
-  <tr>
-    
+        <td><img src="docs/media/screenshot-gallery.png" width = 100%"/></td>
+        <td><img src="docs/media/screenshot-metadata.png" width = 100%"/></td>
+    </tr>
 </table>
 
 ---
