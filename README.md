@@ -73,7 +73,7 @@ https://youtu.be/0ntHNhyz9Xo
     </tr>
     <tr>
         <td><img src="docs/media/screenshot-upload.png" width="100%" /></td>
-        <td><img src="docs/media/screenshot-processing.png" width="100%"/></td>    
+        <td><img src="docs/media/screenshot-processing.png" width="82%"/></td>    
     </tr>
     <tr> 
         <td align="center"><b>Highlights Gallery<b></td>
