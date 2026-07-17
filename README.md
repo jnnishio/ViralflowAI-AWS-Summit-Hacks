@@ -2,24 +2,23 @@
 
 # 🎬 Viralflow AI
 
-**Turn hours of livestream VODs into ranked, captioned, publish-ready vertical highlight clips — in minutes, for dollars.**
+**Turn hours of livestream VODs into ranked, captioned, publish-ready vertical highlight clips — in minutes, not hours.**
 
 🏆 **Amazon Web Services (AWS) Hackathon Winner** &nbsp;·&nbsp; Built with AWS Transcribe · Rekognition · Bedrock
 
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
 <!-- 🖼️ VISUAL PLACEHOLDER — hero banner / logo lockup. Add as docs/media/hero-banner.png -->
-<sub>🖼️ <em>Hero banner placeholder — add <code>docs/media/hero-banner.png</code></em></sub>
-
+![](docs/media/demo-thumbnail.png)
 </div>
 
 ---
 
 ## Overview
 
-Streamers produce hours of live content, but audiences grow on short-form platforms (TikTok / IG Reels / YouTube Shorts). Manually reviewing a 2-hour VOD to cut five vertical clips takes an editor half a day.
+Streamers produce hours of live content, but audiences grow on short-form platforms (TikTok / Instagram Reels / YouTube Shorts). Manually reviewing a 2-hour VOD to cut several vertical clips + editing them for engagement takes creators half a day.
 
-**Viralflow AI ingests a livestream VOD plus its platform event log (chat) and automatically produces ranked, captioned, 9:16 highlight clips with platform-ready titles and hashtags — in minutes.**
+**Viralflow AI ingests a livestream VOD along with its platform event log (chat) and automatically produces ranked, captioned, 9:16 highlight clips with platform-ready titles and hashtags — in minutes. The best part is: the creator is in control. Viralflow includes a built-in intuitive video editor that allows creators to review AI's automatic edits, and add their own personal touch to it.**
 
 The core idea: a highlight is a **cross-modal agreement event** — the chat erupts, the audio peaks, and the scene reacts *at the same moment*. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
@@ -27,12 +26,12 @@ The core idea: a highlight is a **cross-modal agreement event** — the chat eru
 
 ```mermaid
 flowchart LR
-    U[Upload VOD + chat log] --> P[AI processing<br/>signals · fusion · Director]
+    U[Upload VOD + chat log] --> P[Highlight detection<br/>AI processing<br/>signals · fusion · Director]
     P --> H[Highlights gallery<br/>ranked 9:16 clips]
     H --> E[Refine in editor<br/>AI auto-edit + agent]
-    H --> C[Compile a reel]
+    H --> C["`**Create a compilation reel**<br/>(Highlight groups, ranked)`"]
+    C --> E
     E --> X[Copy metadata · export]
-    C --> X
 ```
 
 ---
@@ -43,7 +42,7 @@ flowchart LR
 
 **▶ Walkthrough video:** *(talked over the silent video during presentation/pitch)*
 
-[![Walkthrough video](docs/media/demo-thumbnail.png)](https://youtu.be/0ntHNhyz9Xo)
+https://youtu.be/0ntHNhyz9Xo
 
 
 **Demonstrates**:
@@ -56,12 +55,34 @@ flowchart LR
      Optionally link a thumbnail to the video:  [![Watch the demo](docs/media/demo-thumbnail.png)](https://youtu.be/your-video-id) -->
 > 🎞️ **Demo GIF placeholder** — add `docs/media/demo.gif` (full upload → highlights → edit loop).
 
-<!-- 📸 VISUAL PLACEHOLDER — screenshot gallery. Replace each cell with ![alt](docs/media/<file>.png) once captured. -->
+<!-- 📸 VISUAL PLACEHOLDER — screenshot gallery. Replace each cell with ![alt](docs/media/<file>.png) once captured.
 | Upload | Processing | Highlights gallery |
 |---|---|---|
-| 📸 ![](docs/media/screenshot-upload.png) | 📸 ![](docs/media/screenshot-processing.png) | 📸 ![](docs/media/screenshot-gallery.png) |
+|![](docs/media/screenshot-upload.png) | ![](docs/media/screenshot-processing.png) | ![](docs/media/screenshot-gallery.png) |
 | **Per-platform metadata** | **Agentic editor** | **Compilation reels** |
-| 📸 `docs/media/screenshot-metadata.png` | 📸 `docs/media/screenshot-editor.png` | 📸 `docs/media/screenshot-compilation.png` |
+| 📸 `docs/media/screenshot-metadata.png` | 📸 `docs/media/screenshot-editor.png` | 📸 `docs/media/screenshot-compilation.png` | -->
+
+
+<table align="center">
+    <tr><tr>
+    <tr>
+        <td align="center"><b>Upload VODs Screen</b></td>
+        <td align="center"><b>Transparent AI Processing Screen</b></td>
+    </tr>
+    <tr>
+        <td><img src="docs/media/screenshot-upload.png" width="100%" /></td>
+        <td><img src="docs/media/screenshot-processing.png" width="100%"/></td>    
+    </tr>
+    <tr> 
+        <td align="center"><b>Highlights Gallery<b></td>
+        <td align="center"><b>Per-platform Metadata<b><td>
+    <tr>
+        <td><img src="docs/media/screenshot-gallery.png" width = 100%" /><td>
+        <td><img src="docs/media/screenshot-metadata.png>" width = 100%" /><td>
+    <tr>
+  <tr>
+    
+</table>
 
 ---
 
@@ -121,7 +142,7 @@ flowchart LR
 
 ## 🎬 AI editing (auto-edit, reels & agentic editor)
 
-Detection and cropping produce a clean clip — then a second AI layer makes it *feel* edited. All three subsystems below emit the **same EDL contract** ([`docs/contracts/edl.schema.json`](docs/contracts/)) that the in-browser editor renders, so nothing is ever baked in irreversibly.
+Detection and cropping produce a clean clip. Then a second AI layer makes it *feel* edited. All three subsystems below emit the **same EDL contract** ([`docs/contracts/edl.schema.json`](docs/contracts/)) that the in-browser editor renders, so nothing is ever baked in irreversibly.
 
 ### 1 · AI auto-edit engine (`pipeline/autoedit.py`, `pipeline/autoedit_llm.py`)
 After a highlight is cut, an editing pass adds "make it more viral" beats:
@@ -144,9 +165,6 @@ flowchart LR
     Val --> TL[Editable timeline elements]
     TL --> R[Render 9:16 clip]
 ```
-
-<!-- 🎞️ VISUAL PLACEHOLDER — before/after GIF: raw clip vs. auto-edited (reaction zoom + onomatopoeia caption). Add as docs/media/autoedit-before-after.gif -->
-> 🎞️ **GIF placeholder** — before/after: raw clip vs. auto-edited · add `docs/media/autoedit-before-after.gif`.
 
 ### 2 · Compilation reels (`pipeline/compile_edl.py`, `pipeline/compilations.py`)
 Turn a themed group of highlights into **one multi-clip reel** on a single timeline: a segment per clip laid end to end, transitions between them, and light per-clip emphasis (opening hook + reaction zooms) chosen to match the reel's dominant **vibe** — a "hype" reel gets punchy whip-pan cuts and reaction zooms; an "emotional" one gets gentle crossfades and fades. Same two-tier planner (Bedrock brain + deterministic vibe planner fallback) and same EDL contract as the single-clip engine.
