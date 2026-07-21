@@ -24,6 +24,8 @@ Streamers produce hours of live content, but audiences grow on short-form platfo
 
 The core idea: a highlight is a **cross-modal agreement event** — the chat erupts, the audio peaks, and the scene reacts *at the same moment*. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
+[![View Presentation on Canva](https://shields.io)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
+
 **The journey, end to end:**
 
 ```mermaid
@@ -40,7 +42,7 @@ flowchart LR
 
 ## 🎥 Demo
 
-> **TODO (media):** drop your assets into [`docs/media/`](docs/media/) and update the links below.
+<!-- > **TODO (media):** drop your assets into [`docs/media/`](docs/media/) and update the links below. -->
 
 **▶ Walkthrough video:** *(talked over the silent video during presentation/pitch)*
 
@@ -125,8 +127,9 @@ flowchart LR
     V -- no --> Drop[Discard]
 ```
 
-<!-- PLACEHOLDER — the signature excitement-curve chart with detected highlight windows shaded. Add as docs/media/excitement-curve.png -->
-> 📸 **Screenshot placeholder** — excitement curve with detected highlight windows · add `docs/media/excitement-curve.png`.
+![Excitement curve with detected highlight windows](docs/media/excitement-curve.png)
+
+<sub>Real output from a 74-minute stream (Lang Live Stream ID `3654414`) — the fused curve with the 11 kept highlight windows shaded and their peaks marked. Regenerate with `python3 scripts/make_excitement_curve.py <streamId>`.</sub>
 
 **2 · AI automatic editing engine**
 - Boundaries chosen for setup → payoff, snapped near Rekognition shot cuts.
