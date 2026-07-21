@@ -55,11 +55,14 @@ https://youtu.be/0ntHNhyz9Xo
 2. Highlight carousel for selecting detected highlights
 3. Built-in video editor, including AI auto-editing, auto-captioning, and seamless exporting
 
-<!-- 🎞️ VISUAL PLACEHOLDER — hero demo GIF (30–60s loop of the full flow). Add as docs/media/demo.gif,
+<!-- PLACEHOLDER — hero demo GIF (30–60s loop of the full flow). Add as docs/media/demo.gif,
      then swap the line below for:  ![Demo](docs/media/demo.gif)
-     Optionally link a thumbnail to the video:  [![Watch the demo](docs/media/demo-thumbnail.png)](https://youtu.be/your-video-id) -->
-<!-- > 🎞️ **Demo GIF placeholder** — add `docs/media/demo.gif` (full upload → highlights → edit loop). -->
+<!-- > **Demo GIF placeholder** — add `docs/media/demo.gif` (full upload → highlights → edit loop). -->
 
+
+
+--- 
+## Screenshots
 
 <table align="center">
     <tr></tr>
@@ -69,7 +72,7 @@ https://youtu.be/0ntHNhyz9Xo
     </tr>
     <tr>
         <td><img src="docs/media/screenshot-upload.png" width="100%" /></td>
-        <td><img src="docs/media/screenshot-processing.png" width="82%"/></td>    
+        <td><img src="docs/media/screenshot-processing.png" width="87%"/></td>    
     </tr>
     <tr> 
         <td align="center"><b>Highlights Gallery<b></td>
@@ -80,6 +83,7 @@ https://youtu.be/0ntHNhyz9Xo
         <td><img src="docs/media/screenshot-metadata.png" width = 100%"/></td>
     </tr>
 </table>
+
 
 ---
 
