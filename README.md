@@ -11,7 +11,8 @@ Built with AWS Transcribe · Rekognition · Bedrock
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
 <!-- 🖼️ VISUAL PLACEHOLDER — hero banner / logo lockup. Add as docs/media/hero-banner.png -->
-![](docs/media/demo-thumbnail.png)
+[![](docs/media/demo-thumbnail.png)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
+**Click banner to view presentation slides**
 </div>
 
 ---
@@ -24,7 +25,7 @@ Streamers produce hours of live content, but audiences grow on short-form platfo
 
 The core idea: a highlight is a **cross-modal agreement event** — the chat erupts, the audio peaks, and the scene reacts *at the same moment*. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
-[![View Presentation on Canva](https://shields.io)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
+[![Check out our Presentation!](https://shields.io)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
 
 **The journey, end to end:**
 
@@ -58,13 +59,6 @@ https://youtu.be/0ntHNhyz9Xo
      then swap the line below for:  ![Demo](docs/media/demo.gif)
      Optionally link a thumbnail to the video:  [![Watch the demo](docs/media/demo-thumbnail.png)](https://youtu.be/your-video-id) -->
 <!-- > 🎞️ **Demo GIF placeholder** — add `docs/media/demo.gif` (full upload → highlights → edit loop). -->
-
-<!-- 📸 VISUAL PLACEHOLDER — screenshot gallery. Replace each cell with ![alt](docs/media/<file>.png) once captured.
-| Upload | Processing | Highlights gallery |
-|---|---|---|
-|![](docs/media/screenshot-upload.png) | ![](docs/media/screenshot-processing.png) | ![](docs/media/screenshot-gallery.png) |
-| **Per-platform metadata** | **Agentic editor** | **Compilation reels** |
-| 📸 `docs/media/screenshot-metadata.png` | 📸 `docs/media/screenshot-editor.png` | 📸 `docs/media/screenshot-compilation.png` | -->
 
 
 <table align="center">
@@ -130,7 +124,7 @@ flowchart LR
 
 ![Excitement curve with detected highlight windows](docs/media/excitement-curve.png)
 
-<sub>Real output from a 74-minute stream (Lang Live Stream ID `3654414`) — the fused curve with the 11 kept highlight windows shaded and their peaks marked. Regenerate with `python3 scripts/make_excitement_curve.py <streamId>`.</sub>
+<sub>Real output from a real 74-minute stream (Lang Live Stream ID `3654414`) — the fused curve with the 11 kept highlight windows shaded and their peaks marked. Regenerate with `python3 scripts/make_excitement_curve.py <streamId>`.</sub>
 
 **2 · AI automatic editing engine**
 - Boundaries chosen for setup → payoff, snapped near Rekognition shot cuts.
@@ -169,6 +163,7 @@ flowchart LR
     Val --> TL[Editable timeline elements]
     TL --> R[Render 9:16 clip]
 ```
+![Auto-edit demo](docs/media/video-autoedit.mov)
 
 ### 2 · Compilation reels (`pipeline/compile_edl.py`, `pipeline/compilations.py`)
 Turn a themed group of highlights into **one multi-clip reel** on a single timeline: a segment per clip laid end to end, transitions between them, and light per-clip emphasis (opening hook + reaction zooms) chosen to match the reel's dominant **vibe** — a "hype" reel gets punchy whip-pan cuts and reaction zooms; an "emotional" one gets gentle crossfades and fades. Same two-tier planner (Bedrock brain + deterministic vibe planner fallback) and same EDL contract as the single-clip engine.
@@ -186,8 +181,8 @@ flowchart LR
     EDL --> Ed[Open in editor]
 ```
 
-<!-- 📸 VISUAL PLACEHOLDER — compilation mode in the highlights gallery (reel sections + curation). Add as docs/media/screenshot-compilation.png -->
-> 📸 **Screenshot placeholder** — compilation mode (reel sections + add/remove curation) · add `docs/media/screenshot-compilation.png`.
+
+![Compilation reel example](docs/media/screenshot-compilation.png)
 
 ### 3 · Agentic in-browser editor (`apps/editor/`)
 A vendored fork of [OpenCut](https://github.com/OpenCut-app/OpenCut) (Next.js + a Rust/WASM GPU effects renderer), wired to this project's clips + auto-edit EDLs via a thin "highlight-api" backend. Beyond one-click **AI auto-edit** and **auto-caption**, it runs an **autonomous editing agent**: you describe a change in natural language and a Bedrock **tool-calling loop** executes it against the real timeline, with 15 editing tools —
