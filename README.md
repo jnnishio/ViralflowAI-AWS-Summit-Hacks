@@ -167,7 +167,6 @@ flowchart LR
     Val --> TL[Editable timeline elements]
     TL --> R[Render 9:16 clip]
 ```
-![Auto-edit demo](docs/media/video-autoedit.mov)
 
 ### 2 · Compilation reels (`pipeline/compile_edl.py`, `pipeline/compilations.py`)
 Turn a themed group of highlights into **one multi-clip reel** on a single timeline: a segment per clip laid end to end, transitions between them, and light per-clip emphasis (opening hook + reaction zooms) chosen to match the reel's dominant **vibe** — a "hype" reel gets punchy whip-pan cuts and reaction zooms; an "emotional" one gets gentle crossfades and fades. Same two-tier planner (Bedrock brain + deterministic vibe planner fallback) and same EDL contract as the single-clip engine.
@@ -185,8 +184,7 @@ flowchart LR
     EDL --> Ed[Open in editor]
 ```
 
-
-![Compilation reel example](docs/media/screenshot-compilation.png)
+<img src="docs/media/screenshot-compilation.png" width="300">
 
 ### 3 · Agentic in-browser editor (`apps/editor/`)
 A vendored fork of [OpenCut](https://github.com/OpenCut-app/OpenCut) (Next.js + a Rust/WASM GPU effects renderer), wired to this project's clips + auto-edit EDLs via a thin "highlight-api" backend. Beyond one-click **AI auto-edit** and **auto-caption**, it runs an **autonomous editing agent**: you describe a change in natural language and a Bedrock **tool-calling loop** executes it against the real timeline, with 15 editing tools —
