@@ -10,8 +10,7 @@ Built with AWS Transcribe · Rekognition · Bedrock
 
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
-<!-- 🖼️ VISUAL PLACEHOLDER — hero banner / logo lockup. Add as docs/media/hero-banner.png -->
-[![](docs/media/demo-thumbnail.png)](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf)
+[![](docs/media/hero-banner.png)](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf)
 **Click banner to view presentation slides**
 </div>
 
