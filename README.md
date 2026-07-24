@@ -11,7 +11,7 @@ Built with AWS Transcribe · Rekognition · Bedrock
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
 <!-- 🖼️ VISUAL PLACEHOLDER — hero banner / logo lockup. Add as docs/media/hero-banner.png -->
-[![](docs/media/demo-thumbnail.png)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
+[![](docs/media/demo-thumbnail.png)](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf)
 **Click banner to view presentation slides**
 </div>
 
@@ -25,7 +25,8 @@ Streamers produce hours of live content, but audiences grow on short-form platfo
 
 The core idea: a highlight is a **cross-modal agreement event** — the chat erupts, the audio peaks, and the scene reacts *at the same moment*. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
-[![Check out our Presentation!](https://shields.io)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
+[<u>Check out our Presentation!</u>](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf)
+
 
 **The journey, end to end:**
 
@@ -167,7 +168,8 @@ flowchart LR
     Val --> TL[Editable timeline elements]
     TL --> R[Render 9:16 clip]
 ```
-![Auto-edit demo](docs/media/video-autoedit.mov)
+### 🎬 [<u>Demo: Auto-editing</u>](docs/media/video-autoedit.mov)
+<!-- [![](docs/media/demo-thumbnail.png)](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf) -->
 
 ### 2 · Compilation reels (`pipeline/compile_edl.py`, `pipeline/compilations.py`)
 Turn a themed group of highlights into **one multi-clip reel** on a single timeline: a segment per clip laid end to end, transitions between them, and light per-clip emphasis (opening hook + reaction zooms) chosen to match the reel's dominant **vibe** — a "hype" reel gets punchy whip-pan cuts and reaction zooms; an "emotional" one gets gentle crossfades and fades. Same two-tier planner (Bedrock brain + deterministic vibe planner fallback) and same EDL contract as the single-clip engine.
