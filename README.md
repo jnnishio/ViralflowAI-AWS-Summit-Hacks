@@ -10,7 +10,7 @@ Built with AWS Transcribe · Rekognition · Bedrock
 
 [Live Demo](#-demo) · [Features](#-features) · [How it works](#-how-it-works) · [Architecture](#-architecture) · [Setup](#-getting-started)
 
-[![](docs/media/hero-banner.png)](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf)
+[![](docs/media/hero-banner.png)](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
 **Click banner to view presentation slides**
 </div>
 
@@ -24,7 +24,7 @@ Streamers produce hours of live content, but audiences grow on short-form platfo
 
 The core idea: a highlight is a **cross-modal agreement event** — the chat erupts, the audio peaks, and the scene reacts *at the same moment*. We fuse engagement, audio/speech, and visual signals into one excitement curve, then a **Bedrock "AI Director"** turns statistical peaks into narrative clips (setup → payoff) with publish-ready metadata in 中文 + English.
 
-[<u>Check out our Presentation!</u>](docs/media/Viralflow%20AI%20AWS%20Hackathon%20Presentation.pdf)
+[<u>Check out our Presentation!</u>](https://www.canva.com/design/DAHPd52NlWQ/z1a5B1xg5FpcuZSotduf-A/view)
 
 
 **The journey, end to end:**
